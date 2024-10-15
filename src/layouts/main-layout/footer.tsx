@@ -1,0 +1,108 @@
+export default function Footer() {
+  return (
+    <footer className="bg-black text-gray-300 pt-8 pb-5">
+      <div className="container mx-auto flex flex-wrap justify-between px-20">
+        <div className="flex flex-col space-y-4 w-full md:w-1/4">
+          <h3 className="text-sm font-bold text-gray-100">Customer Care</h3>
+          <ul className="space-y-2">
+            <li>
+              <a
+                href="#"
+                className="hover:underline text-sm text-gray-400 hover:text-gray-200"
+              >
+                Contact Us
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="hover:underline text-sm text-gray-400 hover:text-gray-200"
+              >
+                Shipping & Delivery
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="hover:underline text-sm text-gray-400 hover:text-gray-200"
+              >
+                Returns & Exchanges
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div className="flex flex-col space-y-4 w-full md:w-1/4">
+          <h3 className="text-sm font-bold text-gray-100">About Us</h3>
+          <ul className="space-y-2">
+            <li>
+              <a
+                href="#"
+                className="hover:underline text-sm text-gray-400 hover:text-gray-200"
+              >
+                Why REVOLVE
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="hover:underline text-sm text-gray-400 hover:text-gray-200"
+              >
+                Stores
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                className="hover:underline text-sm text-gray-400 hover:text-gray-200"
+              >
+                Careers
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div className="flex flex-col space-y-4 w-full md:w-1/4">
+          <h3 className="text-sm font-bold text-gray-100">Social</h3>
+          <ul className="flex space-x-4">
+            <li>
+              <a href="#" className="text-gray-400 hover:text-gray-200">
+                <i className="fab fa-facebook fa-lg"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" className="text-gray-400 hover:text-gray-200">
+                <i className="fab fa-instagram fa-lg"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div className="container flex mx-auto justify-between pt-10 items-center">
+          <div className="w-full md:w-1/4 flex space-y-4 items-center">
+            <p className="text-xs text-gray-500 whitespace-nowrap items-center">
+              2024 Eminent, Inc. (a Revolve Group company). All Rights Reserved
+            </p>
+          </div>
+          <div>
+            <ul className="flex space-x-4">
+              <li>
+                <a
+                  href="#"
+                  className="text-xs text-gray-400 hover:text-gray-200 hover:underline"
+                >
+                  Terms
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-xs text-gray-400 hover:text-gray-200 hover:underline"
+                >
+                  Privacy
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
