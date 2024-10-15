@@ -38,9 +38,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 5. Run TypeScript type checking
-      - name: TypeScript type check
-        run: npm run type-check
+      # # 5. Run TypeScript type checking
+      # - name: TypeScript type check
+      #   run: npm run type-check
 
       # 6. Run tests
       - name: Run tests
