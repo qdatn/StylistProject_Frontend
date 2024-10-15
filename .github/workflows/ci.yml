@@ -58,7 +58,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Example for deploying to Vercel (assuming VERCL_TOKEN is stored as a secret in GitHub)
+      # Install Vercel CLI
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      # Example for deploying to Vercel (assuming VERCEL_TOKEN is stored as a secret in GitHub)
       - name: Deploy to Vercel
         run: vercel --prod --token=$VERCEL_TOKEN
         env:
