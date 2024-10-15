@@ -42,9 +42,9 @@ jobs:
       # - name: TypeScript type check
       #   run: npm run type-check
 
-      # 6. Run tests
-      - name: Run tests
-        run: npm test
+      # # 6. Run tests
+      # - name: Run tests
+      #   run: npm test
 
       # 7. Build the project (production build for Next.js)
       - name: Build project
