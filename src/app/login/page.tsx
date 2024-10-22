@@ -2,9 +2,14 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import GoogleLoginButton from "@/components/GoogleLoginButton";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/redux/store";
+import { useRouter } from "next/navigation";
+import { setUser } from "@/redux/reducers/userReducer";
 
 // Define validation schema with Yup
 const validationSchema = Yup.object({
@@ -26,14 +31,39 @@ const initialValues = {
   password: "",
 };
 
-// Define form submission handler
-const handleSubmit = (values: { email: string; password: string }) => {
-  console.log("Login data:", values);
-  // Logic xử lý login, ví dụ gọi API login
-};
-
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+
+  const formDataRef = useRef({ email: "", password: "" });
+  const dispatch: AppDispatch = useDispatch();
+  const User = useSelector((state: RootState) => state.user);
+
+  const router = useRouter(); // hook để chuyển hướng
+
+
+  const handleSubmit = async (values: { email: string; password: string }) => {
+    console.log("Login data:", values);
+    // Logic xử lý login, ví dụ gọi API login
+    formDataRef.current = {
+      email: values.email,
+      password: values.password,
+    };
+    console.log("Login data:", formDataRef);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formDataRef.current
+      );
+      console.log(response.data);
+      const { user, token } = response.data;
+      dispatch(setUser({ email: values.email, token }));
+      alert("Login successful!");
+      router.push("/");
+    } catch (err: any) {
+      alert("Error: " + err.response.data.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
