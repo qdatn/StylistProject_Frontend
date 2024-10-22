@@ -2,45 +2,53 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
+const validationSchema = Yup.object({
+  name: Yup.string().required("Required"),
+  email: Yup.string().email("Invalid email address").required("Required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Required")
+    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .matches(/\d/, "Password must contain at least one number")
+    .matches(
+      /[-_!@#$%^&*(),.?":{}|<>]/,
+      "Password must contain at least one special character"
+    ),
+  confirmedPassword: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Required")
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Required"),
+  condition: Yup.bool().oneOf(
+    [true],
+    "You need to accept our terms and conditions"
+  ),
+});
+
+const initialValues = {
+  name: "",
+  email: "",
+  password: "",
+  confirmedPassword: "",
+  condition: false,
+};
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
-  const validationSchema = Yup.object({
-    name: Yup.string().required("Required"),
-    email: Yup.string().email("Invalid email address").required("Required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Required")
-      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .matches(/\d/, "Password must contain at least one number")
-      .matches(
-        /[-_!@#$%^&*(),.?":{}|<>]/,
-        "Password must contain at least one special character"
-      ),
-    confirmedPassword: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Required")
-      .oneOf([Yup.ref("password")], "Passwords must match")
-      .required("Required"),
-    condition: Yup.bool().oneOf(
-      [true],
-      "You need to accept our terms and conditions"
-    ),
-  });
+  const formDataRef = useRef({ email: "", password: "", role: "customer" });
 
-  const initialValues = {
-    name: "",
-    email: "",
-    password: "",
-    confirmedPassword: "",
-    condition: false,
-  };
+  const apiUrl = process.env.API_URL || "https://localhost:5000";
+
+  const router = useRouter(); // hook để chuyển hướng
 
   // Define form submission handler
-  const handleSubmit = (values: {
+  const handleSubmit = async (values: {
     name: string;
     email: string;
     password: string;
@@ -49,6 +57,21 @@ export default function Register() {
   }) => {
     console.log("Registration data:", values);
     // Logic to handle registration, e.g., call registration API
+    formDataRef.current = {
+      email: values.email,
+      password: values.password,
+      role: "customer",
+    };
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        formDataRef.current
+      );
+      alert("Registration successful!");
+      router.push("/login");
+    } catch (err: any) {
+      alert("Error: " + err.response.data.message);
+    }
   };
 
   return (

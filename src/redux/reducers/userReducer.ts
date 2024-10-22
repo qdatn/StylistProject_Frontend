@@ -19,12 +19,12 @@ const initialState: UserState = {
 };
 
 // Create the user slice
-const userSlice = createSlice({
+const userReducer = createSlice({
   name: "user",
   initialState,
   reducers: {
     // Action to log in the user
-    login(state, action: PayloadAction<{ email: string; token: string }>) {
+    setUser(state, action: PayloadAction<{ email: string; token: string }>) {
       state.userInfo = {
         email: action.payload.email,
         token: action.payload.token,
@@ -40,7 +40,7 @@ const userSlice = createSlice({
 });
 
 // Export the actions
-export const { login, logout } = userSlice.actions;
+export const { setUser, logout } = userReducer.actions;
 
 // Export the reducer
-export default userSlice.reducer;
+export default userReducer.reducer;
