@@ -2,81 +2,78 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import ProductItem from "@/components/productItem"; // Nhập component ProductItem
 
-export default function App() {
-  // test connect fe & be
-  const [data, setData] = useState("");
+// Định nghĩa kiểu cho sản phẩm
+interface Product {
+  id: number; // Thêm ID vào kiểu sản phẩm
+  name: string;
+  originalPrice: string;
+  discountedPrice: string;
+  image: string;
+}
 
-  const getData = async () => {
-    const res = await axios.get("http://localhost:5000/");
-    setData(res.data);
-  };
+export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]); // Khai báo mảng sản phẩm
 
+  // Tạo dữ liệu giả cho sản phẩm
+  const mockProducts: Product[] = [
+    {
+      id: 1,
+      name: 'Wrap bodice balloon sleeve maxi dress',
+      originalPrice: '£46.00',
+      discountedPrice: '£36.00',
+      image: 'https://via.placeholder.com/300x400', // Hình ảnh giả
+    },
+    {
+      id: 2,
+      name: 'Floral print sundress',
+      originalPrice: '£29.00',
+      discountedPrice: '£22.00',
+      image: 'https://via.placeholder.com/300x400',
+    },
+    {
+      id: 3,
+      name: 'Classic denim jacket',
+      originalPrice: '£60.00',
+      discountedPrice: '£45.00',
+      image: 'https://via.placeholder.com/300x400',
+    },
+    {
+      id: 4,
+      name: 'Classic denim jacket',
+      originalPrice: '£60.00',
+      discountedPrice: '£45.00',
+      image: 'https://via.placeholder.com/300x400',
+    },
+    {
+      id: 5,
+      name: 'Classic denim jacket',
+      originalPrice: '£60.00',
+      discountedPrice: '£45.00',
+      image: 'https://via.placeholder.com/300x400',
+    },
+  ];
+
+  // Hàm lấy sản phẩm
   useEffect(() => {
-    getData();
+    // Thay thế dữ liệu thật bằng dữ liệu giả
+    setProducts(mockProducts); // Thiết lập sản phẩm với dữ liệu giả
   }, []);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-        <ul>
-          <li>
-            <Link href="/login">Đăng nhập</Link>
-          </li>
-          <li>
-            <Link href="/product">Product</Link>
-          </li>
-          <li>{data}</li>
-        </ul>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
+    <div className="grid grid-rows-[auto_1fr_auto] bg-white items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      {/* Hiển thị danh sách sản phẩm */}
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
+        {products.map((product) => (
+          <ProductItem key={product.id} product={product} /> // Truyền sản phẩm vào ProductItem
+        ))}
+      </div>
     </div>
+    
   );
+  
 }
 // import { useAuth0 } from "@auth0/auth0-react";
 // const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
