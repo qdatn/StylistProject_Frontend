@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 // import { Provider } from "react-redux";
 import { exampleReducer, userReducer } from "./reducers/index";
+import cartReducer from './reducers/cartReducer';
 
 const store = configureStore({
   reducer: {
     example: exampleReducer,
     user: userReducer,
+    cart: cartReducer,
   },
 });
 
