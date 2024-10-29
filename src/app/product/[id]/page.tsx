@@ -47,9 +47,9 @@ const mockProducts: Product[] = [
         image: 'https://via.placeholder.com/300x400',
         stock_quantity: 10,
         attributes: [
-            { key: "Color", value: ["Red, Blue"] },
+            { key: "Color", value: ["Red", "Blue"] },
             { key: "Material", value: ["Cotton"] },
-            { key: "Size", value: ["M"] }
+            { key: "Size", value: ["M", "L"] }
         ],
     },
     // Thêm các sản phẩm khác nếu cần...
@@ -64,7 +64,7 @@ const mockProducts: Product[] = [
         attributes: [
             { key: "Color", value: ["Blue", "Green"] },
             { key: "Material", value: ["Polyester"] },
-            { key: "Size", value: ["L"] }
+            { key: "Size", value: ["L", "XL"] }
         ],
     },
     // Thêm các sản phẩm khác nếu cần...
