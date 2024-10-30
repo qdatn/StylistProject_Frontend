@@ -1,41 +1,37 @@
-// redux/reducers/cartReducer.ts
+// redux/reducer/cartReducer.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface CartItem {
-  id: number;
-  name: string;
-  price: string; // Hoặc có thể sử dụng kiểu số (number)
-  quantity: number;
+interface CartProduct {
+    id: number;
+    name: string;
+    originalPrice: number;
+    discountedPrice: number;
+    quantity: number;
+    attributes: { key: string; value: string[] }[];
 }
 
 interface CartState {
-  items: CartItem[];
+    items: CartProduct[];
 }
 
 const initialState: CartState = {
-  items: [],
+    items: [],
 };
 
 const cartSlice = createSlice({
-  name: 'cart',
-  initialState,
-  reducers: {
-    addToCart(state, action: PayloadAction<CartItem>) {
-      const existingItem = state.items.find(item => item.id === action.payload.id);
-      if (existingItem) {
-        existingItem.quantity += action.payload.quantity;
-      } else {
-        state.items.push(action.payload);
-      }
+    name: 'cart',
+    initialState,
+    reducers: {
+        addToCart: (state, action: PayloadAction<CartProduct>) => {
+            const existingProduct = state.items.find(item => item.id === action.payload.id);
+            if (existingProduct) {
+                existingProduct.quantity += action.payload.quantity;
+            } else {
+                state.items.push(action.payload);
+            }
+        },
     },
-    removeFromCart(state, action: PayloadAction<number>) {
-      state.items = state.items.filter(item => item.id !== action.payload);
-    },
-    clearCart(state) {
-      state.items = [];
-    },
-  },
 });
 
-export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+export const { addToCart } = cartSlice.actions;
 export default cartSlice.reducer;
