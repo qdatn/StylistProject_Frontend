@@ -1,15 +1,9 @@
 // src/components/ProductItem.tsx
 import React from 'react';
 import Link from 'next/link';
+import  {Product} from '@/models/Product';
 
 // Định nghĩa interface cho các thuộc tính sản phẩm
-interface Product {
-    id: number; // Thêm ID vào kiểu sản phẩm
-    name: string;
-    originalPrice: string;
-    discountedPrice: string;
-    image: string;
-}
 
 interface ProductItemProps {
   product: Product; // Truyền sản phẩm vào dưới dạng prop
@@ -31,9 +25,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
           </h2>
           <div className="font-semibold flex flex-col pb-2 w-full">
               <div className="flex gap-4 pb-2 text-[14px] whitespace-nowrap">
-              <p className="self-start text-zinc-600 line-through">{originalPrice}</p>
+              <p className="self-start text-zinc-600 line-through">£{originalPrice.toFixed(2)}</p>
               {discountedPrice && (
-                  <p className="grow shrink font-bold text-red-500">{discountedPrice}</p>
+                  <p className="grow shrink font-bold text-red-500">£{discountedPrice.toFixed(2)}</p>
               )}
           </div>
           <div className="flex flex-wrap gap-2.5 self-start ">

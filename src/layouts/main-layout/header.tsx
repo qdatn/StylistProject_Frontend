@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Header() {
   return (
     // <!-- header -->
-    <header className="border-y-2">
+    <header className="border-y-">
       <div className="bg-white shadow-md">
         {/* Nav header bar 1 */}
         <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 flex-wrap">

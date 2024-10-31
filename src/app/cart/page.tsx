@@ -3,38 +3,9 @@ import React, { useState } from 'react';
 import CartItem from '@/components/CartItem';
 import Header from '@/layouts/main-layout/header';
 import Footer from '@/layouts/main-layout/footer';
+import { Product } from '@/models/Product'; // Giả định bạn đã có định nghĩa Product trong mô hình
 
-const mockCartItems = [
-    {
-        id: 1,
-        name: 'Wrap bodice balloon sleeve maxi dress',
-        image: 'https://via.placeholder.com/200x300',
-        size: 'M',
-        stock_quantity: 2,
-        originalPrice: 46.00,
-        discountedPrice: 36.00,
-        attributes: [
-            { key: "Color", value: ["Red", "Blue"] },
-            { key: "Material", value: ["Cotton"] },
-            { key: "Size", value: ["M", "L"] }
-        ]
-    },
-    {
-        id: 2,
-        name: 'Floral print sundress',
-        image: 'https://via.placeholder.com/200x300',
-        size: 'L',
-        stock_quantity: 1,
-        originalPrice: 29.00,
-        discountedPrice: 22.00,
-        attributes: [
-            { key: "Color", value: ["Blue", "Green"] },
-            { key: "Material", value: ["Polyester"] },
-            { key: "Size", value: ["L", "XL"] }
-        ]
-    },
-];
-const CartPage: React.FC = () => {
+const CartPage: React.FC<{ items: Product[] }> = ({ items }) => { // Giả định bạn sẽ nhận items từ props
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -44,13 +15,17 @@ const CartPage: React.FC = () => {
         district: '',
         paymentMethod: ''
     });
-    const [cartItems, setCartItems] = useState(mockCartItems);
-    const [discountCode, setDiscountCode] = useState('');
-    const [selectedItems, setSelectedItems] = useState<number[]>([]);
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [cartItems, setCartItems] = useState<Product[]>(items || []); // Sử dụng sản phẩm từ props
+    const [discountCode, setDiscountCode] = useState<string>('');
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
     const applyDiscount = (amount: number) => {
-        return discountCode === '10%' ? amount * 0.9 : discountCode === '20%' ? amount * 0.8 : amount;
+        if (discountCode === '10%') {
+            return amount * 0.9; // Giảm giá 10%
+        } else if (discountCode === '20%') {
+            return amount * 0.8; // Giảm giá 20%
+        }
+        return amount; // Không có giảm giá
     };
 
     const totalAmount = applyDiscount(
@@ -61,23 +36,22 @@ const CartPage: React.FC = () => {
             return total;
         }, 0)
     );
-
-    const updateQuantity = (itemId: number, increment: boolean) => {
+    const updateQuantity = (itemId: string, increment: boolean) => {
         setCartItems(prevItems =>
             prevItems.map(item =>
                 item.id === itemId
-                    ? { ...item, quantity: increment ? item.stock_quantity + 1 : Math.max(item.stock_quantity - 1, 1) }
+                    ? { ...item, stock_quantity: increment ? item.stock_quantity + 1 : Math.max(item.stock_quantity - 1, 1) }
                     : item
             )
         );
     };
 
-    const removeItem = (itemId: number) => {
+    const removeItem = (itemId: string) => {
         setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
         setSelectedItems(prevSelected => prevSelected.filter(id => id !== itemId));
     };
 
-    const toggleSelectItem = (itemId: number, selected: boolean) => {
+    const toggleSelectItem = (itemId: string, selected: boolean) => {
         setSelectedItems(prevSelected =>
             selected ? [...prevSelected, itemId] : prevSelected.filter(id => id !== itemId)
         );
@@ -89,23 +63,33 @@ const CartPage: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        console.log("Order submitted with payment method:", paymentMethod);
+        console.log("Order submitted with payment method:", formData.paymentMethod);
     };
 
     return (
         <>
-            <div className="container mx-auto p-4 flex flex-col md:flex-row bg-white">
+        <Header/>
+                <div className="container mx-auto p-4 flex flex-col md:flex-row bg-white">
                 {/* Danh sách sản phẩm trong giỏ hàng */}
                 <div className="md:w-2/3 p-4 border-r text-gray-700">
                     <h1 className="text-lg font-semibold mb-4">Shopping Cart</h1>
                     {cartItems.map(item => (
                         <CartItem
-                            key={item.id}
-                            item={item}
-                            onUpdateQuantity={(increment) => updateQuantity(item.id, increment)}
-                            onRemove={() => removeItem(item.id)}
-                            onSelect={(selected) => toggleSelectItem(item.id, selected)}
-                        />
+                        key={item.id}
+                        id={item.id}
+                        item={{
+                            id: item.id, 
+                            name: item.name,
+                            originalPrice: item.originalPrice,
+                            discountedPrice: item.discountedPrice,
+                            attributes: item.attributes,
+                            quantity: item.stock_quantity
+            
+                        }}
+                        onUpdateQuantity={(increment) => updateQuantity(item.id, increment)}
+                        onRemove={() => removeItem(item.id)}
+                        onSelect={(selected) => toggleSelectItem(item.id, selected)}
+                    />
                     ))}
                     <div className="flex justify-between font-semibold mt-4">
                         <span>Total Amount:</span>
@@ -182,7 +166,7 @@ const CartPage: React.FC = () => {
                         onChange={handleChange}
                         className="border p-2 w-full mb-4"
                     >
-                        <option value="">Cash Method</option>
+                        <option value="">Select Payment Method</option>
                         <option value="COD">COD - Cash On Delivery</option>
                         <option value="CreditCard">Credit Card</option>
                     </select>
@@ -190,8 +174,7 @@ const CartPage: React.FC = () => {
                         Place Order
                     </button>
                     
-                    
-                  {/* Nút Đặt Hàng */}
+                    {/* Nút Đặt Hàng */}
                     <div className="fixed bottom-0 left-0 right-0 bg-white p-4 h-20 shadow-lg flex flex-row gap-2 hidden md:flex justify-end">
                         <div className='flex flex-row gap-2 text-lg font-medium items-center'>
                             <div className='truncate'>Total Amount:</div>
@@ -201,12 +184,9 @@ const CartPage: React.FC = () => {
                             Place Order
                         </button>
                     </div>
-
-
-
-
                 </div>
             </div>
+            <Footer />
         </>
     );
 };
