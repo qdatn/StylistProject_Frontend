@@ -1,7 +1,7 @@
 import { AiOutlineHeart } from "react-icons/ai";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   return (
@@ -12,9 +12,9 @@ export default function Header() {
         <div className="mx-auto container py-2 flex justify-between border-y-2 px-20">
           {/* <!-- Logo and Brand Name on the left side --> */}
           <div className="flex items-center">
-            <Link href="/" className="text-lg font-bold text-gray-800">
+            <a href="/" className="text-lg font-bold text-gray-800">
               STYLE
-            </Link>
+            </a>
           </div>
           {/* <!-- login sign up nav on the right side --> */}
           <div className="hidden md:flex space-x-4">
@@ -24,18 +24,18 @@ export default function Header() {
             >
               Need help?
             </a>
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-sm text-gray-700 hover:underline hover:text-gray-900 font-medium transition uppercase"
             >
               Log in
-            </a>
-            <a
-              href="/register"
+            </Link>
+            <Link
+              to="/register"
               className="text-sm text-gray-700 hover:underline transition font-bold uppercase"
             >
               Sign up
-            </a>
+            </Link>
           </div>
         </div>
         {/* Nav header bar 2 */}
@@ -63,12 +63,12 @@ export default function Header() {
               Style
             </a>
           </div>
-          <Link
+          <a
             href="/"
             className="text-3xl tracking-wider font-bold text-gray-800 ml-16"
           >
             STYLE
-          </Link>
+          </a>
           {/* <!-- Search and Icons Section --> */}
           <div className="flex items-center space-x-6">
             {/* <!-- Search Bar --> */}

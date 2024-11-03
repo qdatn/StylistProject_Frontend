@@ -16,7 +16,7 @@ const Transition = ({ children }: { children: React.ReactNode }) => {
       className={`transition-container ${isMounted ? "fade-in" : "fade-out"}`}
     >
       {children}
-      <style jsx>{`
+      <style jsx="true">{`
         .transition-container {
           transition: opacity 0.5s ease-in-out;
           opacity: 0;

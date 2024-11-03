@@ -4,12 +4,12 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import React, { useEffect, useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
-import GoogleLoginButton from "@/components/GoogleLoginButton";
+import GoogleLoginButton from "@components/GoogleLoginButton";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store";
+import { RootState, AppDispatch } from "@redux/store";
 import { useRouter } from "next/navigation";
-import { setUser } from "@/redux/reducers/userReducer";
+import { setUser } from "@redux/reducers/userReducer";
 
 // Define validation schema with Yup
 const validationSchema = Yup.object({
@@ -39,7 +39,6 @@ export default function Login() {
   const User = useSelector((state: RootState) => state.user);
 
   const router = useRouter(); // hook để chuyển hướng
-
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     console.log("Login data:", values);

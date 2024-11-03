@@ -1,5 +1,5 @@
 // import Link from "next/link";
-import { MainLayout } from "../layout";
+import { MainLayout } from "../../../layout";
 
 export default function Cart() {
   return (
