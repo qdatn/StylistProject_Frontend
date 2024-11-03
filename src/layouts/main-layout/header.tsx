@@ -6,10 +6,10 @@ import { Link } from "react-router-dom";
 export default function Header() {
   return (
     // <!-- header -->
-    <header className="border-y-2">
+    <header className="border-y-">
       <div className="bg-white shadow-md">
         {/* Nav header bar 1 */}
-        <div className="mx-auto container py-2 flex justify-between border-y-2 px-20">
+        <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 flex-wrap">
           {/* <!-- Logo and Brand Name on the left side --> */}
           <div className="flex items-center">
             <a href="/" className="text-lg font-bold text-gray-800">
@@ -40,7 +40,7 @@ export default function Header() {
         </div>
         {/* Nav header bar 2 */}
 
-        <div className="flex items-center justify-between px-20 py-4">
+        <div className="flex items-center justify-between px-4 md:px-20 py-4 flex-wrap">
           {/* <!-- Navigation Links for Medium and Above Screens --> */}
 
           <div className="hidden md:flex space-x-8">
@@ -65,7 +65,7 @@ export default function Header() {
           </div>
           <a
             href="/"
-            className="text-3xl tracking-wider font-bold text-gray-800 ml-16"
+            className="text-3xl tracking-wider font-bold text-gray-800 ml-16 md:ml-0"
           >
             STYLE
           </a>
@@ -85,10 +85,9 @@ export default function Header() {
             {/* <!-- Love Icon --> */}
             <a
               href="/favorist_list"
-              className="flex items-center hover:bg-gray-50 px-2 hover:rounded"
+              className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
             >
               <AiOutlineHeart className="w-5 h-5" />
-
               <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
                 0
               </div>
@@ -97,15 +96,10 @@ export default function Header() {
             {/* <!-- Cart Icon --> */}
             <a
               href="/cart"
-              className="flex items-center hover:bg-gray-50 px-2 hover:rounded"
+              className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
             >
               <IoBagHandleOutline className="w-5 h-5" />
               <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
-                {/* <img
-                src="/public/assets/icon/heart.png"
-                alt=""
-                className="h-5 w-5"
-              /> */}
                 0
               </div>
             </a>
@@ -116,7 +110,7 @@ export default function Header() {
       {/* <!-- Menu Header Bar --> */}
       <nav className="bg-white">
         <div className="container mx-auto px-6 py-3">
-          <ul className="flex space-x-6 justify-center gap-16">
+          <ul className="flex space-x-6 justify-center gap-16 flex-wrap">
             <li>
               <a
                 href="#"
@@ -141,22 +135,6 @@ export default function Header() {
                 DRESSES
               </a>
             </li>
-            {/* <li>
-              <a
-                href="#"
-                className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
-              >
-                SHOES
-              </a>
-            </li> */}
-            {/* <li>
-              <a
-                href="#"
-                className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
-              >
-                BEAUTY
-              </a>
-            </li> */}
             <li>
               <a
                 href="#"
