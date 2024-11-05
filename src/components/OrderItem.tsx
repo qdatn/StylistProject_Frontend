@@ -1,6 +1,6 @@
 // components/OrderItem.tsx
 import React from 'react';
-import { OrderItem as OrderItemType } from '@/models/OrderItem';
+import { OrderItem as OrderItemType } from '@models/OrderItem';
 
 interface OrderItemProps {
   item: OrderItemType;

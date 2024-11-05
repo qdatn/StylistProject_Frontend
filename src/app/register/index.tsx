@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Required"),
@@ -22,8 +22,7 @@ const validationSchema = Yup.object({
   confirmedPassword: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Required")
-    .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Required"),
+    .oneOf([Yup.ref("password")], "Passwords must match"),
   condition: Yup.bool().oneOf(
     [true],
     "You need to accept our terms and conditions"
@@ -40,12 +39,10 @@ const initialValues = {
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-
   const formDataRef = useRef({ email: "", password: "", role: "customer" });
+  const navigate = useNavigate(); // Hook để điều hướng
 
-  const apiUrl = process.env.API_URL || "https://localhost:5000";
-
-  const router = useRouter(); // hook để chuyển hướng
+  const apiUrl = process.env.API_URL || "http://localhost:5000"; // Đường dẫn API
 
   // Define form submission handler
   const handleSubmit = async (values: {
@@ -64,13 +61,13 @@ export default function Register() {
     };
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        `${apiUrl}/api/auth/register`,
         formDataRef.current
       );
       alert("Registration successful!");
-      router.push("/login");
-    } catch (err: any) {
-      alert("Error: " + err.response.data.message);
+      navigate("/login"); // Điều hướng đến trang đăng nhập
+    } catch (err : any) {
+      alert("Error: " + err.response?.data?.message || "An error occurred");
     }
   };
 
@@ -153,7 +150,7 @@ export default function Register() {
                 >
                   Password
                 </label>
-                <div className=" relative">
+                <div className="relative">
                   <Field
                     type={showPassword ? "text" : "password"} // Toggle between text and password types
                     id="password"

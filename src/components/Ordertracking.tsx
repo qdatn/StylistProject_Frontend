@@ -1,7 +1,7 @@
 // components/Ordertracking.tsx
 import React from 'react';
-import OrderItem from '@/components/OrderItem';
-import { Order } from '@/models/Order';
+import OrderItem from '@components/OrderItem';
+import { Order } from '@models/Order';
 
 interface OrdertrackingProps {
   order: Order;

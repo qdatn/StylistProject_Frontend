@@ -1,17 +1,17 @@
 // app/product/[id]/page.tsx
 "use client";
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '@/redux/reducers/cartReducer';
-import Header from '@/layouts/main-layout/header';
-import Footer from '@/layouts/main-layout/footer';
-import CommentItem from '@/components/CommentItem';
-import  mockComments  from '@/models/Comment';
+import { addToCart } from '@redux/reducers/cartReducer';
+import Header from '@layouts/main-layout/header';
+import Footer from '@layouts/main-layout/footer';
+import CommentItem from '@components/CommentItem';
+import  mockComments  from '@models/Comment';
 import { AiOutlinePlus, AiOutlineMinus } from 'react-icons/ai';
 import { FaStar } from 'react-icons/fa';
-import  mockProducts from '@/models/Product';
-import  {Product} from '@/models/Product';
+import  mockProducts from '@models/Product';
+import  {Product} from '@models/Product';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -67,7 +67,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
             <div className="container mx-auto p-8 bg-white">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex justify-center w-full md:w-1/2">
-                        <Image
+                        <img
                             src={product.image}
                             alt={product.name}
                             width={400}
