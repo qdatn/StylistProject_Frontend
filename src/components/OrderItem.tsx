@@ -8,7 +8,7 @@ interface OrderItemProps {
 
 const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
   return (
-    <div className="order-item flex items-center py-2 border-b">
+    <div className="order-item flex items-center py-2 border-b text-gray-700">
       <img src={item.imageUrl} alt={item.product_name} className="w-16 h-16 mr-4" />
       <div className="flex-grow">
         <h2 className="font-semibold">{item.product_name}</h2>

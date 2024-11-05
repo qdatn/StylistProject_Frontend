@@ -3,15 +3,20 @@
 import React, { use } from 'react';
 import Ordertracking from '@/components/Ordertracking';
 import mockOrders from '@/models/Order';
-
+import Header from '@/layouts/main-layout/header';
+import Footer from '@/layouts/main-layout/footer';
 const OrderPage = () => {
   return (
-    <div className="order-page-container">
-      <h1 className="text-2xl font-bold mb-4">Order form</h1>
+    <>
+    <Header/>
+    <div className="order-page-container bg-white">
+      <h1 className="text-xl font-semibold p-6 text-gray-700">Order form</h1>
       {mockOrders.map(order => (
         <Ordertracking key={order.order_id} order={order} />
       ))}
     </div>
+  <Footer/>
+  </>
   );
 };
 

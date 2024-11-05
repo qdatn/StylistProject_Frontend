@@ -9,7 +9,7 @@ interface OrdertrackingProps {
 
 const Ordertracking: React.FC<OrdertrackingProps> = ({ order }) => {
   return (
-    <div className="order-tracking border p-4 mb-4 rounded-lg shadow">
+    <div className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700">
       <div className="order-status mb-2">
         <span className="text-sm">Giao hàng thành công</span>
         <span className="font-bold ml-2">{order.status.toUpperCase()}</span>
