@@ -1,6 +1,11 @@
 // App.tsx
 import React, { Children } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  BrowserRouter,
+} from "react-router-dom";
 import Home from "./app/page";
 import ProductList from "@app/customer/product";
 import RootLayout, { MainLayout } from "./layout";
@@ -13,20 +18,22 @@ import Header from "@layouts/main-layout/header";
 
 const App: React.FC = () => {
   return (
-    <Router>
-      {/* <Layout> */}
-      <Routes>
-        <Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/reigster" element={<Register />} />
-        </Route>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/product" element={<ProductList />} />
-        </Route>
-      </Routes>
-      {/* </Layout> */}
-    </Router>
+    <RootLayout>
+      <BrowserRouter>
+        {/* <Layout> */}
+        <Routes>
+          <Route>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/product" element={<ProductList />} />
+          </Route>
+        </Routes>
+        {/* </Layout> */}
+      </BrowserRouter>
+    </RootLayout>
   );
 };
 

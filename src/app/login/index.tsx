@@ -8,8 +8,9 @@ import GoogleLoginButton from "@components/GoogleLoginButton";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@redux/store";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { setUser } from "@redux/reducers/userReducer";
+import ErrorBoundary from "antd/es/alert/ErrorBoundary";
 
 // Define validation schema with Yup
 const validationSchema = Yup.object({
@@ -38,7 +39,9 @@ export default function Login() {
   const dispatch: AppDispatch = useDispatch();
   const User = useSelector((state: RootState) => state.user);
 
-  const router = useRouter(); // hook để chuyển hướng
+  console.log(import.meta.env.VITE_PUBLIC_GOOGLE_CLIENT_ID);
+
+  // const router = useRouter(); // hook để chuyển hướng
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     console.log("Login data:", values);
@@ -58,7 +61,7 @@ export default function Login() {
       const { user, token } = response.data;
       dispatch(setUser({ email: values.email, token }));
       alert("Login successful!");
-      router.push("/");
+      // router.push("/");
     } catch (err: any) {
       alert("Error: " + err.response.data.message);
     }
@@ -179,7 +182,9 @@ export default function Login() {
             </Form>
           )}
         </Formik>
-        <GoogleLoginButton />
+        <ErrorBoundary>
+          <GoogleLoginButton />
+        </ErrorBoundary>
 
         {/* Sign Up Link */}
         <div className="text-center mt-6">

@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Required"),
@@ -43,9 +43,9 @@ export default function Register() {
 
   const formDataRef = useRef({ email: "", password: "", role: "customer" });
 
-  const apiUrl = process.env.API_URL || "https://localhost:5000";
+  const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:5000";
 
-  const router = useRouter(); // hook để chuyển hướng
+  // const router = useRouter(); // hook để chuyển hướng
 
   // Define form submission handler
   const handleSubmit = async (values: {
@@ -68,7 +68,7 @@ export default function Register() {
         formDataRef.current
       );
       alert("Registration successful!");
-      router.push("/login");
+      // router.push("/login");
     } catch (err: any) {
       alert("Error: " + err.response.data.message);
     }

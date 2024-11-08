@@ -4,8 +4,8 @@ import Footer from "@layouts/main-layout/footer";
 
 import React, { useEffect, useState } from "react";
 import ProductItem from "@components/productItem"; // Nhập component ProductItem
-import mockProducts from "@models/Product";
-import { Product } from "@models/Product";
+import mockProducts from "../models/Product";
+import { Product } from "../models/Product";
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]); // Khai báo mảng sản phẩm
