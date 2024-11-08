@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import store from "@redux/store";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { Outlet } from "react-router-dom";
 // import { useEffect } from "react";
 
 const domain = process.env.REACT_APP_AUTH0_DOMAIN || "";
@@ -27,6 +28,11 @@ const ggClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 //   weight: "100 900",
 // });
 
+// const geistInter = localFont({
+//   src: "./fonts/Inter.woff",
+//   variable: "--font-geist-inter",
+//   weight: "100 900",
+// });
 
 // export const metadata: Metadata = {
 //   title: "Stylist",
@@ -52,8 +58,8 @@ export default function RootLayout({
         <Provider store={store}>
           <html lang="en">
             <body
-              // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-              className={`$ antialiased`}
+            // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            // className={`${geistInter.variable} antialiased`}
             >
               {children}
             </body>
@@ -76,12 +82,16 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
           type="image/x-icon"
         ></link>
       </head>
-      <body className={`$antialiased`}>
+      <body
+      //  className={`${geistInter.variable} antialiased`}
+      >
         {/* Header - Thay đổi header ở layouts/main-header/header */}
         <Header />
 
         {/* Nội dung return về ở page sẽ truyền vào children ở layout này */}
-        <div className="mx-20">{children}</div>
+        <div className="mx-20">
+          <Outlet />
+        </div>
 
         {/* Footer - Thay đổi footer ở layouts/main-footer/footer */}
         <Footer />
