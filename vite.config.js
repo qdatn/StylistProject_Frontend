@@ -13,6 +13,7 @@ export default defineConfig({
       "@models":path.resolve(__dirname, "./src/models"),
       "@app": path.resolve(__dirname, "./src/app"),
       "@contexts": path.resolve(__dirname, "./src/contexts"),
+      "@models": path.resolve(__dirname, "./src/models"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),
       "@layouts": path.resolve(__dirname, "src/layouts"),
       "@libs": path.resolve(__dirname, "./src/lib"),

@@ -6,10 +6,11 @@ import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import GoogleLoginButton from "@components/GoogleLoginButton"; // Ensure this component exists
 import axios from "axios";
-import { setUser } from "@redux/reducers/userReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@redux/store";
-import { useNavigate } from "react-router-dom";
+// import { useRouter } from "next/navigation";
+import { setUser } from "@redux/reducers/userReducer";
+import ErrorBoundary from "antd/es/alert/ErrorBoundary";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -32,8 +33,11 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const formDataRef = useRef({ email: "", password: "" });
   const dispatch: AppDispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user);
-  const navigate = useNavigate();
+  const User = useSelector((state: RootState) => state.user);
+
+  console.log(import.meta.env.VITE_PUBLIC_GOOGLE_CLIENT_ID);
+
+  // const router = useRouter(); // hook để chuyển hướng
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     formDataRef.current = {
@@ -49,7 +53,7 @@ export default function Login() {
       const { user, token } = response.data;
       dispatch(setUser({ email: values.email, token }));
       alert("Login successful!");
-      navigate("/");
+      // router.push("/");
     } catch (err: any) {
       alert("Error: " + err.response?.data?.message || "Something went wrong");
     }
@@ -134,8 +138,9 @@ export default function Login() {
             </Form>
           )}
         </Formik>
-
-        <GoogleLoginButton />
+        <ErrorBoundary>
+          <GoogleLoginButton />
+        </ErrorBoundary>
 
         {/* Sign Up Link */}
         <div className="text-center mt-6">

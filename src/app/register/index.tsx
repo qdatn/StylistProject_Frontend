@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+// import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Required"),
@@ -40,9 +40,10 @@ const initialValues = {
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const formDataRef = useRef({ email: "", password: "", role: "customer" });
-  const navigate = useNavigate(); // Hook để điều hướng
 
-  const apiUrl = process.env.API_URL || "http://localhost:5000"; // Đường dẫn API
+  const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:5000";
+
+  // const router = useRouter(); // hook để chuyển hướng
 
   // Define form submission handler
   const handleSubmit = async (values: {
@@ -65,9 +66,9 @@ export default function Register() {
         formDataRef.current
       );
       alert("Registration successful!");
-      navigate("/login"); // Điều hướng đến trang đăng nhập
-    } catch (err : any) {
-      alert("Error: " + err.response?.data?.message || "An error occurred");
+      // router.push("/login");
+    } catch (err: any) {
+      alert("Error: " + err.response.data.message);
     }
   };
 
