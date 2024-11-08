@@ -10,6 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@models":path.resolve(__dirname, "./src/models"),
       "@app": path.resolve(__dirname, "./src/app"),
       "@contexts": path.resolve(__dirname, "./src/contexts"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),
@@ -23,8 +24,6 @@ export default defineConfig({
       "@types": path.resolve(__dirname, "./src/types"),
       "@components": path.resolve(__dirname, "src/components"),
       "@utils": path.resolve(__dirname, "./src/utils"),
-      // model khong can thi xoa di
-      "@models": path.resolve(__dirname, 'src/models'),
     },
   },
 });

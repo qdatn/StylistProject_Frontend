@@ -1,13 +1,12 @@
 "use client";
 
 // import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-import Header from "@/layouts/main-layout/header";
-import Footer from "@/layouts/main-layout/footer";
-import ScrollToTopButton from "@/components/ScrollToTopButton";
+import Header from "@layouts/main-layout/header";
+import Footer from "@layouts/main-layout/footer";
+import ScrollToTopButton from "@components/ScrollToTopButton";
 import { Provider } from "react-redux";
-import store from "@/redux/store";
+import store from "@redux/store";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 // import { useEffect } from "react";
@@ -28,11 +27,6 @@ const ggClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 //   weight: "100 900",
 // });
 
-const geistInter = localFont({
-  src: "./fonts/Inter.woff",
-  variable: "--font-geist-inter",
-  weight: "100 900",
-});
 
 // export const metadata: Metadata = {
 //   title: "Stylist",
@@ -59,7 +53,7 @@ export default function RootLayout({
           <html lang="en">
             <body
               // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-              className={`${geistInter.variable} antialiased`}
+              className={`$ antialiased`}
             >
               {children}
             </body>
@@ -82,7 +76,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
           type="image/x-icon"
         ></link>
       </head>
-      <body className={`${geistInter.variable} antialiased`}>
+      <body className={`$antialiased`}>
         {/* Header - Thay đổi header ở layouts/main-header/header */}
         <Header />
 

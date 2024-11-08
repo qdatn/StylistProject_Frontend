@@ -1,5 +1,5 @@
 // models/Order.ts
-import { OrderItem } from '@/models/OrderItem';
+import { OrderItem } from '@models/OrderItem';
 
 export interface Order {
   order_id: string;

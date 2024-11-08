@@ -1,10 +1,10 @@
 "use client";
 // app/order/page.tsx
-import React, { use } from 'react';
-import Ordertracking from '@/components/Ordertracking';
-import mockOrders from '@/models/Order';
-import Header from '@/layouts/main-layout/header';
-import Footer from '@/layouts/main-layout/footer';
+import React from 'react';
+import Ordertracking from '@components/Ordertracking';
+import mockOrders from '@models/Order';
+import Header from '@layouts/main-layout/header';
+import Footer from '@layouts/main-layout/footer';
 const OrderPage = () => {
   return (
     <>

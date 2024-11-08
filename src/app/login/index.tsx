@@ -2,30 +2,27 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
-import GoogleLoginButton from "@components/GoogleLoginButton";
+import GoogleLoginButton from "@components/GoogleLoginButton"; // Ensure this component exists
 import axios from "axios";
+import { setUser } from "@redux/reducers/userReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@redux/store";
-import { setUser } from "@redux/reducers/userReducer";
 import { useNavigate } from "react-router-dom";
 
-// Xác định các quy tắc xác thực với Yup
+// Validation schema
 const validationSchema = Yup.object({
-  email: Yup.string().email("Địa chỉ email không hợp lệ").required("Bắt buộc"),
+  email: Yup.string().email("Invalid email address").required("Required"),
   password: Yup.string()
-    .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
-    .required("Bắt buộc")
-    .matches(/[A-Z]/, "Mật khẩu phải có ít nhất một chữ cái in hoa")
-    .matches(/\d/, "Mật khẩu phải có ít nhất một chữ số")
-    .matches(
-      /[-_!@#$%^&*(),.?":{}|<>]/,
-      "Mật khẩu phải có ít nhất một ký tự đặc biệt"
-    ),
+    .min(6, "Password must be at least 6 characters")
+    .required("Required")
+    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .matches(/\d/, "Password must contain at least one number")
+    .matches(/[-_!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character"),
 });
 
-// Giá trị khởi tạo
+// Initial form values
 const initialValues = {
   email: "",
   password: "",
@@ -35,12 +32,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const formDataRef = useRef({ email: "", password: "" });
   const dispatch: AppDispatch = useDispatch();
-  const User = useSelector((state: RootState) => state.user);
-
+  const user = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
 
   const handleSubmit = async (values: { email: string; password: string }) => {
-    console.log("Dữ liệu đăng nhập:", values);
     formDataRef.current = {
       email: values.email,
       password: values.password,
@@ -53,27 +48,23 @@ export default function Login() {
       );
       const { user, token } = response.data;
       dispatch(setUser({ email: values.email, token }));
-      alert("Đăng nhập thành công!");
+      alert("Login successful!");
       navigate("/");
     } catch (err: any) {
-      alert("Lỗi: " + err.response?.data?.message || "Không thể đăng nhập");
+      alert("Error: " + err.response?.data?.message || "Something went wrong");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        {/* Logo */}
         <div className="flex justify-center mb-10 mt-0">
           <a href="/" className="text-5xl tracking-wider font-bold text-gray-800">
             STYLE
           </a>
         </div>
 
-        {/* Tiêu đề đăng nhập */}
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Đăng nhập
-        </h2>
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
 
         <Formik
           initialValues={initialValues}
@@ -82,40 +73,30 @@ export default function Login() {
         >
           {({ isSubmitting }) => (
             <Form>
-              {/* Trường Email */}
+              {/* Email Field */}
               <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="email"
-                >
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                   Email
                 </label>
                 <Field
                   type="email"
                   name="email"
-                  placeholder="Nhập email của bạn"
+                  placeholder="Enter your email"
                   className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring focus:border-gray-500"
                 />
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
-              {/* Trường Mật khẩu */}
+              {/* Password Field */}
               <div className="mb-6">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="password"
-                >
-                  Mật khẩu
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                  Password
                 </label>
                 <div className="relative">
                   <Field
                     type={showPassword ? "text" : "password"}
                     name="password"
-                    placeholder="Nhập mật khẩu của bạn"
+                    placeholder="Enter your password"
                     className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring focus:border-gray-500"
                   />
                   <button
@@ -123,65 +104,45 @@ export default function Login() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-700"
                   >
-                    {showPassword ? (
-                      <AiFillEyeInvisible size={24} />
-                    ) : (
-                      <AiFillEye size={24} />
-                    )}
+                    {showPassword ? <AiFillEyeInvisible size={24} /> : <AiFillEye size={24} />}
                   </button>
                 </div>
-                <ErrorMessage
-                  name="password"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
-                />
+                <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
-              {/* Ghi nhớ và Quên mật khẩu */}
+              {/* Remember Me and Forgot Password */}
               <div className="flex items-center justify-between mb-6">
                 <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-4 w-4 text-gray-600"
-                  />
-                  <span className="ml-2 text-gray-600 text-sm">
-                    Ghi nhớ tôi
-                  </span>
+                  <input type="checkbox" className="form-checkbox h-4 w-4 text-gray-600" />
+                  <span className="ml-2 text-gray-600 text-sm">Remember me</span>
                 </label>
-                <a
-                  href="#"
-                  className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none"
-                >
-                  Quên mật khẩu?
+                <a href="#" className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none">
+                  Forgot password?
                 </a>
               </div>
 
-              {/* Nút Đăng nhập */}
+              {/* Login Button */}
               <div>
                 <button
                   type="submit"
                   className="w-full bg-black text-white font-bold py-2 px-4 rounded hover:bg-gray-900 focus:outline-none focus:ring focus:border-gray-500 transition"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
+                  {isSubmitting ? "Logging in..." : "Log In"}
                 </button>
               </div>
             </Form>
           )}
         </Formik>
 
-        {/* Đăng nhập với Google */}
         <GoogleLoginButton />
 
-        {/* Link đến trang Đăng ký */}
+        {/* Sign Up Link */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
-            Chưa có tài khoản?
-            <a
-              href="/register"
-              className="text-gray-900 font-semibold hover:underline"
-            >
-              &nbsp;Đăng ký
+            Don&#39;t have an account?
+            <a href="/register" className="text-gray-900 font-semibold hover:underline">
+              &nbsp;Sign up
             </a>
           </p>
         </div>
