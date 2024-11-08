@@ -4,11 +4,11 @@ name: CI/CD Pipeline for React/Next.js
 on:
   push:
     branches:
-      # - master
+      - master
       - develop
   pull_request:
     branches:
-      # - master
+      - master
       - develop
 
 jobs:
