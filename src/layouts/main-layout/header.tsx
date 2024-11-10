@@ -4,7 +4,7 @@ import { IoIosSearch } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { AiOutlineUser } from "react-icons/ai";
 
-export default function Header() {
+export default function CustomerHeader() {
   return (
     // <!-- header -->
     <header className="border-y-">

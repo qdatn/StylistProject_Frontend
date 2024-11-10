@@ -1,4 +1,4 @@
-export default function Footer() {
+export default function CustomerFooter() {
   return (
     <footer className="bg-black text-gray-300 pt-8 pb-5">
       <div className="container mx-auto flex flex-wrap justify-between px-20">
