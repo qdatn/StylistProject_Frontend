@@ -16,6 +16,7 @@ import OrderPage from "@app/customer/order";
 import ProductDetail from "@app/customer/product/product_detail";
 import CartPage from "@app/customer/cart";
 import { Product } from "@src/types/Product";
+import AccountPage from "@app/customer/account";
 // import Home from "./pages/Home";
 // import About from "./pages/About";
 // import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ function App() {
           <Route>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/account" element={<AccountPage />} />
           </Route>
           <Route element={<MainLayout />}>
             <Route path="/" element={<Home />} />
@@ -39,7 +41,6 @@ function App() {
             <Route path="/order" element={<OrderPage />} />
             <Route path="/product/:id" element={< ProductDetail/>} />
             <Route path="/cart" element={<CartPage items={items} />} />
-
           </Route>
         </Routes>
         {/* </Layout> */}

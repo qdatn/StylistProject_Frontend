@@ -30,19 +30,15 @@ const ProductDetail: React.FC = () => {
     }, [id]);
 
 
+    const [addToCartSuccess, setAddToCartSuccess] = useState(true);
+
+    // Cập nhật handleAddToCart để hiển thị thông báo
     const handleAddToCart = () => {
-        if (product) {
-            dispatch(addToCart({
-                id: product.id,
-                name: product.name,
-                originalPrice: product.originalPrice,
-                discountedPrice: product.discountedPrice,
-                quantity,
-                attributes: product.attributes.map(attr => ({
-                    key: attr.key,
-                    value: [selectedAttributes[attr.key]]
-                })),
-            }));
+        if (product) { // Kiểm tra product có phải là null không
+            // Gọi action addToCart để thêm sản phẩm vào giỏ hàng
+            dispatch(addToCart({ product, quantity }));
+        } else {
+            console.error("Product is not available.");
         }
     };
 
@@ -108,7 +104,7 @@ const ProductDetail: React.FC = () => {
                             <button className="w-60 bg-gray-700 text-white py-2 rounded-sm text-lg font-semibold" onClick={handleAddToCart}>
                                 ADD TO BAG
                             </button>
-                        
+
                         </div>
                     </div>
                 </div>

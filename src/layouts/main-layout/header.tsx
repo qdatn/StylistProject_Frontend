@@ -2,6 +2,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { Link } from "react-router-dom";
+import { AiOutlineUser } from "react-icons/ai";
 
 export default function Header() {
   return (
@@ -82,15 +83,15 @@ export default function Header() {
                 <IoIosSearch />
               </button>
             </div>
-            {/* <!-- Love Icon --> */}
+            {/* <!-- Account Icon --> */}
             <a
-              href="/favorist_list"
+              href="/account"
               className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
             >
-              <AiOutlineHeart className="w-5 h-5" />
-              <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
+              <AiOutlineUser  className="w-5 h-5" />
+              {/* <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
                 0
-              </div>
+              </div> */}
             </a>
 
             {/* <!-- Cart Icon --> */}

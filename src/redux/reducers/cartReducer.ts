@@ -1,13 +1,8 @@
-// redux/reducer/cartReducer.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Product } from '@src/types/Product';
 
-interface CartProduct {
-    id: string;
-    name: string;
-    originalPrice: number;
-    discountedPrice: number;
+interface CartProduct extends Product {
     quantity: number;
-    attributes: { key: string; value: string[] }[];
 }
 
 interface CartState {
@@ -22,12 +17,16 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addToCart: (state, action: PayloadAction<CartProduct>) => {
-            const existingProduct = state.items.find(item => item.id === action.payload.id);
+        addToCart: (state, action: PayloadAction<{ product: Product; quantity: number }>) => {
+            const { product, quantity } = action.payload;
+            const existingProduct = state.items.find(item => item.id === product.id);
+
             if (existingProduct) {
-                existingProduct.quantity += action.payload.quantity;
+                // Nếu sản phẩm đã tồn tại, tăng số lượng
+                existingProduct.quantity += quantity;
             } else {
-                state.items.push(action.payload);
+                // Nếu sản phẩm chưa tồn tại, thêm vào giỏ hàng với số lượng
+                state.items.push({ ...product, quantity });
             }
         },
     },
