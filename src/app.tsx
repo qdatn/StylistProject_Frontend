@@ -12,7 +12,7 @@ import { Product } from "@src/types/Product";
 import AccountPage from "@app/customer/account";
 import { MainLayout } from "@layouts/main-layout/customer-layout";
 import { AdminLayout } from "@layouts/admin-layout/admin-layout";
-import AdminHome from "@app/admin/home/page";
+import AdminHome from "@app/admin/home";
 
 const ggClientId = import.meta.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 const items: Product[] = [];

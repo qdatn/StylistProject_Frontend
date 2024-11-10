@@ -1,5 +1,6 @@
 // components/Header.tsx
 import React from 'react';
+import { IoNotificationsOutline } from "react-icons/io5";
 
 const AdminHeader = () => {
     return (
@@ -15,7 +16,8 @@ const AdminHeader = () => {
 
             {/* Thông tin người dùng */}
             <div className="flex items-center space-x-4">
-                <button className="text-gray-600">🔔</button>
+                <IoNotificationsOutline  className=" text-gray-800 hover:text-yellow-500 w-7 h-7"/>
+                
                 <div className="flex items-center space-x-2">
                     <span className="text-gray-800 font-semibold">Admin StylistLeo</span>
                     <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white">St</div>
