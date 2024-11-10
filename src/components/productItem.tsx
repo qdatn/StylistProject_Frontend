@@ -1,7 +1,7 @@
 // src/components/ProductItem.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Product } from '@models/Product';
+import { Product } from '@src/types/Product';
 
 // Định nghĩa interface cho các thuộc tính sản phẩm
 interface ProductItemProps {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { CartProduct } from '../models/CartProduct';
-import mockProducts from '../models/Product'; // Nhập dữ liệu sản phẩm giả
+import { CartProduct } from '../types/CartProduct';
+import mockProducts from '../types/Product'; // Nhập dữ liệu sản phẩm giả
 
 export interface CartItemProps {
     id: string; // ID sản phẩm

@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import CartItem from "@components/CartItem";
 import Header from "@layouts/main-layout/header";
 import Footer from "@layouts/main-layout/footer";
-import { Product } from "@models/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
+import { Product } from "@src/types/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
 
-const CartPage: React.FC<{ items: Product[] }> = ({ items }) => {
+const CartPage: React.FC<{ items?: Product[] }> = ({ items = [] }) => {
   // Giả định bạn sẽ nhận items từ props
   const [formData, setFormData] = useState({
     name: "",
@@ -80,7 +80,6 @@ const CartPage: React.FC<{ items: Product[] }> = ({ items }) => {
 
   return (
     <>
-      <Header />
       <div className="container mx-auto p-4 flex flex-col md:flex-row bg-white">
         {/* Danh sách sản phẩm trong giỏ hàng */}
         <div className="md:w-2/3 p-4 border-r text-gray-700">
@@ -205,7 +204,6 @@ const CartPage: React.FC<{ items: Product[] }> = ({ items }) => {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { Attribute } from '@models/Attribute';
+import { Attribute } from './Attribute';
 export interface Comment {
     id: number;
     username: string;

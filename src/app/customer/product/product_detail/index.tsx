@@ -3,26 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@redux/reducers/cartReducer';
-import Header from '@layouts/main-layout/header';
-import Footer from '@layouts/main-layout/footer';
+
 import CommentItem from '@components/CommentItem';
-import  mockComments  from '@models/Comment';
+import mockComments from '@src/types/Comment';
 import { AiOutlinePlus, AiOutlineMinus } from 'react-icons/ai';
 import { FaStar } from 'react-icons/fa';
-import  mockProducts from '@models/Product';
-import  {Product} from '@models/Product';
-import { useNavigate } from 'react-router-dom';
+import mockProducts from '@src/types/Product';
+import { Product } from "@src/types/Product";
+import { useNavigate, useParams } from 'react-router-dom';
 
 
 
-interface ProductDetailProps {
-    params: {
-        id: string;
-    };
-}
-
-const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
-    const { id } = params;
+const ProductDetail: React.FC = () => {
+    const { id } = useParams();
     const [product, setProduct] = useState<Product | null>(null);
     const [quantity, setQuantity] = useState(1);
     const [detailsVisible, setDetailsVisible] = useState(false);
@@ -35,13 +28,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
             setProduct(foundProduct || null);
         }
     }, [id]);
-    
+
 
     const handleAddToCart = () => {
         if (product) {
-            dispatch(addToCart({ 
-                id: product.id, 
-                name: product.name, 
+            dispatch(addToCart({
+                id: product.id,
+                name: product.name,
                 originalPrice: product.originalPrice,
                 discountedPrice: product.discountedPrice,
                 quantity,
@@ -63,7 +56,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
 
     return (
         <>
-        <Header/>
+
             <div className="container mx-auto p-8 bg-white">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex justify-center w-full md:w-1/2">
@@ -115,9 +108,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
                             <button className="w-60 bg-gray-700 text-white py-2 rounded-sm text-lg font-semibold" onClick={handleAddToCart}>
                                 ADD TO BAG
                             </button>
-                            <button className="w-60 bg-yellow-500 text-white py-2 rounded-sm text-lg font-semibold">
-                                BUY NOW
-                            </button>
+                        
                         </div>
                     </div>
                 </div>
@@ -130,15 +121,15 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
                                 {totalRating.toFixed(1)} <FaStar className="ml-2" />
                             </p>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {filteredComments.map(comment => (
-                                <CommentItem 
-                                    key={comment.id} 
-                                    username={comment.username} 
-                                    rating={comment.rating} 
-                                    attributes={comment.attributes} 
-                                    review={comment.review} 
+                                <CommentItem
+                                    key={comment.id}
+                                    username={comment.username}
+                                    rating={comment.rating}
+                                    attributes={comment.attributes}
+                                    review={comment.review}
                                     created_date={comment.created_date}
                                 />
                             ))}
@@ -146,7 +137,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ params }) => {
                     </div>
                 </div>
             </div>
-            <Footer/>
+
         </>
     );
 };
