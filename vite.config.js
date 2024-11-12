@@ -15,7 +15,7 @@ export default defineConfig({
       "@models": path.resolve(__dirname, "./src/models"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),
       "@layouts": path.resolve(__dirname, "src/layouts"),
-      "@libs": path.resolve(__dirname, "./src/lib"),
+      "@libs": path.resolve(__dirname, "./src/libs"),
       "@middlewares": path.resolve(__dirname, "./src/middlewares"),
       "@public": path.resolve(__dirname, "./src/public"),
       "@redux": path.resolve(__dirname, "./src/redux"),
