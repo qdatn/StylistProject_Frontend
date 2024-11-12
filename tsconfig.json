@@ -38,6 +38,7 @@
         "*"
       ],
       "@app/*": [
+        "./src/*",
         "app/*"
       ],
       "@models/*": [
@@ -53,7 +54,7 @@
         "layouts/*"
       ],
       "@libs/*": [
-        "lib/*"
+        "libs/*"
       ],
       "@middlewares/*": [
         "middlewares/*"
