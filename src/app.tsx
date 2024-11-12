@@ -13,6 +13,11 @@ import { MainLayout } from "@layouts/main-layout/customer-layout";
 import { AdminLayout } from "@layouts/admin-layout/admin-layout";
 import AdminHome from "@app/admin/home";
 import { OTPForm } from "@app/password/OTP";
+import StoragePage from "@app/admin/storage";
+import ProductList from "@app/admin/product/ProductList";
+import Categories from "@app/admin/product/Categories";
+import CustomerList from "@app/admin/customer/CustomerList";
+import OrderManagement from "@app/admin/order";
 
 const items: Product[] = [];
 
@@ -38,7 +43,11 @@ function App() {
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin/" element={<AdminHome />} />
-            <Route path="/admin/storage" element={<CartPage items={items} />} />
+            <Route path="/admin/storage" element={<StoragePage/>} />
+            <Route path="/admin/product/list" element={<ProductList/>} />
+            <Route path="/admin/product/categories" element={<Categories/>} />
+            <Route path="/admin/order" element={<OrderManagement/>} />
+            <Route path="/admin/customer" element={<CustomerList/>} />
           </Route>
 
         </Routes>
