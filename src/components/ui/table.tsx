@@ -1,82 +1,80 @@
-// components/ui/ProductTable.tsx
-
 import React, { useState } from 'react';
-import { Table, Button, Space } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import { Table, Button, Space, Input, message, Select } from 'antd';
+import { TableProps, TableColumnsType} from 'antd';
+import { ColumnsType } from 'antd/es/table';
 
-interface Product {
-  key: string;
-  name: string;
-  price: number;
-  stock: number;
-  category: string;
-  actions?: React.ReactNode;
+const { Search } = Input;
+const { Option } = Select;
+
+interface CommonTableProps<T> extends TableProps<T> {
+  columns: ColumnsType<T>;
+  dataSource: T[];
+  rowKey: string;
+  rowSelection?: any;
 }
 
-const dataSource: Product[] = [
-  {
-    key: '1',
-    name: 'Product 1',
-    price: 100,
-    stock: 50,
-    category: 'Category A',
-  },
-  {
-    key: '2',
-    name: 'Product 2',
-    price: 150,
-    stock: 20,
-    category: 'Category B',
-  },
-  // Thêm sản phẩm mẫu khác hoặc fetch từ backend
-];
+function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
+  const { columns, dataSource, rowKey, rowSelection, ...restProps } = props;
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [tableData, setTableData] = useState(dataSource);
+  const [searchText, setSearchText] = useState('');
 
-const ProductTable: React.FC = () => {
-  const columns: ColumnsType<Product> = [
-    {
-      title: 'Tên sản phẩm',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Giá',
-      dataIndex: 'price',
-      key: 'price',
-      render: (price) => `${price} VND`,
-    },
-    {
-      title: 'Tồn kho',
-      dataIndex: 'stock',
-      key: 'stock',
-    },
-    {
-      title: 'Danh mục',
-      dataIndex: 'category',
-      key: 'category',
-    },
-    {
-      title: 'Hành động',
-      key: 'actions',
-      render: (_, record) => (
-        <Space size="middle">
-          <Button type="primary" onClick={() => editProduct(record.key)}>Sửa</Button>
-          <Button danger onClick={() => deleteProduct(record.key)}>Xóa</Button>
-        </Space>
-      ),
-    },
-  ];
-
-  const editProduct = (key: string) => {
-    console.log(`Chỉnh sửa sản phẩm với key: ${key}`);
-    // Xử lý logic chỉnh sửa sản phẩm
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  const deleteProduct = (key: string) => {
-    console.log(`Xóa sản phẩm với key: ${key}`);
-    // Xử lý logic xóa sản phẩm
+  const handleDelete = () => {
+    setTableData((prevData) => prevData.filter(item => !selectedRowKeys.includes(item[rowKey])));
+    setSelectedRowKeys([]);
+    message.success("Selected items deleted");
   };
 
-  return <Table dataSource={dataSource} columns={columns} />;
-};
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+    const filteredData = dataSource.filter(item =>
+      item.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setTableData(filteredData);
+  };
 
-export default ProductTable;
+  const mergedRowSelection = rowSelection
+    ? {
+        selectedRowKeys,
+        onChange: onSelectChange,
+        ...rowSelection,
+      }
+    : undefined;
+
+  return (
+    <>
+      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+        <Search
+          placeholder="Search"
+          onSearch={handleSearch}
+          style={{ width: 200 }}
+        />
+      </div>
+
+      {selectedRowKeys.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <Space>
+            <span>{`Selected ${selectedRowKeys.length} items`}</span>
+            <Button onClick={handleDelete} type="primary">Delete</Button>
+            <Button>Hide</Button>
+          </Space>
+        </div>
+      )}
+
+      <Table
+        columns={columns}
+        dataSource={tableData}
+        rowKey={rowKey}
+        rowSelection={mergedRowSelection}
+        pagination={{ pageSize: 5 }}
+        {...restProps}
+      />
+    </>
+  );
+}
+
+export default CommonTable;

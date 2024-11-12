@@ -29,7 +29,7 @@ const MenuSidebar = () => {
                     <Link to="/password">Password</Link>
                 </li>
                 <li className="text-gray-700 font-semibold p-4 hover:bg-gray-200">
-                    <Link to="#sign-out">Sign Out</Link>
+                    <Link to="/login">Sign Out</Link>
                 </li>
             </ul>
         </div>
