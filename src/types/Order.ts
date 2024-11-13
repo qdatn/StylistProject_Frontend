@@ -30,7 +30,20 @@ const mockOrders: Order[] = [
           { key: "Size", value: "XL" }
         ],
         imageUrl: "/path/to/image.jpg"
-      }
+      },
+      {
+        product_id: "64b123a5f0f6d4e123456781",
+        product_name: "Wrap bodice balloon sleeve midi dress",
+        orderitem_quantity: 2,
+        note: "Gói quà",
+        purchased_price: 40.00,
+        discounted_price: 36.00,
+        attributes: [
+          { key: "Color", value: "Blue" },
+          { key: "Size", value: "M" }
+        ],
+        imageUrl: "/path/to/image.jpg"
+      },
     ],
     status: "delivered",
     discount: "SUMMER20",
