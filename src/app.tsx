@@ -18,6 +18,8 @@ import ProductList from "@app/admin/product/ProductList";
 import Categories from "@app/admin/product/Categories";
 import CustomerList from "@app/admin/customer/CustomerList";
 import OrderManagement from "@app/admin/order";
+import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
+import ResetPasswordForm from "@app/password/ResetPasswordForm";
 
 const items: Product[] = [];
 
@@ -31,7 +33,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<AccountPage />} />
-          <Route path="/password" element={<OTPForm />} />
+          <Route path="/OTPpassword" element={<OTPForm />} />
+          <Route path="/forgotpassword" element={<ForgotPasswordForm/>} />
+          <Route path="/resetpassword" element={<ResetPasswordForm/>} />
 
           {/* Định nghĩa MainLayout và các route con */}
           <Route element={<MainLayout />}>
@@ -48,6 +52,7 @@ function App() {
             <Route path="/admin/product/categories" element={<Categories/>} />
             <Route path="/admin/order" element={<OrderManagement/>} />
             <Route path="/admin/customer" element={<CustomerList/>} />
+
           </Route>
 
         </Routes>
