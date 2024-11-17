@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import axios from "axios";
+import { Link } from "react-router-dom";
 // import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
@@ -43,8 +44,6 @@ export default function Register() {
 
   const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:5000";
 
-  // const router = useRouter(); // hook để chuyển hướng
-
   // Define form submission handler
   const handleSubmit = async (values: {
     name: string;
@@ -72,17 +71,21 @@ export default function Register() {
     }
   };
 
+  // if (!user) {
+  //   return <p>No user logged in</p>;
+  // }
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
         {/* LOGO BEGIN */}
         <div className="flex justify-center mb-10 mt-0">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="text-5xl tracking-wider font-bold text-gray-800"
           >
             STYLE
-          </a>
+          </Link>
         </div>
         {/* LOGO END*/}
 
@@ -253,12 +256,12 @@ export default function Register() {
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
             Already have an account?
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-gray-900 font-semibold hover:underline"
             >
               &nbsp;Log in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
