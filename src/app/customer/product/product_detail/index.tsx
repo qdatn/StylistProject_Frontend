@@ -11,6 +11,7 @@ import { FaStar } from 'react-icons/fa';
 import mockProducts from '@src/types/Product';
 import { Product } from "@src/types/Product";
 import { useNavigate, useParams } from 'react-router-dom';
+import { Carousel, Slider } from 'antd';
 
 
 
@@ -24,11 +25,11 @@ const ProductDetail: React.FC = () => {
 
     useEffect(() => {
         if (id) {
-            const foundProduct = mockProducts.find(product => product.id === id); // Tìm sản phẩm theo id
+            const foundProduct = mockProducts.find(product => product._id === id); // Tìm sản phẩm theo id
             setProduct(foundProduct || null);
         }
     }, [id]);
-
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const [addToCartSuccess, setAddToCartSuccess] = useState(true);
 
@@ -45,10 +46,13 @@ const ProductDetail: React.FC = () => {
     const handleAttributeChange = (key: string, value: string) => {
         setSelectedAttributes(prev => ({ ...prev, [key]: value }));
     };
-    const filteredComments = mockComments.filter(comment => comment.productId === Number(id));
+    const filteredComments = mockComments.filter(comment => comment.product._id) ;
     const totalRating = filteredComments.reduce((sum, comment) => sum + comment.rating, 0) / (filteredComments.length || 1);
 
     if (!product) return <p>Loading...</p>;
+    if (!product || !product.image || product.image.length === 0) {
+        return <p>No product data or images available.</p>;
+    }
 
     return (
         <>
@@ -56,16 +60,43 @@ const ProductDetail: React.FC = () => {
             <div className="container mx-auto p-8 bg-white">
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="flex justify-center w-full md:w-1/2">
-                        <img
-                            src={product.image}
-                            alt={product.name}
-                            width={400}
-                            height={600}
-                            className="object-contain"
-                        />
+
+                        <div className="relative w-[600px] h-[400px]">
+                            {/* Hiển thị ảnh hiện tại */}
+                            <img
+                                src={product.image[currentImageIndex]}
+                                alt={`${product.product_name || 'Product'} - ${currentImageIndex + 1}`}
+                                className="object-contain w-full h-full"
+                            />
+
+                            {/* Nút điều hướng bên trái */}
+                            <button
+                                className="absolute top-1/2 left-10 transform -translate-y-1/2 text-gray-800 p-2 rounded hover:bg-gray-200"
+                                onClick={() =>
+                                    setCurrentImageIndex((prevIndex) =>
+                                        prevIndex === 0 ? product.image.length - 1 : prevIndex - 1
+                                    )
+                                }
+                            >
+                                ❮
+                            </button>
+
+                            {/* Nút điều hướng bên phải */}
+                            <button
+                                className="absolute top-1/2 right-10 transform -translate-y-1/2 text-gray-800 p-2 rounded hover:bg-gray-200"
+                                onClick={() =>
+                                    setCurrentImageIndex((prevIndex) =>
+                                        prevIndex === product.image.length - 1 ? 0 : prevIndex + 1
+                                    )
+                                }
+                            >
+                                ❯
+                            </button>
+                        </div>
+
                     </div>
                     <div className="mt-5 flex flex-col w-full md:w-1/2">
-                        <h1 className="text-[20px] font-medium mb-8 text-gray-700">{product.name}</h1>
+                        <h1 className="text-[20px] font-medium mb-8 text-gray-700">{product.product_name}</h1>
                         <div className="text-2xl flex items-center gap-2">
                             <p className="text-gray-500 line-through font-semibold">£{product.originalPrice.toFixed(2)}</p>
                             <p className="text-red-500 font-bold">£{product.discountedPrice.toFixed(2)}</p>
@@ -121,7 +152,7 @@ const ProductDetail: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {filteredComments.map(comment => (
                                 <CommentItem
-                                    key={comment.id}
+                                    key={comment._id}
                                     username={comment.username}
                                     rating={comment.rating}
                                     attributes={comment.attributes}

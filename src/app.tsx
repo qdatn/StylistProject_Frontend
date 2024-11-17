@@ -13,12 +13,20 @@ import { MainLayout } from "@layouts/main-layout/customer-layout";
 import { AdminLayout } from "@layouts/admin-layout/admin-layout";
 import AdminHome from "@app/admin/home";
 import { OTPForm } from "@app/password/OTP";
-import ProductManagementPage from "@app/admin/product/ProductList";
+import StoragePage from "@app/admin/storage";
+import ProductList from "@app/admin/product/ProductList";
+import Categories from "@app/admin/product/Categories";
+import CustomerList from "@app/admin/customer/CustomerList";
+import OrderManagement from "@app/admin/order";
+import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
+import ResetPasswordForm from "@app/password/ResetPasswordForm";
+import NewProduct from "@app/admin/product/NewProduct";
+import ProductEdit from "@app/admin/product/ProductEdit";
 
 const items: Product[] = [];
 
 function App() {
-  const userRole: 'admin' | 'customer' = 'admin'; // Có thể thay đổi trong thực tế
+  const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
   return (
     <RootLayout>
@@ -27,25 +35,30 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<AccountPage />} />
-          <Route path="/password" element={<OTPForm />} />
-          
+          <Route path="/OTPpassword" element={<OTPForm />} />
+          <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
+          <Route path="/resetpassword" element={<ResetPasswordForm />} />
+
           {/* Định nghĩa MainLayout và các route con */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<CartPage items={items} />} />
-
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin/" element={<AdminHome />} />
-            <Route path="/admin/order" element={<ProductManagementPage/>} />
-            <Route path="/admin/dilivery" element={<OrderPage />} />
-            <Route path="/admin/product" element={<ProductManagementPage/>} />
-            <Route path="/admin/product/:id" element={<ProductDetail />} />
-            <Route path="/admin/storage" element={<CartPage items={items} />} />
+            <Route path="/admin/storage" element={<StoragePage />} />
+            <Route path="/admin/product/list" element={<ProductList />} />
+            <Route path="/admin/product/categories" element={<Categories />} />
+            <Route path="admin/product/list/new" element={<NewProduct />} />
+            <Route path="/admin/order" element={<OrderManagement />} />
+            <Route path="/admin/customer" element={<CustomerList />} />
+            <Route
+              path="/admin/product/list/edit/:id"
+              element={<ProductEdit />}
+            />
           </Route>
-          
         </Routes>
       </BrowserRouter>
     </RootLayout>

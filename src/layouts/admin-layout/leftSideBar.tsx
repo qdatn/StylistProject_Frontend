@@ -1,5 +1,6 @@
 // components/Sidebar.tsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
   const [isProductOpen, setIsProductOpen] = useState(false);
@@ -7,41 +8,41 @@ const Sidebar = () => {
   return (
     <div className="w-1/5 bg-white h-full shadow-lg flex flex-col">
       <div className="p-6">
-        <a href="/" className="text-2xl font-bold text-yellow-500">
+        <Link to="/" className="text-2xl font-bold text-yellow-500">
           Style
-        </a>
+        </Link>
       </div>
       <ul className="flex flex-col">
         <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
-          <a href="#">General</a>
+          <Link to="/admin">General</Link>
         </li>
         <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
-          <a href="#">Order</a>
+          <Link to="/admin/order">Order</Link>
         </li>
-        <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
-          <a href="#">Delivery</a>
-        </li>
-        <li className="py-3 px-4 text-gray-600 hover:bg-gray-200 cursor-pointer" onClick={() => setIsProductOpen(!isProductOpen)}>
+        <li
+          className="py-3 px-4 text-gray-600 hover:bg-gray-200 cursor-pointer"
+          onClick={() => setIsProductOpen(!isProductOpen)}
+        >
           <span>Product</span>
         </li>
         {isProductOpen && (
           <ul className="pl-6">
             <li className="py-2 px-4 text-gray-600 hover:bg-gray-200">
-              <a href="#">Product List</a>
+              <Link to="/admin/product/list">Product List</Link>
             </li>
             <li className="py-2 px-4 text-gray-600 hover:bg-gray-200">
-              <a href="#">Categories</a>
+              <Link to="/admin/product/categories">Categories</Link>
             </li>
             <li className="py-2 px-4 text-gray-600 hover:bg-gray-200">
-              <a href="#">Price List</a>
+              <Link to="/admin/product/pricelist">Price List</Link>
             </li>
           </ul>
         )}
         <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
-          <a href="#">Storage</a>
+          <Link to="/admin/storage">Storage</Link>
         </li>
         <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
-          <a href="#">Customer</a>
+          <Link to="/admin/customer">Customer</Link>
         </li>
       </ul>
     </div>

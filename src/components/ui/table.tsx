@@ -1,117 +1,83 @@
-import * as React from "react"
+import React, { useState } from 'react';
+import { Table, Button, Space, Input, message } from 'antd';
+import { TableProps } from 'antd';
+import { ColumnsType } from 'antd/es/table';
 
-import { cn } from "@libs/utils"
+const { Search } = Input;
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
-))
-Table.displayName = "Table"
-
-const TableHeader = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
-))
-TableHeader.displayName = "TableHeader"
-
-const TableBody = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
-    {...props}
-  />
-))
-TableBody.displayName = "TableBody"
-
-const TableFooter = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tfoot
-    ref={ref}
-    className={cn(
-      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-      className
-    )}
-    {...props}
-  />
-))
-TableFooter.displayName = "TableFooter"
-
-const TableRow = React.forwardRef<
-  HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-      className
-    )}
-    {...props}
-  />
-))
-TableRow.displayName = "TableRow"
-
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-      className
-    )}
-    {...props}
-  />
-))
-TableHead.displayName = "TableHead"
-
-const TableCell = React.forwardRef<
-  HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <td
-    ref={ref}
-    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
-    {...props}
-  />
-))
-TableCell.displayName = "TableCell"
-
-const TableCaption = React.forwardRef<
-  HTMLTableCaptionElement,
-  React.HTMLAttributes<HTMLTableCaptionElement>
->(({ className, ...props }, ref) => (
-  <caption
-    ref={ref}
-    className={cn("mt-4 text-sm text-muted-foreground", className)}
-    {...props}
-  />
-))
-TableCaption.displayName = "TableCaption"
-
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
+interface CommonTableProps<T> extends TableProps<T> {
+  columns: ColumnsType<T>;
+  dataSource: T[];
+  rowKey: string;
+  rowSelection?: any;
+  onAddNew?: () => void; // Add a prop for the "Add New" button handler
 }
+
+function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
+  const { columns, dataSource, rowKey, rowSelection, onAddNew, ...restProps } = props;
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [tableData, setTableData] = useState(dataSource);
+  const [searchText, setSearchText] = useState('');
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const handleDelete = () => {
+    setTableData((prevData) => prevData.filter(item => !selectedRowKeys.includes(item[rowKey])));
+    setSelectedRowKeys([]);
+    message.success("Selected items deleted");
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+    const filteredData = dataSource.filter(item =>
+      item.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setTableData(filteredData);
+  };
+
+  const mergedRowSelection = rowSelection
+    ? {
+        selectedRowKeys,
+        onChange: onSelectChange,
+        ...rowSelection,
+      }
+    : undefined;
+
+  return (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <Search
+          placeholder="Search"
+          onSearch={handleSearch}
+          style={{ width: 200 }}
+        />
+        <Button type="primary" onClick={onAddNew}>
+          Add New
+        </Button>
+      </div>
+
+      {selectedRowKeys.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <Space>
+            <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
+            <Button onClick={handleDelete}>Delete</Button>
+            <Button>Hide</Button>
+          </Space>
+        </div>
+      )}
+
+      <Table
+        columns={columns}
+        dataSource={tableData}
+        rowKey={rowKey}
+        rowSelection={mergedRowSelection}
+        pagination={{ pageSize: 5 }}
+        {...restProps}
+      />
+    </>
+  );
+}
+
+export default CommonTable;

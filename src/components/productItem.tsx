@@ -10,10 +10,10 @@ interface ProductItemProps {
 
 const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
   const navigate = useNavigate();
-  const { id, name, originalPrice, discountedPrice, image } = product;
+  const { _id, product_name, originalPrice, discountedPrice, image } = product;
 
   const handleClick = () => {
-    navigate(`/product/${id}`);
+    navigate(`/product/${_id}`);
   };
 
   return (
@@ -23,13 +23,13 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
     >
       <img
         loading="lazy"
-        src={image}
-        alt={name}
+        src={product.image?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
+        alt={product.product_name}
         className="object-contain w-full"
       />
       <div className="font-medium flex flex-col p-2 w-full">
         <h2 className="pb-2 text-[14px] text-neutral-700">
-          {name}
+          {product_name}
         </h2>
         <div className="font-semibold flex flex-col pb-2 w-full">
           <div className="flex gap-4 pb-2 text-[14px] whitespace-nowrap">

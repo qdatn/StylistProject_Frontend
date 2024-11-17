@@ -9,7 +9,7 @@ const OrderPage = () => {
       <div className="order-page-container bg-white">
         <h1 className="text-xl font-semibold pt-6 pb-6 text-gray-700">Order form</h1>
         {mockOrders.map(order => (
-          <Ordertracking key={order.order_id} order={order} />
+          <Ordertracking key={order._id} order={order} />
         ))}
       </div>
     </>

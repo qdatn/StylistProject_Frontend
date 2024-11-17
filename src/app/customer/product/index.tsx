@@ -1,5 +1,4 @@
 import Transition from "@components/Transition";
-import { MainLayout } from "../../../layout";
 // import Image from "next/image";
 // import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -22,7 +21,7 @@ export default function ProductList() {
         {/* Hiển thị danh sách sản phẩm */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
           {products.map((product) => (
-            <ProductItem key={product.id} product={product} /> // Truyền sản phẩm vào ProductItem
+            <ProductItem key={product._id} product={product} /> // Truyền sản phẩm vào ProductItem
           ))}
         </div>
       </div>
