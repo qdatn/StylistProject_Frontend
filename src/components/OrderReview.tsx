@@ -53,13 +53,13 @@ const OrderReviewForm: React.FC<OrderReviewFormProps> = ({ order, onClose }) => 
             `}
           </style>
           {order.order_items.map(item => (
-            <ReviewItem key={item.product_id} item={item} />
+            <ReviewItem item={item} />
           ))}
         </div>
 
         {/* Submit & Cancel Buttons */}
         <div className="flex justify-end mt-4 gap-4">
-          <button className="bg-gray-800 text-white px-10 py-2 rounded font-semibold">Submit</button>
+          <button className="bg-gray-800 text-white px-10 py-2 rounded font-semibold hover:bg-gray-500">Submit</button>
         </div>
       </div>
     </div>

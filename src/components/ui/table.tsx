@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { Table, Button, Space, Input, message, Select } from 'antd';
-import { TableProps, TableColumnsType} from 'antd';
+import { Table, Button, Space, Input, message } from 'antd';
+import { TableProps } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 
 const { Search } = Input;
-const { Option } = Select;
 
 interface CommonTableProps<T> extends TableProps<T> {
   columns: ColumnsType<T>;
   dataSource: T[];
   rowKey: string;
   rowSelection?: any;
+  onAddNew?: () => void; // Add a prop for the "Add New" button handler
 }
 
 function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
-  const { columns, dataSource, rowKey, rowSelection, ...restProps } = props;
+  const { columns, dataSource, rowKey, rowSelection, onAddNew, ...restProps } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState(dataSource);
   const [searchText, setSearchText] = useState('');
@@ -47,19 +47,22 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
 
   return (
     <>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="flex items-center justify-between mb-4">
         <Search
           placeholder="Search"
           onSearch={handleSearch}
           style={{ width: 200 }}
         />
+        <Button type="primary" onClick={onAddNew}>
+          Add New
+        </Button>
       </div>
 
       {selectedRowKeys.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <Space>
-            <span>{`Selected ${selectedRowKeys.length} items`}</span>
-            <Button onClick={handleDelete} type="primary">Delete</Button>
+            <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
+            <Button onClick={handleDelete}>Delete</Button>
             <Button>Hide</Button>
           </Space>
         </div>

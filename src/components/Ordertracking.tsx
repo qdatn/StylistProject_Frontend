@@ -21,7 +21,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order }) => {
       {/* Danh sách sản phẩm */}
       <div className="order-items mb-4">
         {order.order_items.map(item => (
-          <OrderItem key={item.product_id} item={item} />
+          <OrderItem item={item} />
         ))}
       </div>
 

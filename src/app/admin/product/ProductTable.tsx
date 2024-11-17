@@ -1,13 +1,13 @@
 import React from 'react';
-import CommonTable from '@components/ui/table'; // Assuming correct path for CommonTable
+import { useNavigate } from 'react-router-dom';
 import { Tag } from 'antd';
 import dayjs from 'dayjs';
-import { ColumnsType } from 'antd/es/table'; // Import the correct type for columns
-import { Key } from 'antd/es/table/interface'; // Correct import for Key
-import mockProducts from '@src/types/Product';
+import CommonTable from '@components/ui/table'; // Giả sử đường dẫn này đúng
+import { ColumnsType } from 'antd/es/table';
+import mockProducts from '@src/types/Product'; // Giả sử mockProducts là đúng
 import { Product } from '@src/types/Product';
 
-// Define columns for the product table
+// Định nghĩa các cột cho bảng sản phẩm
 const productColumns: ColumnsType<Product> = [
   {
     title: 'Image',
@@ -49,23 +49,38 @@ const productColumns: ColumnsType<Product> = [
       { text: 'Available', value: true },
       { text: 'Unavailable', value: false },
     ],
-    onFilter: (value: boolean | Key, record: Product) => record.status === value,
+    onFilter: (value, record) => record.status === value,
   },
 ];
 
 const ProductTable: React.FC = () => {
-  // Assuming 'mockProducts' is the correct path for your product data
-  
+  const navigate = useNavigate(); // Gọi useNavigate ở đây
+
+  // Hàm này sẽ được gọi khi người dùng nhấn vào một dòng
+  const handleRowClick = (record: Product) => {
+    // Điều hướng đến trang chỉnh sửa sản phẩm với ID của sản phẩm
+    navigate(`/admin/product/list/edit/${record._id}`);
+  };
+  const handleAddNewProduct = () => {
+    // Navigate to the ProductDetail page for adding a new product
+    navigate('new');
+  };
 
   return (
-    <CommonTable
-      columns={productColumns}
-      dataSource={mockProducts} // Pass mock product data
-      rowKey="id"
-      rowSelection={{
-        type: 'checkbox',
-      }}
-    />
+    <div>
+      <CommonTable
+        columns={productColumns}
+        dataSource={mockProducts}
+        rowKey="id"
+        rowSelection={{
+          type: 'checkbox',
+        }}
+        onRow={(record) => ({
+          onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
+        })}
+        onAddNew={handleAddNewProduct} // Pass navigation handler
+      />
+    </div>
   );
 };
 

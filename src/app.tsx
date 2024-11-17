@@ -20,6 +20,8 @@ import CustomerList from "@app/admin/customer/CustomerList";
 import OrderManagement from "@app/admin/order";
 import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
 import ResetPasswordForm from "@app/password/ResetPasswordForm";
+import NewProduct from "@app/admin/product/NewProduct";
+import ProductEdit from "@app/admin/product/ProductEdit";
 
 const items: Product[] = [];
 
@@ -50,8 +52,10 @@ function App() {
             <Route path="/admin/storage" element={<StoragePage/>} />
             <Route path="/admin/product/list" element={<ProductList/>} />
             <Route path="/admin/product/categories" element={<Categories/>} />
+            <Route path="admin/product/list/new" element={<NewProduct/>} />
             <Route path="/admin/order" element={<OrderManagement/>} />
             <Route path="/admin/customer" element={<CustomerList/>} />
+            <Route path="/admin/product/list/edit/:id" element={<ProductEdit />} />
 
           </Route>
 

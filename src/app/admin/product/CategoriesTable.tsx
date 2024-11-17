@@ -20,7 +20,7 @@ const CategoryTable: React.FC = () => {
     <CommonTable
       columns={categoryColumns}
       dataSource={mockCategories}
-      rowKey="category_id"
+      rowKey="_id"
       rowSelection={{
         type: 'checkbox',
       }}

@@ -19,7 +19,7 @@ const cartSlice = createSlice({
     reducers: {
         addToCart: (state, action: PayloadAction<{ product: Product; quantity: number }>) => {
             const { product, quantity } = action.payload;
-            const existingProduct = state.items.find(item => item.id === product.id);
+            const existingProduct = state.items.find(item => item._id === product._id);
 
             if (existingProduct) {
                 // Nếu sản phẩm đã tồn tại, tăng số lượng
