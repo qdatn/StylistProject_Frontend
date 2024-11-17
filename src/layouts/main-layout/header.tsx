@@ -1,9 +1,38 @@
 import { AiOutlineHeart } from "react-icons/ai";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AiOutlineUser } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@redux/store";
+import { useState } from "react";
+import axios from "axios";
+import axiosClient from "@api/axiosClient";
+import { clearUser } from "@redux/reducers/authReducer";
 
-export default function Header() {
+export default function CustomerHeader() {
+  const user = useSelector((state: RootState) => state.auth);
+  const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // State to manage hover visibility
+  const [showPopup, setShowPopup] = useState(false);
+
+  // Function to handle hover events
+  const handleProfileClick = () => {
+    showPopup ? setShowPopup(false) : setShowPopup(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowPopup(false);
+  };
+
+  const handleLogout = () => {
+    const logout = axiosClient.post("http://localhost:5000/api/auth/login", {});
+    dispatch(clearUser());
+    navigate("/login");
+  };
+
   return (
     // <!-- header -->
     <header className="border-y-">
@@ -12,19 +41,38 @@ export default function Header() {
         <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 flex-wrap">
           {/* <!-- Logo and Brand Name on the left side --> */}
           <div className="flex items-center">
-            <a href="/" className="text-lg font-bold text-gray-800">
+            <Link to="/" className="text-lg font-bold text-gray-800">
               STYLE
-            </a>
+            </Link>
           </div>
           {/* <!-- login sign up nav on the right side --> */}
           <div className="hidden md:flex space-x-4">
-            <a
-              href="#"
+            <Link
+              to="#"
               className="text-sm text-gray-700 hover:underline hover:text-gray-900 font-medium transition"
             >
               Need help?
-            </a>
-            <Link
+            </Link>
+            {/* Chỉ hiển thị "Log in" và "Sign up" nếu người dùng chưa đăng nhập */}
+            {!user.auth.isLogin ? (
+              <>
+                <Link
+                  to="/login"
+                  className="text-sm text-gray-700 hover:underline hover:text-gray-900 font-medium transition uppercase"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/register"
+                  className="text-sm text-gray-700 hover:underline transition font-bold uppercase"
+                >
+                  Sign up
+                </Link>
+              </>
+            ) : (
+              <></>
+            )}
+            {/* <Link
               to="/login"
               className="text-sm text-gray-700 hover:underline hover:text-gray-900 font-medium transition uppercase"
             >
@@ -35,7 +83,7 @@ export default function Header() {
               className="text-sm text-gray-700 hover:underline transition font-bold uppercase"
             >
               Sign up
-            </Link>
+            </Link> */}
           </div>
         </div>
         {/* Nav header bar 2 */}
@@ -44,31 +92,31 @@ export default function Header() {
           {/* <!-- Navigation Links for Medium and Above Screens --> */}
 
           <div className="hidden md:flex space-x-8">
-            <a
-              href="#"
+            <Link
+              to="#"
               className="text-gray-700 hover:underline hover:text-gray-900 transition font-bold underline"
             >
               Women
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="text-gray-700 hover:underline hover:text-gray-900 font-medium transition"
             >
               Men
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="#"
               className="text-gray-700 hover:underline hover:text-gray-900 font-medium transition"
             >
               Style
-            </a>
+            </Link>
           </div>
-          <a
-            href="/"
+          <Link
+            to="/"
             className="text-3xl tracking-wider font-bold text-gray-800 ml-16 md:ml-0"
           >
             STYLE
-          </a>
+          </Link>
           {/* <!-- Search and Icons Section --> */}
           <div className="flex items-center space-x-6">
             {/* <!-- Search Bar --> */}
@@ -82,27 +130,50 @@ export default function Header() {
                 <IoIosSearch />
               </button>
             </div>
-            {/* <!-- Love Icon --> */}
-            <a
-              href="/favorist_list"
-              className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
-            >
-              <AiOutlineHeart className="w-5 h-5" />
-              <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
-                0
+
+            {/* <!-- Account Icon --> */}
+            <div className="flex-col items-center">
+              <div
+                // to="/account"
+                className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
+                onClick={handleProfileClick}
+                // onMouseLeave={handleMouseLeave}
+              >
+                <AiOutlineUser className="w-5 h-5" />
               </div>
-            </a>
+              {/* Popup (visible on hover) */}
+              {showPopup && (
+                <div
+                  className="absolute mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
+                  onClick={handleProfileClick}
+                  // onMouseLeave={handleMouseLeave}
+                >
+                  <Link
+                    to="/account"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Account
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* <!-- Cart Icon --> */}
-            <a
-              href="/cart"
+            <Link
+              to="/cart"
               className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
             >
               <IoBagHandleOutline className="w-5 h-5" />
               <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
                 0
               </div>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -112,52 +183,52 @@ export default function Header() {
         <div className="container mx-auto px-6 py-3">
           <ul className="flex space-x-6 justify-center gap-16 flex-wrap">
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 NEW TODAY
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 CLOTHING
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 DRESSES
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 ACCESSORIES
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 BRANDS
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 SALE
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
