@@ -14,7 +14,7 @@ interface ProductFormProps {
 
 const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, onCancel }) => {
     const [product, setProduct] = useState<Partial<Product>>(initialProduct);
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [newCategory, setNewCategory] = useState<Category>({
         _id: '',
         category_name: '',
@@ -38,8 +38,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
             }));
             setFileList(formattedImages);
         }
-        if (initialProduct?.categories && initialProduct.categories.length > 0) {
-            setSelectedCategory(initialProduct.categories[0]._id); // Lấy danh mục đầu tiên
+        if (initialProduct?.categories) {
+            const categoryIds = initialProduct.categories.map((category) => category._id);
+            setSelectedCategories(categoryIds);
         }
     }, [initialProduct]);
     // Xử lý upload file
@@ -84,11 +85,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
         message.info('Image removed.');
     };
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCategory(e.target.value);
-        setShowNewCategoryForm(false);
+    const handleCategoryCheckboxChange = (categoryId: string) => {
+        setSelectedCategories((prev) =>
+            prev.includes(categoryId)
+                ? prev.filter((id) => id !== categoryId) // Bỏ chọn nếu đã tồn tại
+                : [...prev, categoryId] // Thêm nếu chưa tồn tại
+        );
     };
-
     const handleNewCategoryFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewCategory((prev) => ({ ...prev, [name]: value }));
@@ -117,7 +120,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
             return;
         }
         setCategories([...categories, newCategory]);
-        setSelectedCategory(newCategory._id);
+
         setShowNewCategoryForm(false);
     };
 
@@ -132,18 +135,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
         if (!product.brand) newErrors.brand = 'Brand is required.';
         if (product.stock_quantity !== undefined && product.stock_quantity < 0)
             newErrors.stock_quantity = 'Stock quantity cannot be negative.';
-        if (!selectedCategory && !showNewCategoryForm)
-            newErrors.categories = 'Please select or add at least one category.';
+        if (selectedCategories.length === 0) newErrors.categories = 'Please select at least one category.';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSave = () => {
         if (validate()) {
-            const selectedCategoryObj = categories.find((cat) => cat._id === selectedCategory);
+            const selectedCategoryObjects = categories.filter((cat) =>
+                selectedCategories.includes(cat._id)
+            );
             const finalProduct: Partial<Product> = {
                 ...product,
-                categories: selectedCategoryObj ? [selectedCategoryObj] : [],
+                categories: selectedCategoryObjects,
                 image: fileList.map((file) => file.url || file.response?.url || ''), // Lấy URL từ fileList
             };
             onSave(finalProduct);
@@ -154,7 +158,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
                 <div>
                     <label className="block font-medium">Product ID</label>
                     <input
@@ -287,7 +291,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                 </div>
             </div>
 
-            <div className="mt-6 flex flex-row gap-6">
+            <div className="mt-6 flex flex-row gap-8">
                 <div className='w-1/2 justify-center'>
 
                     <div>
@@ -344,33 +348,31 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                     </div>
                 </div>
                 <div className='w-1/2 justify-center'>
-
-
-
                     <label className="block font-medium">Category</label>
-                    <div className='flex flex-row pt-2'>
-                        <select
-                            name="categories"
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                            className={`w-full mt-1 p-2 border rounded-md ${errors.categories ? 'border-red-500' : ''}`}
-                        >
-                            <option value="">Select a category</option>
+                    <div className='flex flex-row pt-3 pb-3'>
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-2">
                             {categories.map((category) => (
-                                <option key={category._id} value={category._id}>
-                                    {category.category_name}
-                                </option>
+                                <div key={category._id} className="flex items-center text-[15px]">
+                                    <input
+                                        type="checkbox"
+                                        id={category._id}
+                                        value={category._id}
+                                        checked={selectedCategories.includes(category._id)}
+                                        onChange={() => handleCategoryCheckboxChange(category._id)}
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor={category._id}>{category.category_name}</label>
+                                </div>
                             ))}
-                        </select>
-                        <button
-
-                            onClick={toggleNewCategoryForm}
-                            className=" text-black p-2 rounded-md"
-                        >
-                            {showNewCategoryForm ? <IoClose /> : <IoAddSharp />}
-                        </button>
+                        </div>
                     </div>
                     <div>
+                        <button
+                            onClick={toggleNewCategoryForm}
+                            className=" text-black pt-2 text-[15px] rounded-md flex flex-row gap-2 justify-center items-center"
+                        >Add new category
+                            {showNewCategoryForm ? <IoClose /> : <IoAddSharp />}
+                        </button>
                         {showNewCategoryForm ? (
                             <div>
                                 <input
@@ -410,8 +412,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
             </div>
             <div className='flex flex-row gap-2 justify-end'>
                 <div className='flex '>
-                    <Button  className=' text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
-                        Save 
+                    <Button className=' text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
+                        Save
                     </Button>
                 </div>
                 <div className='flex justify-end'>
