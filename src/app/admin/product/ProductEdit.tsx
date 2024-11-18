@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ProductForm from "@components/ProductForm";
-import mockProducts, { Product } from "@src/types/Product";
+import mockProducts, { Product, updateProductInMockProducts } from "@src/types/Product";
 
 const EditProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Lấy ID sản phẩm từ URL
@@ -26,11 +26,16 @@ const EditProduct: React.FC = () => {
       const updatedProducts = mockProducts.map((prod) =>
         prod._id === product._id ? { ...prod, ...updatedProduct } : prod
       );
+      const updatedProductData = { ...product, ...updatedProduct };
+      updateProductInMockProducts(updatedProductData); // Cập nhật mockProducts
 
-      console.log("Updated Products:", updatedProducts); // Kiểm tra kết quả
+      console.log("Updated Products:", updatedProduct); // Kiểm tra kết quả
       alert("Sản phẩm đã được cập nhật thành công.");
       navigate("/admin/product/list"); // Chuyển hướng về danh sách sản phẩm
     }
+  };
+  const handelCancel = () => {
+    navigate("/admin/product/list");
   };
 
   return (
@@ -40,6 +45,7 @@ const EditProduct: React.FC = () => {
         <ProductForm
           initialProduct={product}
           onSave={handleUpdateProduct}
+          onCancel={handelCancel}
         />
       ) : (
         <p>Đang tải dữ liệu sản phẩm...</p>

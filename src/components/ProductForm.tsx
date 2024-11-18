@@ -9,9 +9,10 @@ import { UploadOutlined } from '@ant-design/icons';
 interface ProductFormProps {
     initialProduct?: Partial<Product>;
     onSave: (product: Partial<Product>) => void;
+    onCancel: () => void;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }) => {
+const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, onCancel }) => {
     const [product, setProduct] = useState<Partial<Product>>(initialProduct);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [newCategory, setNewCategory] = useState<Category>({
@@ -36,6 +37,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                 url: url, // URL của ảnh
             }));
             setFileList(formattedImages);
+        }
+        if (initialProduct?.categories && initialProduct.categories.length > 0) {
+            setSelectedCategory(initialProduct.categories[0]._id); // Lấy danh mục đầu tiên
         }
     }, [initialProduct]);
     // Xử lý upload file
@@ -404,10 +408,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                     </div>
                 </div>
             </div>
-            <div className='flex justify-end'>
-                <Button className=' text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
-                    Save Product
-                </Button>
+            <div className='flex flex-row gap-2 justify-end'>
+                <div className='flex '>
+                    <Button  className=' text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
+                        Save 
+                    </Button>
+                </div>
+                <div className='flex justify-end'>
+                    <Button
+                        className=' text-[16px] p-4 w-32 mt-6'
+                        onClick={onCancel}>
+                        Cancel
+                    </Button>
+                </div>
             </div>
 
         </div>

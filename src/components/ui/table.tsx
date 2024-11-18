@@ -10,7 +10,9 @@ interface CommonTableProps<T> extends TableProps<T> {
   dataSource: T[];
   rowKey: string;
   rowSelection?: any;
-  onAddNew?: () => void; // Add a prop for the "Add New" button handler
+  onRow?: (record: T) => React.HTMLProps<HTMLElement>;
+  onAddNew: () => void;
+  onProductUpdate?: (updatedProduct: T) => void;  // Thêm prop onProductUpdate
 }
 
 function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
@@ -32,9 +34,22 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
   const handleSearch = (value: string) => {
     setSearchText(value);
     const filteredData = dataSource.filter(item =>
-      item.name.toLowerCase().includes(value.toLowerCase())
+      Object.values(item).some(val =>
+        String(val).toLowerCase().includes(value.toLowerCase())
+      )
     );
     setTableData(filteredData);
+  };
+  const handleHide = () => {
+    setTableData(prevData =>
+      prevData.map(item =>
+        selectedRowKeys.includes(item[rowKey])
+          ? { ...item, status: false } // Giả sử bạn ẩn sản phẩm bằng cách đổi trạng thái thành false
+          : item
+      )
+    );
+    setSelectedRowKeys([]);
+    message.success("Selected items hidden");
   };
 
   const mergedRowSelection = rowSelection
@@ -63,7 +78,7 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           <Space>
             <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
             <Button onClick={handleDelete}>Delete</Button>
-            <Button>Hide</Button>
+            <Button onClick={handleHide}>Hide</Button>
           </Space>
         </div>
       )}
