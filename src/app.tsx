@@ -21,7 +21,8 @@ import OrderManagement from "@app/admin/order";
 import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
 import ResetPasswordForm from "@app/password/ResetPasswordForm";
 import NewProduct from "@app/admin/product/NewProduct";
-import ProductEdit from "@app/admin/product/ProductEdit";
+import EditProduct from "@app/admin/product/ProductEdit";
+import EditProductStorage from "@app/admin/storage/ProductEdit";
 
 const items: Product[] = [];
 
@@ -56,7 +57,11 @@ function App() {
             <Route path="/admin/customer" element={<CustomerList />} />
             <Route
               path="/admin/product/list/edit/:id"
-              element={<ProductEdit />}
+              element={<EditProduct />}
+            />
+            <Route
+              path="/admin/storage/edit/:id"
+              element={<EditProductStorage/>}
             />
           </Route>
         </Routes>

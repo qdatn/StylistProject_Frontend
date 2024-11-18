@@ -11,15 +11,17 @@ interface CommonTableProps<T> extends TableProps<T> {
   rowKey: string;
   rowSelection?: any;
   onRow?: (record: T) => React.HTMLProps<HTMLElement>;
-  onAddNew: () => void;
+  onAddNew?: () => void;
   onProductUpdate?: (updatedProduct: T) => void;  // Thêm prop onProductUpdate
+  hideAddButton?: boolean;
 }
 
 function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
-  const { columns, dataSource, rowKey, rowSelection, onAddNew, ...restProps } = props;
+  const { columns, dataSource, rowKey, rowSelection, onAddNew, hideAddButton = false,...restProps } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState(dataSource);
   const [searchText, setSearchText] = useState('');
+  
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -68,9 +70,9 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           onSearch={handleSearch}
           style={{ width: 200 }}
         />
-        <Button type="primary" onClick={onAddNew}>
+        {!hideAddButton && (<Button type="primary" onClick={onAddNew}>
           Add New
-        </Button>
+        </Button>)}
       </div>
 
       {selectedRowKeys.length > 0 && (

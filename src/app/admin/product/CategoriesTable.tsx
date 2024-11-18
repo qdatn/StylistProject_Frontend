@@ -1,8 +1,11 @@
 import React from 'react';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
 import { Tag } from 'antd';
-import { mockCategories } from '@src/types/Category'; // Import mock data của category
-
+import { Category, mockCategories } from '@src/types/Category'; // Import mock data của category
+interface CategoryTableProps {
+  categories: Category[];
+  
+}
 const categoryColumns = [
   {
     title: 'Category Name',
