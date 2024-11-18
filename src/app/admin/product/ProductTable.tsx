@@ -12,7 +12,7 @@ const productColumns: ColumnsType<Product> = [
   {
     title: 'Image',
     dataIndex: 'image',
-    render: (image: string) => <img src={image} alt="product" style={{ width: 50, height: 50 }} />,
+    render: (image: string) => <img src={image[0]} alt="product" style={{ width: 50, height: 50 }} />,
   },
   {
     title: 'Name',

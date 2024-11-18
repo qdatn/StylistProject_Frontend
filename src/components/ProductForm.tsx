@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Product } from '@src/types/Product';
 import { Category, mockCategories } from '@src/types/Category';
 import { IoAddSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import { Upload, Button, Input, message, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-
 
 interface ProductFormProps {
     initialProduct?: Partial<Product>;
@@ -15,15 +14,30 @@ interface ProductFormProps {
 const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }) => {
     const [product, setProduct] = useState<Partial<Product>>(initialProduct);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [newCategory, setNewCategory] = useState<Category>({ _id: '', category_name: '', description: '' });
+    const [newCategory, setNewCategory] = useState<Category>({
+        _id: '',
+        category_name: '',
+        description: '',
+    });
     const [showNewCategoryForm, setShowNewCategoryForm] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [categories, setCategories] = useState<Category[]>(mockCategories);
-    //const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [fileList, setFileList] = useState<any[]>([]);
     const [newImageUrl, setNewImageUrl] = useState<string>('');
     const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
 
+    useEffect(() => {
+        if (initialProduct?.image) {
+            // Chuyển đổi URL sang format fileList
+            const formattedImages = initialProduct.image.map((url, index) => ({
+                uid: `${index}`,
+                name: `Image-${index + 1}`,
+                status: 'done',
+                url: url, // URL của ảnh
+            }));
+            setFileList(formattedImages);
+        }
+    }, [initialProduct]);
     // Xử lý upload file
     const handleUploadChange = (info: any) => {
         let newFileList = [...info.fileList];
@@ -84,7 +98,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
         }));
     };
 
-
     const toggleNewCategoryForm = () => {
         setShowNewCategoryForm((prev) => !prev);
         setNewCategory({ _id: '', category_name: '', description: '' });
@@ -108,11 +121,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
         const newErrors: Record<string, string> = {};
         if (!product._id) newErrors.id = 'Product ID is required.';
         if (!product.product_name) newErrors.name = 'Product name is required.';
-        if (!product.originalPrice || product.originalPrice <= 0) newErrors.originalPrice = 'Original price must be greater than 0.';
-        if (product.discountedPrice === undefined || product.discountedPrice < 0) newErrors.discountedPrice = 'Discounted price must not be negative.';
+        if (!product.originalPrice || product.originalPrice <= 0)
+            newErrors.originalPrice = 'Original price must be greater than 0.';
+        if (product.discountedPrice === undefined || product.discountedPrice < 0)
+            newErrors.discountedPrice = 'Discounted price must not be negative.';
         if (!product.brand) newErrors.brand = 'Brand is required.';
-        if (product.stock_quantity !== undefined && product.stock_quantity < 0) newErrors.stock_quantity = 'Stock quantity cannot be negative.';
-        if (!selectedCategory && !showNewCategoryForm) newErrors.categories = 'Please select or add at least one category.';
+        if (product.stock_quantity !== undefined && product.stock_quantity < 0)
+            newErrors.stock_quantity = 'Stock quantity cannot be negative.';
+        if (!selectedCategory && !showNewCategoryForm)
+            newErrors.categories = 'Please select or add at least one category.';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -123,12 +140,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
             const finalProduct: Partial<Product> = {
                 ...product,
                 categories: selectedCategoryObj ? [selectedCategoryObj] : [],
-                image: fileList,
+                image: fileList.map((file) => file.url || file.response?.url || ''), // Lấy URL từ fileList
             };
             onSave(finalProduct);
         }
     };
     const today = new Date().toISOString().split('T')[0];
+
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
 
@@ -204,11 +222,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                     {errors.brand && <p className="text-red-500 text-sm">{errors.brand}</p>}
                 </div>
             </div>
-             
-            
+
+
             <div >
                 <div className="justify-center mt-2 pt-2 space-y-4">
-                <label className="block font-medium">Product Images</label>
+                    <label className="block font-medium">Product Images</label>
 
                     {/* Upload nhiều ảnh */}
                     <Upload
@@ -256,10 +274,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                     <label className=" block font-medium">Decription</label>
                     <textarea
                         className="w-full mt-1 p-3 border rounded"
-                        value={product.description}
-
-                        placeholder="Write decription."
+                        name="description"
+                        value={product.description || ''}
+                        onChange={handleChange} // Thêm sự kiện onChange
+                        placeholder="Write description."
                     />
+                    {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
                 </div>
             </div>
 

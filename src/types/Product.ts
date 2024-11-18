@@ -31,7 +31,7 @@ const mockProducts: Product[] = [
         image: ['https://via.placeholder.com/300x400', 'https://via.placeholder.com/400x600'],
         stock_quantity: 10,
         categories: [
-            { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+            { _id: '4', category_name: "Dresses", description: "Women's dresses" }
         ],
         attributes: [
             { key: "Color", value: ["Red", "Blue"] },
@@ -51,7 +51,7 @@ const mockProducts: Product[] = [
         image: ['https://via.placeholder.com/300x400'],
         stock_quantity: 10,
         categories: [
-            { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+            { _id: '4', category_name: "Dresses", description: "Women's dresses" }
         ],
         attributes: [
             { key: "Color", value: ["Blue", "Green"] },
@@ -71,7 +71,7 @@ const mockProducts: Product[] = [
         image: ['https://via.placeholder.com/300x400', 'https://via.placeholder.com/400x600'],
         stock_quantity: 10,
         categories: [
-            { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+            { _id: '4', category_name: "Dresses", description: "Women's dresses" }
         ],
         attributes: [
             { key: "Color", value: ["Green"] },
@@ -91,7 +91,7 @@ const mockProducts: Product[] = [
         image: ['https://via.placeholder.com/300x400'],
         stock_quantity: 10,
         categories: [
-            { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+            { _id: '4', category_name: "Dresses", description: "Women's dresses" }
         ],
 
         attributes: [
@@ -112,7 +112,7 @@ const mockProducts: Product[] = [
         image: ['https://via.placeholder.com/300x400'],
         stock_quantity: 10,
         categories: [
-            { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+            { _id: '4', category_name: "Dresses", description: "Women's dresses" }
         ],
         attributes: [
             { key: "Color", value: ["Green"] },
@@ -132,7 +132,7 @@ const mockProducts: Product[] = [
         image: ['https://via.placeholder.com/300x400'],
         stock_quantity: 10,
         categories: [
-            { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+            { _id: '4', category_name: "Dresses", description: "Women's dresses" }
         ],
         attributes: [
             { key: "Color", value: ["Green"] },
@@ -152,7 +152,7 @@ const mockProducts: Product[] = [
         image: ['https://via.placeholder.com/300x400'],
         stock_quantity: 10,
         categories: [
-            { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+            { _id: '4', category_name: "Dresses", description: "Women's dresses" }
         ],
         attributes: [
             { key: "Color", value: ["Green"] },
