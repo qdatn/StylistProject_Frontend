@@ -20,7 +20,11 @@ export default function CustomerHeader() {
 
   // Function to handle hover events
   const handleProfileClick = () => {
-    showPopup ? setShowPopup(false) : setShowPopup(true);
+    if (user.auth.isLogin) {
+      showPopup ? setShowPopup(false) : setShowPopup(true);
+    } else {
+      navigate("/login");
+    }
   };
 
   const handleMouseLeave = () => {
@@ -134,15 +138,15 @@ export default function CustomerHeader() {
             {/* <!-- Account Icon --> */}
             <div className="flex-col items-center">
               <div
-                // to="/account"
-                className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
+                // to={user.auth.isLogin ? "/account" : "/login"}
+                className="flex items-center text-gray-700 hover:bg-gray-50 px- hover:rounded py-2 cursor-pointer"
                 onClick={handleProfileClick}
                 // onMouseLeave={handleMouseLeave}
               >
                 <AiOutlineUser className="w-5 h-5" />
               </div>
               {/* Popup (visible on hover) */}
-              {showPopup && (
+              {showPopup && user.auth.isLogin && (
                 <div
                   className="absolute mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
                   onClick={handleProfileClick}

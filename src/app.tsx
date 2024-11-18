@@ -35,7 +35,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<AccountPage />} />
-          <Route path="/OTPpassword" element={<OTPForm />} />
+          <Route path="/OTP" element={<OTPForm />} />
           <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
           <Route path="/resetpassword" element={<ResetPasswordForm />} />
 
