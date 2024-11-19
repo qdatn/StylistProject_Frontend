@@ -3,8 +3,14 @@ import { clearUser } from "@redux/reducers/authReducer";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { Avatar } from "antd";
+import { UserAccount } from "@src/types/UserAccount";
 
-const MenuSidebar = () => {
+interface AccountDetailsProps {
+  user: UserAccount | null;
+}
+
+const MenuSidebar: React.FC<AccountDetailsProps> = ({ user }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = () => {
@@ -20,11 +26,17 @@ const MenuSidebar = () => {
         </Link>
       </div>
       <div className="flex items-center pl-2 pb-6">
-        <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-xl text-white font-bold mr-3">
+        {/* <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-xl text-white font-bold mr-3">
           NH
-        </div>
+        </div> */}
+        {/* Avatar cho user */}
+        <Avatar
+          size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
+          // className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-xl text-white font-bold mr-3"
+          src={user?.avatar}
+        />
         <div>
-          <h2 className="text-lg font-semibold">Nguyễn Hương</h2>
+          <h2 className="text-lg font-semibold">{user?.name}</h2>
         </div>
       </div>
 

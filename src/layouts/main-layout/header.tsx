@@ -6,7 +6,6 @@ import { AiOutlineUser } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
 import { useState } from "react";
-import axios from "axios";
 import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
 
@@ -21,7 +20,7 @@ export default function CustomerHeader() {
   // Function to handle hover events
   const handleProfileClick = () => {
     if (user.auth.isLogin) {
-      showPopup ? setShowPopup(false) : setShowPopup(true);
+      setShowPopup(!showPopup);
     } else {
       navigate("/login");
     }
@@ -149,8 +148,8 @@ export default function CustomerHeader() {
               {showPopup && user.auth.isLogin && (
                 <div
                   className="absolute mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
-                  onClick={handleProfileClick}
-                  // onMouseLeave={handleMouseLeave}
+                  // onClick={handleProfileClick}
+                  onMouseLeave={handleMouseLeave}
                 >
                   <Link
                     to="/account"
