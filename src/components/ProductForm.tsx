@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Product } from '@src/types/Product';
 import { Category, mockCategories } from '@src/types/Category';
-import { IoAddSharp } from "react-icons/io5";
+import { IoAddSharp, IoRemove } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import { Upload, Button, Input, message, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { Attribute, mockAttributes } from '@src/types/Attribute';
 
 interface ProductFormProps {
     initialProduct?: Partial<Product>;
@@ -26,7 +27,89 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
     const [fileList, setFileList] = useState<any[]>([]);
     const [newImageUrl, setNewImageUrl] = useState<string>('');
     const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
+    const [attributes, setAttributes] = useState<Attribute[]>(mockAttributes);
+    const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+    const [newKey, setNewKey] = useState<string>('');
+    const [newValues, setNewValues] = useState<Record<string, string>>({});
+    const [selectedValues, setSelectedValues] = useState<Record<string, Set<string>>>({});
+    // Thêm key mới
+    const handleAddKey = () => {
+        if (!newKey.trim()) return;
+        if (attributes.some((attr) => attr.key === newKey)) {
+            alert('This attribute already exists.');
+            return;
+        }
+        setAttributes((prev) => [...prev, { key: newKey, value: [] }]);
+        setNewKey('');
+    };
 
+    // Xóa key
+    const handleDeleteKey = (key: string) => {
+        setAttributes((prev) => prev.filter((attr) => attr.key !== key));
+        setSelectedValues((prev) => {
+            const updated = { ...prev };
+            delete updated[key];
+            return updated;
+        });
+    };
+
+    // Toggle hiển thị giá trị của một key
+    const toggleKey = (key: string) => {
+        setExpandedKeys((prev) => {
+            const newExpanded = new Set(prev);
+            if (newExpanded.has(key)) {
+                newExpanded.delete(key);
+            } else {
+                newExpanded.add(key);
+            }
+            return newExpanded;
+        });
+    };
+
+    // Thêm giá trị vào một key
+    const handleAddValue = (key: string) => {
+        if (!newValues[key]?.trim()) return;
+        setAttributes((prev) =>
+            prev.map((attr) =>
+                attr.key === key
+                    ? { ...attr, value: [...attr.value, newValues[key].trim()] }
+                    : attr
+            )
+        );
+        setNewValues((prev) => ({ ...prev, [key]: '' }));
+    };
+
+    // Xóa giá trị khỏi một key
+    const handleDeleteValue = (key: string, value: string) => {
+        setAttributes((prev) =>
+            prev.map((attr) =>
+                attr.key === key ? { ...attr, value: attr.value.filter((v) => v !== value) } : attr
+            )
+        );
+        setSelectedValues((prev) => {
+            const updated = { ...prev };
+            if (updated[key]) {
+                updated[key].delete(value);
+            }
+            return updated;
+        });
+    };
+
+    // Xử lý checkbox thay đổi
+    const handleCheckboxChange = (key: string, value: string) => {
+        setSelectedValues((prev) => {
+            const updated = { ...prev };
+            if (!updated[key]) {
+                updated[key] = new Set();
+            }
+            if (updated[key].has(value)) {
+                updated[key].delete(value);
+            } else {
+                updated[key].add(value);
+            }
+            return updated;
+        });
+    };
     useEffect(() => {
         if (initialProduct?.image) {
             // Chuyển đổi URL sang format fileList
@@ -41,6 +124,26 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
         if (initialProduct?.categories) {
             const categoryIds = initialProduct.categories.map((category) => category._id);
             setSelectedCategories(categoryIds);
+        }
+        if (initialProduct?.attributes) {
+            // Cập nhật attributes dựa trên sản phẩm
+            const productAttributes: Attribute[] = product.attributes || [];
+            setAttributes((prevAttributes) => {
+                return prevAttributes.map((attr) => {
+                    const productAttr = productAttributes.find((pa) => pa.key === attr.key);
+                    return productAttr
+                        ? { ...attr, value: Array.from(new Set([...attr.value, ...productAttr.value])) }
+                        : attr;
+                });
+            });
+
+            // Cập nhật các giá trị đã được chọn (checkbox)
+            const selected = productAttributes.reduce((acc, attr) => {
+                acc[attr.key] = new Set(attr.value);
+                return acc;
+            }, {} as Record<string, Set<string>>);
+
+            setSelectedValues(selected);
         }
     }, [initialProduct]);
     // Xử lý upload file
@@ -142,11 +245,16 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
 
     const handleSave = () => {
         if (validate()) {
+            const updatedAttributes = attributes.map((attr) => ({
+                key: attr.key,
+                value: Array.from(selectedValues[attr.key] || []),
+            }));
             const selectedCategoryObjects = categories.filter((cat) =>
                 selectedCategories.includes(cat._id)
             );
             const finalProduct: Partial<Product> = {
                 ...product,
+                attributes: updatedAttributes,
                 categories: selectedCategoryObjects,
                 image: fileList.map((file) => file.url || file.response?.url || ''), // Lấy URL từ fileList
             };
@@ -158,12 +266,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
 
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-2">
                 <div>
                     <label className="block font-medium">Product ID</label>
                     <input
                         type="text"
-                        name="id"
+                        name="_id"
                         value={product._id || ''}
                         onChange={handleChange}
                         placeholder="Enter product ID"
@@ -176,7 +284,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                     <label className="block font-medium">Product Name</label>
                     <input
                         type="text"
-                        name="name"
+                        name="product_name"
                         value={product.product_name || ''}
                         onChange={handleChange}
                         placeholder="Enter product name"
@@ -291,8 +399,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                 </div>
             </div>
 
-            <div className="mt-6 flex flex-row gap-8">
-                <div className='w-1/2 justify-center'>
+            <div className="mt-6 flex flex-row ">
+                <div className='w-1/2 justify-center pr-6'>
 
                     <div>
                         <label className="block font-medium">Stock Quantity</label>
@@ -347,7 +455,101 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                         {errors.create_date && <p className="text-red-500 text-sm">{errors.create_date}</p>}
                     </div>
                 </div>
-                <div className='w-1/2 justify-center'>
+
+            </div>
+            <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-2">
+                {/* Các attribute */}
+                <div>
+                    <label className="font-medium">Attributes</label>
+                    <div className="flex items-center gap-2 mb-4">
+                        <input
+                            type="text"
+                            className="p-2 border rounded"
+                            value={newKey}
+                            placeholder="Enter new attribute (e.g., Color)"
+                            onChange={(e) => setNewKey(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            onClick={handleAddKey}
+                            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            <IoAddSharp />
+                        </button>
+                    </div>
+
+                    {/* Hiển thị danh sách attribute */}
+                    {attributes.map((attr) => (
+                        <div key={attr.key} className="border-b border-gray-200 pb-4 mb-4">
+                            <div className="flex justify-between items-center">
+                                {/* Key của attribute */}
+                                <span
+                                    className="cursor-pointer text-[15px] text-gray-800 flex items-center gap-1"
+                                    onClick={() => toggleKey(attr.key)}
+                                >
+                                    {attr.key} {expandedKeys.has(attr.key) ? <IoRemove /> : <IoAddSharp />}
+                                </span>
+
+                                {/* Nút xóa key */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteKey(attr.key)}
+                                    className="text-gray-500 hover:underline"
+                                >
+                                    <IoClose />
+                                </button>
+                            </div>
+
+                            {/* Hiển thị giá trị (value) nếu key được mở rộng */}
+                            {expandedKeys.has(attr.key) && (
+                                <div>
+                                    <div className="flex flex-wrap gap-4 mt-2">
+                                        {attr.value.map((val) => (
+                                            <div key={val} className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedValues[attr.key]?.has(val) || false}
+                                                    onChange={() => handleCheckboxChange(attr.key, val)}
+                                                    className="form-checkbox"
+                                                />
+                                                <span>{val}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteValue(attr.key, val)}
+                                                    className="text-gray-500 hover:text-red-500"
+                                                >
+                                                    <IoClose />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Thêm giá trị mới */}
+                                    <div className="flex items-center gap-2 mt-4">
+                                        <input
+                                            type="text"
+                                            value={newValues[attr.key] || ''}
+                                            placeholder={`Add value to ${attr.key}`}
+                                            className="p-2 border rounded"
+                                            onChange={(e) =>
+                                                setNewValues((prev) => ({ ...prev, [attr.key]: e.target.value }))
+                                            }
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleAddValue(attr.key)}
+                                            className="p-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            <IoAddSharp />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                <div >
                     <label className="block font-medium">Category</label>
                     <div className='flex flex-row pt-3 pb-3'>
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-2">

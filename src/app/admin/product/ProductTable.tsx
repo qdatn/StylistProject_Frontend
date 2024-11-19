@@ -8,7 +8,6 @@ import { Product } from "@src/types/Product";
 
 interface ProductTableProps {
   products: Product[];
-  onProductUpdate: (updatedProduct: Product) => void; // Nhận hàm cập nhật sản phẩm từ prop
 }
 
 const productColumns: ColumnsType<Product> = [
@@ -58,7 +57,6 @@ const productColumns: ColumnsType<Product> = [
 
 const ProductTable: React.FC<ProductTableProps> = ({
   products,
-  onProductUpdate,
 }) => {
   const navigate = useNavigate();
 
@@ -84,8 +82,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         onRow={(record) => ({
           onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
         })}
-        onAddNew={handleAddNewProduct}
-        onProductUpdate={onProductUpdate} // Truyền hàm cập nhật cho CommonTable (hoặc xử lý sự kiện cập nhật sản phẩm)
+        onAddNew={handleAddNewProduct}        
       />
     </div>
   );

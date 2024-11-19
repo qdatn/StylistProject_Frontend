@@ -1,7 +1,7 @@
 // app/admin/product/EditProduct.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import mockProducts, { Product, updateProductInMockProducts } from "@src/types/Product";
+import mockProducts, { Product } from "@src/types/Product";
 import ProductStorageForm from "@components/ProductStorageForm";
 
 const EditProductStorage: React.FC = () => {
@@ -22,15 +22,28 @@ const EditProductStorage: React.FC = () => {
 
   const handleUpdateProduct = (updatedProduct: Partial<Product>) => {
     if (product) {
-      // Cập nhật sản phẩm trong mockProducts
-      const updatedProductData = { ...product, ...updatedProduct };
-      updateProductInMockProducts(updatedProductData); // Cập nhật mockProducts
+      // Đảm bảo rằng _id luôn có giá trị và không bị mất khi cập nhật
+      const updatedProductWithId: Product = {
+        ...product,
+        ...updatedProduct,
+        _id: product._id, // Đảm bảo rằng _id không bị mất
+      };
 
-      console.log("Updated Products:", updatedProduct); // Kiểm tra kết quả
-      alert("Sản phẩm đã được cập nhật thành công.");
+      // Cập nhật danh mục trong mockCategories (nếu cần)
+      const index = mockProducts.findIndex((cat) => cat._id === product._id);
+      if (index !== -1) {
+        mockProducts[index] = { ...mockProducts[index], ...updatedProduct };
+      }
+
+      // Cập nhật lại danh mục trong state
+      setProduct(updatedProductWithId);
+
+      // Thông báo thành công
+      console.log("Updated Product:", updatedProductWithId);
+      alert("Product updated successfully!");
       navigate("/admin/storage"); // Chuyển hướng về danh sách sản phẩm
-    }
-  };
+    };
+  }
   const handelCancel = () => {
     navigate("/admin/storage");
   };

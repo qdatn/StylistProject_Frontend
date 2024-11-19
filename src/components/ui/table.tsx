@@ -12,7 +12,7 @@ interface CommonTableProps<T> extends TableProps<T> {
   rowSelection?: any;
   onRow?: (record: T) => React.HTMLProps<HTMLElement>;
   onAddNew?: () => void;
-  onProductUpdate?: (updatedProduct: T) => void;  // Thêm prop onProductUpdate
+  onUpdate?: (updated: T) => void;  
   hideAddButton?: boolean;
 }
 

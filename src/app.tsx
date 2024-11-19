@@ -23,6 +23,8 @@ import ResetPasswordForm from "@app/password/ResetPasswordForm";
 import NewProduct from "@app/admin/product/NewProduct";
 import EditProduct from "@app/admin/product/ProductEdit";
 import EditProductStorage from "@app/admin/storage/ProductEdit";
+import NewCategory from "@app/admin/product/NewCategories";
+import EditCategory from "@app/admin/product/CategoriesEdit";
 
 const items: Product[] = [];
 
@@ -61,8 +63,13 @@ function App() {
             />
             <Route
               path="/admin/storage/edit/:id"
-              element={<EditProductStorage/>}
+              element={<EditProductStorage />}
             />
+             <Route
+              path="/admin/product/categories/edit/:id"
+              element={<EditCategory />}
+            />
+            <Route path="/admin/product/categories/new" element={<NewCategory />} />
           </Route>
         </Routes>
       </BrowserRouter>

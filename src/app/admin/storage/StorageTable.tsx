@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 interface StorageTableProps {
     products: Product[];
-    onStorageUpdate: (updatedProduct: Product) => void; // Nhận hàm cập nhật sản phẩm từ prop
 }
 const productColumns: ColumnsType<Product> = [
 
@@ -56,7 +55,6 @@ const productColumns: ColumnsType<Product> = [
 
 const StorageTable: React.FC<StorageTableProps> = ({
     products,
-    onStorageUpdate,
 }) => {
     const navigate = useNavigate();
 
@@ -75,7 +73,6 @@ const StorageTable: React.FC<StorageTableProps> = ({
                 onRow={(record) => ({
                     onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
                 })}
-                onProductUpdate={onStorageUpdate} // Truyền hàm cập nhật cho CommonTable (hoặc xử lý sự kiện cập nhật sản phẩm)
                 hideAddButton={true}
             />
         </div>

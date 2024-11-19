@@ -21,7 +21,7 @@ export interface Product {
 }
 
 // Dữ liệu giả cho sản phẩm
-let mockProducts: Product[] = [
+const mockProducts: Product[] = [
     {
         _id: '1',
         product_name: 'Wrap bodice balloon sleeve maxi dress',
@@ -167,9 +167,3 @@ let mockProducts: Product[] = [
 ];
 
 export default mockProducts;
-
-export const updateProductInMockProducts = (updatedProduct: Product) => {
-    mockProducts = mockProducts.map((product) =>
-        product._id === updatedProduct._id ? updatedProduct : product
-    );
-};
