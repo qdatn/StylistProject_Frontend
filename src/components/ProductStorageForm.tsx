@@ -14,23 +14,9 @@ interface ProductStorageFormProps {
 
 const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct = {}, onSave, onCancel }) => {
     const [product, setProduct] = useState<Partial<Product>>(initialProduct);
-    const [showNewCategoryForm, setShowNewCategoryForm] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [categories, setCategories] = useState<Category[]>(mockCategories);
     const [fileList, setFileList] = useState<any[]>([]);
-    const [newImageUrl, setNewImageUrl] = useState<string>('');
-    const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
-    // Xử lý upload file
-    const handleUploadChange = (info: any) => {
-        let newFileList = [...info.fileList];
-        setFileList(newFileList);
-        // Kiểm tra trạng thái upload
-        if (info.file.status === 'done') {
-            message.success(`${info.file.name} uploaded successfully.`);
-        } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} upload failed.`);
-        }
-    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
         setProduct((prev) => ({
@@ -57,13 +43,10 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
 
             const finalProduct: Partial<Product> = {
                 ...product,
-
-                image: fileList.map((file) => file.url || file.response?.url || ''), // Lấy URL từ fileList
             };
             onSave(finalProduct);
         }
     };
-    const today = new Date().toISOString().split('T')[0];
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
 
