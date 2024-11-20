@@ -1,10 +1,10 @@
 // app/admin/product/EditProduct.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import ProductForm from "@components/ProductForm";
 import mockProducts, { Product } from "@src/types/Product";
+import ProductStorageForm from "@components/ProductStorageForm";
 
-const EditProduct: React.FC = () => {
+const EditProductStorage: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Lấy ID sản phẩm từ URL
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
@@ -16,7 +16,7 @@ const EditProduct: React.FC = () => {
       setProduct(existingProduct);
     } else {
       alert("Không tìm thấy sản phẩm.");
-      navigate("/admin/product/list"); // Quay lại danh sách nếu không tìm thấy sản phẩm
+      navigate("/admin/storage"); // Quay lại danh sách nếu không tìm thấy sản phẩm
     }
   }, [id, navigate]);
 
@@ -41,18 +41,18 @@ const EditProduct: React.FC = () => {
       // Thông báo thành công
       console.log("Updated Product:", updatedProductWithId);
       alert("Product updated successfully!");
-      navigate("/admin/product/list"); // Chuyển hướng về danh sách sản phẩm
-    }
-  };
+      navigate("/admin/storage"); // Chuyển hướng về danh sách sản phẩm
+    };
+  }
   const handelCancel = () => {
-    navigate("/admin/product/list");
+    navigate("/admin/storage");
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
       {product ? (
-        <ProductForm
+        <ProductStorageForm
           initialProduct={product}
           onSave={handleUpdateProduct}
           onCancel={handelCancel}
@@ -64,4 +64,4 @@ const EditProduct: React.FC = () => {
   );
 };
 
-export default EditProduct;
+export default EditProductStorage;

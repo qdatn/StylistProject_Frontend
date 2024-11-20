@@ -10,14 +10,18 @@ interface CommonTableProps<T> extends TableProps<T> {
   dataSource: T[];
   rowKey: string;
   rowSelection?: any;
-  onAddNew?: () => void; // Add a prop for the "Add New" button handler
+  onRow?: (record: T) => React.HTMLProps<HTMLElement>;
+  onAddNew?: () => void;
+  onUpdate?: (updated: T) => void;  
+  hideAddButton?: boolean;
 }
 
 function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
-  const { columns, dataSource, rowKey, rowSelection, onAddNew, ...restProps } = props;
+  const { columns, dataSource, rowKey, rowSelection, onAddNew, hideAddButton = false,...restProps } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState(dataSource);
   const [searchText, setSearchText] = useState('');
+  
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -32,9 +36,22 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
   const handleSearch = (value: string) => {
     setSearchText(value);
     const filteredData = dataSource.filter(item =>
-      item.name.toLowerCase().includes(value.toLowerCase())
+      Object.values(item).some(val =>
+        String(val).toLowerCase().includes(value.toLowerCase())
+      )
     );
     setTableData(filteredData);
+  };
+  const handleHide = () => {
+    setTableData(prevData =>
+      prevData.map(item =>
+        selectedRowKeys.includes(item[rowKey])
+          ? { ...item, status: false } // Giả sử bạn ẩn sản phẩm bằng cách đổi trạng thái thành false
+          : item
+      )
+    );
+    setSelectedRowKeys([]);
+    message.success("Selected items hidden");
   };
 
   const mergedRowSelection = rowSelection
@@ -53,9 +70,9 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           onSearch={handleSearch}
           style={{ width: 200 }}
         />
-        <Button type="primary" onClick={onAddNew}>
+        {!hideAddButton && (<Button type="primary" onClick={onAddNew}>
           Add New
-        </Button>
+        </Button>)}
       </div>
 
       {selectedRowKeys.length > 0 && (
@@ -63,7 +80,7 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           <Space>
             <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
             <Button onClick={handleDelete}>Delete</Button>
-            <Button>Hide</Button>
+            <Button onClick={handleHide}>Hide</Button>
           </Space>
         </div>
       )}
