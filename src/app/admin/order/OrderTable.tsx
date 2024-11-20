@@ -21,7 +21,7 @@ const orderColumns:  ColumnsType<Order>=[
   {
     title: 'Total Price',
     dataIndex: 'total_price',
-    render: (price: number) => `$${price.toFixed(2)}`, // Hiển thị giá tiền với định dạng USD
+    render: (price: number) => `£${price.toFixed(2)}`, // Hiển thị giá tiền với định dạng USD
   },
   {
     title: 'Status',

@@ -3,7 +3,7 @@ import { Product } from '@src/types/Product';
 import { Category, mockCategories } from '@src/types/Category';
 import { IoAddSharp, IoRemove } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-import { Upload, Button, Input, message, Modal } from 'antd';
+import { Upload, Button, Input, message, Modal, Checkbox } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { Attribute, mockAttributes } from '@src/types/Attribute';
 
@@ -610,6 +610,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
 
                         {errors.categories && <p className="text-red-500 text-sm">{errors.categories}</p>}
                     </div>
+                </div>
+                <div>
+                    <label className="block font-medium">Status</label>
+                    <Checkbox
+                        checked={product.status}
+                        onChange={(e) => setProduct({ ...product, status: e.target.checked })}
+                        className={`mt-1 ${errors.status ? 'text-red-500' : ''}`}
+                    >
+                        Active
+                    </Checkbox>
+                    {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
                 </div>
             </div>
             <div className='flex flex-row gap-2 justify-end'>
