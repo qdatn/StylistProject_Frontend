@@ -65,6 +65,9 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders }) => {
 
   return (
     <div>
+      <div>
+
+      </div>
       <CommonTable
         columns={orderColumns}
         dataSource={orders}
@@ -76,6 +79,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders }) => {
           onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
         })}
         onAddNew={handleAddNewOrder} // Hàm thêm mới đơn hàng
+        hideHideButton={true}
       />
     </div>
   );

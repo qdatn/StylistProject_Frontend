@@ -462,9 +462,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                 <div>
                     <label className="font-medium">Attributes</label>
                     <div className="flex items-center gap-2 mb-4">
-                        <input
+                        <Input
                             type="text"
-                            className="p-2 border rounded"
+                            className="p-2 border rounded-md"
                             value={newKey}
                             placeholder="Enter new attribute (e.g., Color)"
                             onChange={(e) => setNewKey(e.target.value)}
@@ -505,7 +505,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                                 <div>
                                     <div className="flex flex-wrap gap-4 mt-2">
                                         {attr.value.map((val) => (
-                                            <div key={val} className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded">
+                                            <div key={val} className="group flex items-center gap-2 bg-gray-100 px-2 py-1 rounded">
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedValues[attr.key]?.has(val) || false}
@@ -516,7 +516,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                                                 <button
                                                     type="button"
                                                     onClick={() => handleDeleteValue(attr.key, val)}
-                                                    className="text-gray-500 hover:text-red-500"
+                                                    className=" text-gray-300 group-hover:text-gray-800"
                                                 >
                                                     <IoClose />
                                                 </button>
@@ -526,11 +526,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
 
                                     {/* Thêm giá trị mới */}
                                     <div className="flex items-center gap-2 mt-4">
-                                        <input
+                                        <Input
                                             type="text"
                                             value={newValues[attr.key] || ''}
                                             placeholder={`Add value to ${attr.key}`}
-                                            className="p-2 border rounded"
+                                            className=" border rounded-md w-1/2"
                                             onChange={(e) =>
                                                 setNewValues((prev) => ({ ...prev, [attr.key]: e.target.value }))
                                             }
@@ -538,7 +538,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                                         <button
                                             type="button"
                                             onClick={() => handleAddValue(attr.key)}
-                                            className="p-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                            className="p-1.5 bg-gray-400 text-white rounded hover:bg-gray-500"
                                         >
                                             <IoAddSharp />
                                         </button>

@@ -12,16 +12,17 @@ interface CommonTableProps<T> extends TableProps<T> {
   rowSelection?: any;
   onRow?: (record: T) => React.HTMLProps<HTMLElement>;
   onAddNew?: () => void;
-  onUpdate?: (updated: T) => void;  
+  onUpdate?: (updated: T) => void;
   hideAddButton?: boolean;
+  hideHideButton?: boolean;
 }
 
 function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
-  const { columns, dataSource, rowKey, rowSelection, onAddNew, hideAddButton = false,...restProps } = props;
+  const { columns, dataSource, rowKey, rowSelection, onAddNew, hideAddButton = false, hideHideButton = false, ...restProps } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState(dataSource);
   const [searchText, setSearchText] = useState('');
-  
+
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -56,10 +57,10 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
 
   const mergedRowSelection = rowSelection
     ? {
-        selectedRowKeys,
-        onChange: onSelectChange,
-        ...rowSelection,
-      }
+      selectedRowKeys,
+      onChange: onSelectChange,
+      ...rowSelection,
+    }
     : undefined;
 
   return (
@@ -80,7 +81,9 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           <Space>
             <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
             <Button onClick={handleDelete}>Delete</Button>
-            <Button onClick={handleHide}>Hide</Button>
+            {!hideHideButton && (<Button onClick={onAddNew}>
+              Hide
+            </Button>)}
           </Space>
         </div>
       )}
