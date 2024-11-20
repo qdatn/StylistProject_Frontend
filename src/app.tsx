@@ -14,7 +14,6 @@ import { AdminLayout } from "@layouts/admin-layout/admin-layout";
 import AdminHome from "@app/admin/home";
 import { OTPForm } from "@app/password/OTP";
 import StoragePage from "@app/admin/storage";
-import ProductList from "@app/admin/product/ProductList";
 import Categories from "@app/admin/product/Categories";
 import CustomerList from "@app/admin/customer/CustomerList";
 import OrderManagement from "@app/admin/order";
@@ -22,6 +21,7 @@ import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
 import ResetPasswordForm from "@app/password/ResetPasswordForm";
 import NewProduct from "@app/admin/product/NewProduct";
 import ProductEdit from "@app/admin/product/ProductEdit";
+import ProductListPage from "@app/customer/product";
 
 const items: Product[] = [];
 
@@ -49,7 +49,7 @@ function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin/" element={<AdminHome />} />
             <Route path="/admin/storage" element={<StoragePage />} />
-            <Route path="/admin/product/list" element={<ProductList />} />
+            <Route path="/admin/product/list" element={<ProductListPage />} />
             <Route path="/admin/product/categories" element={<Categories />} />
             <Route path="admin/product/list/new" element={<NewProduct />} />
             <Route path="/admin/order" element={<OrderManagement />} />
