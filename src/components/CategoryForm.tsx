@@ -41,7 +41,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
 
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
                 <div>
                     <label className="block font-medium">Category ID</label>
                     <input

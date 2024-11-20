@@ -25,6 +25,8 @@ import EditProduct from "@app/admin/product/ProductEdit";
 import EditProductStorage from "@app/admin/storage/ProductEdit";
 import NewCategory from "@app/admin/product/NewCategories";
 import EditCategory from "@app/admin/product/CategoriesEdit";
+import NewOrder from "@app/admin/order/OrderNew";
+import EditOrder from "@app/admin/order/OrderEdit";
 
 const items: Product[] = [];
 
@@ -69,7 +71,13 @@ function App() {
               path="/admin/product/categories/edit/:id"
               element={<EditCategory />}
             />
+            <Route
+              path="/admin/order/edit/:id"
+              element={<EditOrder />}
+            />
             <Route path="/admin/product/categories/new" element={<NewCategory />} />
+          
+            <Route path="/admin/order/new" element={<NewOrder/>} />
           </Route>
         </Routes>
       </BrowserRouter>
