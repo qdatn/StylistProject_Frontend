@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Product } from "@src/types/Product";
+import { AiOutlineCheck, AiOutlineClose, AiOutlineDown, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import { Input } from "antd";
 
 export interface CartItemProps {
   product: Product; // Dữ liệu sản phẩm từ Cart
-  onUpdateQuantity?: (increment: boolean) => void; // Hàm để cập nhật số lượng
+  onUpdateQuantity?: (newQuantity: number) => void; // Hàm để cập nhật số lượng, truyền trực tiếp số lượng mới
   onRemove?: () => void; // Hàm để xóa sản phẩm
-  onSelect?: (selected: boolean) => void; // Hàm để chọn sản phẩm
-  quantity?: number; // Số lượng sản phẩm trong giỏ hàng
+  onSelect: (selected: boolean) => void; // Hàm để chọn sản phẩm
+  quantity: number; // Số lượng sản phẩm trong giỏ hàng
 }
 
 // Hàm để lấy hình ảnh sản phẩm dựa trên ID
@@ -18,64 +20,91 @@ const CartItem: React.FC<CartItemProps> = ({
   onSelect,
   quantity,
 }) => {
+  const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handleAttributeChange = (key: string, value: string) => {
+    setSelectedAttributes(prev => ({ ...prev, [key]: value }));
+  };
+
+  const toggleSelect = () => {
+    const newSelected = !isSelected;
+    setIsSelected(newSelected);
+    onSelect(newSelected);
+  };
   return (
-    <div className="flex justify-between items-center border-b py-4">
-      <div className="flex items-center">
-        {/* Hình ảnh sản phẩm */}
-        <img
-          src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
-          alt={product.product_name}
-          className="w-20 h-20 object-cover mr-4"
-        />
-        <div>
-          <h2 className="font-semibold">{product.product_name}</h2>
-          <p className="text-gray-600">Giá gốc: ${product.price.toFixed(2)}</p>
-          <p className="text-red-500">
-            Giá đã giảm: ${product.price?.toFixed(2)}
-          </p>
-          <p className="text-gray-500">Số lượng: {quantity}</p>
-          <div className="mt-2">
-            {product.attributes?.map((attr) => (
-              <div key={attr.key} className="flex">
-                <span className="font-medium">{attr.key}: </span>
-                <span className="text-gray-600 ml-2">
-                  {attr.value.join(", ")}
-                </span>
+    <div className="flex flex-col sm:flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
+      <img
+        src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
+        alt={product.product_name}
+        className="w-20 h-20 object-cover rounded-lg mr-4"
+      />
+
+      <div className="flex flex-col flex-grow">
+        <div className="flex justify-between items-start">
+          <h2 className="font-semibold mb-1">{product.product_name}</h2>
+          <button onClick={onRemove} className="text-gray-300 hover:text-gray-700">
+            <AiOutlineClose size={20} />
+          </button>
+        </div>
+        <div className="flex flex-row gap-2 font-bold mb-2">
+          <span className="text-gray-500 line-through">£{product.price.toFixed(2)}</span>
+          <span className="text-red-500">£{product.price.toFixed(2)}</span>
+        </div>
+        <div className="flex items-center mb-2 flex-wrap">
+          {product.attributes.map(attr => (
+            <div key={attr.key} className="flex items-center mr-4 mb-2">
+              <label className="mr-2 text-[15px]">{attr.key}:</label>
+              <div className="relative">
+                <select
+                  value={selectedAttributes[attr.key] || attr.value[0]}
+                  onChange={(e) => handleAttributeChange(attr.key, e.target.value)}
+                  className="text-[15px] appearance-none px-4 py-2 text-gray-700 focus:outline-none bg-white pr-6"
+                >
+                  {attr.value.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+                <AiOutlineDown className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500" />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      </div>
-      <div className="text-right">
-        <p className="font-bold text-lg">
-          ${(product.discountedPrice! * quantity!).toFixed(2)}{" "}
-          {/* Tính tổng giá cho sản phẩm */}
-        </p>
-        <div className="flex gap-4 mt-2">
-          {/* Các nút điều chỉnh số lượng */}
+        <div className="flex items-center">
           <button
-            onClick={() => onUpdateQuantity!(true)}
-            className="px-2 py-1 bg-blue-500 text-white rounded"
+            onClick={() => onUpdateQuantity && onUpdateQuantity(quantity - 1)}
+            disabled={quantity <= 1}
+            className="p-1 rounded-l text-gray-600 hover:bg-gray-200"
           >
-            +
+            <AiOutlineMinus />
           </button>
+          <Input
+            type="text"
+            min="1"
+            max={product.stock_quantity}
+            value={quantity}
+            onChange={(e) =>
+              onUpdateQuantity && onUpdateQuantity(Math.max(1, Math.min(Number(e.target.value), product.stock_quantity)))
+            }
+            className="text-center w-14 border"
+          />
           <button
-            onClick={() => onUpdateQuantity!(false)}
-            className="px-2 py-1 bg-blue-500 text-white rounded"
+            onClick={() => onUpdateQuantity && onUpdateQuantity(quantity + 1)}
+            disabled={quantity >= product.stock_quantity}
+            className="p-1 rounded-r text-gray-600 hover:bg-gray-200"
           >
-            -
-          </button>
-          {/* Nút xóa sản phẩm */}
-          <button
-            onClick={onRemove}
-            className="px-4 py-1 bg-red-500 text-white rounded"
-          >
-            Xóa
+            <AiOutlinePlus />
           </button>
         </div>
-      </div>
-    </div>
+      </div >
+      <button onClick={toggleSelect} className="ml-4">
+        <div className={`w-6 h-6 border rounded ${isSelected ? 'bg-gray-400' : 'bg-white'} flex items-center justify-center`}>
+          <AiOutlineCheck className={isSelected ? 'text-white' : 'text-transparent'} />
+        </div>
+      </button>
+    </div >
   );
 };
+
 
 export default CartItem;
