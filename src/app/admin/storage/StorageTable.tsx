@@ -9,11 +9,14 @@ interface StorageTableProps {
     products: Product[];
 }
 const productColumns: ColumnsType<Product> = [
-
+    {
+        title: 'ID',
+        dataIndex: '_id',
+    },
     {
         title: 'Image',
-        dataIndex: 'image',
-        render: (image: string) => <img src={image[0]} alt="product" style={{ width: 50, height: 50 }} />,
+        dataIndex: 'images',
+        render: (images: string) => <img src={images[0]} alt="product" style={{ width: 50, height: 50 }} />,
     },
     {
         title: 'Name',
@@ -34,8 +37,8 @@ const productColumns: ColumnsType<Product> = [
 
     {
         title: 'Date Created',
-        dataIndex: 'create_date',
-        render: (create_date: string) => dayjs(create_date).format('DD/MM/YYYY'),
+        dataIndex: 'createdAt',
+        render: (createdAt: string) => dayjs(createdAt).format('DD/MM/YYYY'),
     },
     {
         title: 'Status',

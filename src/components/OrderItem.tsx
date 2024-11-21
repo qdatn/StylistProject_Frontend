@@ -13,7 +13,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
     <div className="flex items-center border-b py-4 text-gray-700">
       {/* Hình ảnh sản phẩm */}
       <img
-        src={product.image?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
+        src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
         alt={product.product_name}
         className="w-20 h-24 object-cover mr-4"
       />
@@ -30,7 +30,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
       {/* Giá sản phẩm */}
       <div className="text-right">
         <p className="text-sm line-through text-gray-500 mb-1">
-          £{product.originalPrice.toFixed(2)}
+          £{product.price.toFixed(2)}
         </p>
         <p className="text-sm text-red-500 font-semibold">
           £{product.discountedPrice.toFixed(2)}

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import ProductList from "./customer/product";
+import ProductListPage from "./customer/product";
 import Slider from "@app/slider";
 import Banner from "./banner";
 
@@ -8,8 +8,8 @@ export default function HomePage() {
   return (
     <>
       <Slider />
-      <ProductList />
-      <Banner/>
+      <ProductListPage />
+      <Banner />
     </>
   );
 }
