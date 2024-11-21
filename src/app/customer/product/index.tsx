@@ -17,9 +17,9 @@ export default function ProductList() {
 
   return (
     <>
-      <div className="grid grid-rows-[auto_1fr_auto] bg-white items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="grid grid-rows-[auto_1fr_auto] bg-white items-center justify-items-center min-h-screen p-8 gap-x-16  sm:p-20 font-[family-name:var(--font-geist-sans)]">
         {/* Hiển thị danh sách sản phẩm */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
             <ProductItem key={product._id} product={product} /> // Truyền sản phẩm vào ProductItem
           ))}
