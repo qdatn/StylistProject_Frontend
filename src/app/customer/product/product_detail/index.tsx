@@ -1,7 +1,7 @@
 // app/product/[id]/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@redux/reducers/cartReducer";
 
 import CommentItem from "@components/CommentItem";
@@ -14,10 +14,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Carousel, Slider } from "antd";
 import axiosClient from "@api/axiosClient";
 import formatDateTime from "@utils/formatDateTime";
+import { RootState } from "@redux/store";
+import { Cart } from "@src/types/Cart";
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
-  const [products, setProducts] = useState<Product | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [comments, setComments] = useState<CommentList | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [detailsVisible, setDetailsVisible] = useState(false);
@@ -25,6 +27,7 @@ const ProductDetail: React.FC = () => {
     [key: string]: string;
   }>({});
   const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth);
 
   console.log(id);
   const urlPath = import.meta.env.VITE_API_URL;
@@ -38,7 +41,7 @@ const ProductDetail: React.FC = () => {
         {}
       );
 
-      setProducts(response);
+      setProduct(response);
       console.log("PRODUCT", response);
     } catch (error) {
       alert(error);
@@ -74,15 +77,24 @@ const ProductDetail: React.FC = () => {
   const [addToCartSuccess, setAddToCartSuccess] = useState(true);
 
   // Cập nhật handleAddToCart để hiển thị thông báo
-  //   const handleAddToCart = () => {
-  //     if (products) {
-  //       // Kiểm tra product có phải là null không
-  //       // Gọi action addToCart để thêm sản phẩm vào giỏ hàng
-  //       dispatch(addToCart({ products, quantity }));
-  //     } else {
-  //       console.error("Product is not available.");
-  //     }
-  //   };
+  const handleAddToCart = () => {
+    if (product) {
+      // Kiểm tra product có phải là null không
+      // Gọi action addToCart để thêm sản phẩm vào giỏ hàng
+      // dispatch(addToCart({ product, quantity }));
+      try {
+        const productId = product._id;
+        const userId = user.auth.user?.user._id;
+        const res = axiosClient.put<Cart>(`${urlPath}/api/cart/${userId}`, {
+          products: [productId.toString()],
+        });
+      } catch (error) {
+        alert(error);
+      }
+    } else {
+      console.error("Product is not available.");
+    }
+  };
 
   const handleAttributeChange = (key: string, value: string) => {
     setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
@@ -97,8 +109,8 @@ const ProductDetail: React.FC = () => {
     //     (filteredComments?.length || 1);
   }
 
-  if (!products) return <p>Loading...</p>;
-  if (!products || !products.images || products.images.length === 0) {
+  if (!product) return <p>Loading...</p>;
+  if (!product || !product.images || product.images.length === 0) {
     return <p>No products data or images available.</p>;
   }
 
@@ -110,8 +122,8 @@ const ProductDetail: React.FC = () => {
             <div className="relative w-[600px] h-[400px]">
               {/* Hiển thị ảnh hiện tại */}
               <img
-                src={products.images[currentImageIndex]}
-                alt={`${products.product_name || "Product"} - ${
+                src={product.images[currentImageIndex]}
+                alt={`${product.product_name || "Product"} - ${
                   currentImageIndex + 1
                 }`}
                 className="object-contain w-full h-full"
@@ -122,7 +134,7 @@ const ProductDetail: React.FC = () => {
                 className="absolute top-1/2 left-10 transform -translate-y-1/2 text-gray-800 p-2 rounded hover:bg-gray-200"
                 onClick={() =>
                   setCurrentImageIndex((prevIndex) =>
-                    prevIndex === 0 ? products.images.length - 1 : prevIndex - 1
+                    prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
                   )
                 }
               >
@@ -134,7 +146,7 @@ const ProductDetail: React.FC = () => {
                 className="absolute top-1/2 right-10 transform -translate-y-1/2 text-gray-800 p-2 rounded hover:bg-gray-200"
                 onClick={() =>
                   setCurrentImageIndex((prevIndex) =>
-                    prevIndex === products.images.length - 1 ? 0 : prevIndex + 1
+                    prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
                   )
                 }
               >
@@ -144,19 +156,19 @@ const ProductDetail: React.FC = () => {
           </div>
           <div className="mt-5 flex flex-col w-full md:w-1/2">
             <h1 className="text-[20px] font-medium mb-8 text-gray-700">
-              {products.product_name}
+              {product.product_name}
             </h1>
             <div className="text-2xl flex items-center gap-2">
               <p className="text-gray-500 line-through font-semibold">
-                £{products.price.toFixed(2)}
+                £{product.price.toFixed(2)}
               </p>
               <p className="text-red-500 font-bold">
-                £{products.price.toFixed(2)}
+                £{product.price.toFixed(2)}
               </p>
             </div>
 
             <div className="mt-8">
-              {products.attributes.map((attr) => (
+              {product.attributes.map((attr) => (
                 <div key={attr.key} className="mb-4">
                   <label className="text-[16px] font-medium text-gray-700 block mb-1">
                     {attr.key}:
@@ -194,20 +206,20 @@ const ProductDetail: React.FC = () => {
               <button
                 className="border p-2"
                 onClick={() =>
-                  setQuantity((q) => Math.min(q + 1, products.stock_quantity))
+                  setQuantity((q) => Math.min(q + 1, product.stock_quantity))
                 }
               >
                 <AiOutlinePlus />
               </button>
               <p className="text-gray-500 ml-4">
-                In stock: {products.stock_quantity}
+                In stock: {product.stock_quantity}
               </p>
             </div>
 
             <div className="mt-8 flex gap-4">
               <button
                 className="w-60 bg-gray-700 text-white py-2 rounded-sm text-lg font-semibold"
-                // onClick={handleAddToCart}
+                onClick={handleAddToCart}
               >
                 ADD TO BAG
               </button>

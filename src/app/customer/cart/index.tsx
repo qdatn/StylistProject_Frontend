@@ -1,9 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CartItem from "@components/CartItem";
 import { Product } from "@src/types/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
+import axiosClient from "@api/axiosClient";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
+import { Cart } from "@src/types/Cart";
 
-const CartPage: React.FC<{ items?: Product[] }> = ({ items = [] }) => {
+const CartPage = () => {
+  const user = useSelector((state: RootState) => state.auth);
+  const urlPath = import.meta.env.VITE_API_URL;
   // Giả định bạn sẽ nhận items từ props
   const [formData, setFormData] = useState({
     name: "",
@@ -14,9 +20,25 @@ const CartPage: React.FC<{ items?: Product[] }> = ({ items = [] }) => {
     district: "",
     paymentMethod: "",
   });
-  const [cartItems, setCartItems] = useState<Product[]>(items || []); // Sử dụng sản phẩm từ props
+  const [cartItems, setCartItems] = useState<Product[]>([]); // Sử dụng sản phẩm từ props
   const [discountCode, setDiscountCode] = useState<string>(""); // Giảm giá
   const [selectedItems, setSelectedItems] = useState<string[]>([]); // Sản phẩm được chọn
+
+  const fetchCartItem = async () => {
+    const userId = user.auth.user?.user._id;
+    try {
+      const cartItem = await axiosClient.getOne<Cart>(
+        `${urlPath}/api/cart/${userId}`
+      );
+      setCartItems(cartItem.products);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCartItem();
+  }, []);
 
   // Hàm áp dụng giảm giá
   const applyDiscount = (amount: number) => {
@@ -56,7 +78,9 @@ const CartPage: React.FC<{ items?: Product[] }> = ({ items = [] }) => {
 
   // Xóa sản phẩm khỏi giỏ hàng
   const removeItem = (itemId: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item._id !== itemId)
+    );
     setSelectedItems((prevSelected) =>
       prevSelected.filter((_id) => _id !== itemId)
     );
@@ -92,14 +116,14 @@ const CartPage: React.FC<{ items?: Product[] }> = ({ items = [] }) => {
           <h1 className="text-lg font-semibold mb-4">Shopping Cart</h1>
           {cartItems.map((item) => (
             <CartItem
-            
-            key={item._id} // Thêm key cho mỗi CartItem
-            product={item}
-            quantity={item.stock_quantity}
-            onUpdateQuantity={(increment) => updateQuantity(item._id, increment)}
-            onRemove={() => removeItem(item._id)}
-            onSelect={(selected) => toggleSelectItem(item._id, selected)}
-              
+              key={item._id} // Thêm key cho mỗi CartItem
+              product={item}
+              quantity={item.stock_quantity}
+              onUpdateQuantity={(increment) =>
+                updateQuantity(item._id, increment)
+              }
+              onRemove={() => removeItem(item._id)}
+              onSelect={(selected) => toggleSelectItem(item._id, selected)}
             />
           ))}
           <div className="flex justify-between font-semibold mt-4">

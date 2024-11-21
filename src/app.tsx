@@ -26,8 +26,7 @@ import NewCategory from "@app/admin/product/NewCategories";
 import EditCategory from "@app/admin/product/CategoriesEdit";
 import NewOrder from "@app/admin/order/OrderNew";
 import EditOrder from "@app/admin/order/OrderEdit";
-
-const items: Product[] = [];
+import ProductListPage from "@app/customer/product";
 
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
@@ -48,7 +47,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<CartPage items={items} />} />
+            <Route path="/cart" element={<CartPage />} />
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin/" element={<AdminHome />} />
@@ -66,17 +65,17 @@ function App() {
               path="/admin/storage/edit/:id"
               element={<EditProductStorage />}
             />
-             <Route
+            <Route
               path="/admin/product/categories/edit/:id"
               element={<EditCategory />}
             />
+            <Route path="/admin/order/edit/:id" element={<EditOrder />} />
             <Route
-              path="/admin/order/edit/:id"
-              element={<EditOrder />}
+              path="/admin/product/categories/new"
+              element={<NewCategory />}
             />
-            <Route path="/admin/product/categories/new" element={<NewCategory />} />
-          
-            <Route path="/admin/order/new" element={<NewOrder/>} />
+
+            <Route path="/admin/order/new" element={<NewOrder />} />
           </Route>
         </Routes>
       </BrowserRouter>

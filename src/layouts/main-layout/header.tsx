@@ -168,15 +168,17 @@ export default function CustomerHeader() {
             </div>
 
             {/* <!-- Cart Icon --> */}
-            <Link
-              to="/cart"
-              className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
-            >
-              <IoBagHandleOutline className="w-5 h-5" />
-              <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
-                0
-              </div>
-            </Link>
+            {user && (
+              <Link
+                to={user.auth.isLogin ? "/cart" : "/login"}
+                className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
+              >
+                <IoBagHandleOutline className="w-5 h-5" />
+                <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
+                  0
+                </div>
+              </Link>
+            )}
           </div>
         </div>
       </div>

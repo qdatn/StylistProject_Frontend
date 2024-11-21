@@ -8,9 +8,13 @@ import { Product } from "@src/types/Product";
 import axiosClient from "@api/axiosClient";
 import { Pagination } from "@src/types/Pagination";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { Spin } from "antd";
 
 export default function ProductListPage() {
-  const [products, setProducts] = useState<ProductList>();
+  const [products, setProducts] = useState<ProductList>({
+    data: [],
+    pagination: {},
+  });
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: 1,
     pageSize: 10,
@@ -31,7 +35,10 @@ export default function ProductListPage() {
       );
 
       setProducts((prev) => ({
-        data: [...(prev?.data ?? []), ...response.data],
+        data:
+          page === 1
+            ? response.data
+            : [...(prev?.data ?? []), ...response.data],
         pagination: response.pagination,
       }));
       setPagination(response.pagination);
@@ -43,8 +50,8 @@ export default function ProductListPage() {
   const fetchMoreData = async () => {
     // console.log("Bat dau fetch");
     // await setPagination(products?.pagination);
-    if (pagination && pagination.currentPage < pagination.totalPages!) {
-      const nextPage = pagination.currentPage + 1;
+    if (pagination && pagination.currentPage! < pagination.totalPages!) {
+      const nextPage = pagination.currentPage! + 1;
       console.log("nextPAGE:", pagination?.currentPage);
       await fetchProductItem(nextPage, pagination.pageSize!); // Fetch next page
     } else {
@@ -52,7 +59,7 @@ export default function ProductListPage() {
     }
   };
   useEffect(() => {
-    fetchProductItem(pagination?.currentPage ?? 1, pagination.pageSize);
+    fetchProductItem(pagination?.currentPage ?? 1, pagination.pageSize!);
     // fetchData();
   }, []);
 
@@ -73,10 +80,10 @@ export default function ProductListPage() {
         dataLength={products?.data.length ?? 10}
         next={fetchMoreData}
         hasMore={hasMore}
-        loader={<h4>Loading...</h4>}
+        loader={<Spin tip="Loading" size="small"></Spin>}
         endMessage={
-          <p style={{ textAlign: "center" }}>
-            <b>Yay! You have seen it all</b>
+          <p className="mb-10 flex items-center justify-center">
+            <b>All product had been loaded</b>
           </p>
         }
       >
