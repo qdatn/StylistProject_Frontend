@@ -26,6 +26,9 @@ import NewCategory from "@app/admin/product/NewCategories";
 import EditCategory from "@app/admin/product/CategoriesEdit";
 import NewOrder from "@app/admin/order/OrderNew";
 import EditOrder from "@app/admin/order/OrderEdit";
+import DiscountManagement from "@app/admin/discount";
+import NewDiscount from "@app/admin/discount/NewDiscount";
+import EditDiscount from "@app/admin/discount/DiscountEdit";
 import ProductListPage from "@app/customer/product";
 
 function App() {
@@ -56,6 +59,7 @@ function App() {
             <Route path="/admin/product/categories" element={<Categories />} />
             <Route path="admin/product/list/new" element={<NewProduct />} />
             <Route path="/admin/order" element={<OrderManagement />} />
+            <Route path="/admin/discount" element={<DiscountManagement />} />
             <Route path="/admin/customer" element={<CustomerList />} />
             <Route
               path="/admin/product/list/edit/:id"
@@ -74,8 +78,13 @@ function App() {
               path="/admin/product/categories/new"
               element={<NewCategory />}
             />
-
-            <Route path="/admin/order/new" element={<NewOrder />} />
+            <Route
+              path="/admin/discount/edit/:id"
+              element={<EditDiscount />}
+            />
+            <Route path="/admin/product/categories/new" element={<NewCategory />} />
+            <Route path="/admin/order/new" element={<NewOrder/>} />
+            <Route path="/admin/discount/new" element={<NewDiscount/>} />
           </Route>
         </Routes>
       </BrowserRouter>

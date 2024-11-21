@@ -12,16 +12,16 @@ interface CommonTableProps<T> extends TableProps<T> {
   rowSelection?: any;
   onRow?: (record: T) => React.HTMLProps<HTMLElement>;
   onAddNew?: () => void;
-  onUpdate?: (updated: T) => void;  
+  onUpdate?: (updated: T) => void;
   hideAddButton?: boolean;
+  hideHideButton?: boolean;//nhưng form không cần nút "toggle status" thì cho nút này ẩn đi
 }
 
 function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
-  const { columns, dataSource, rowKey, rowSelection, onAddNew, hideAddButton = false,...restProps } = props;
+  const { columns, dataSource, rowKey, rowSelection, onAddNew, hideAddButton = false, hideHideButton = false, ...restProps } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState(dataSource);
   const [searchText, setSearchText] = useState('');
-  
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -42,24 +42,26 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
     );
     setTableData(filteredData);
   };
-  const handleHide = () => {
+
+  //tương ứng với hideHidebutton để thay đổi trạng thái
+  const handleToggleStatus = () => {
     setTableData(prevData =>
       prevData.map(item =>
         selectedRowKeys.includes(item[rowKey])
-          ? { ...item, status: false } // Giả sử bạn ẩn sản phẩm bằng cách đổi trạng thái thành false
+          ? { ...item, status: !item.status } // Đảo ngược trạng thái `status`
           : item
       )
     );
     setSelectedRowKeys([]);
-    message.success("Selected items hidden");
+    message.success("Toggled status of selected items");
   };
 
   const mergedRowSelection = rowSelection
     ? {
-        selectedRowKeys,
-        onChange: onSelectChange,
-        ...rowSelection,
-      }
+      selectedRowKeys,
+      onChange: onSelectChange,
+      ...rowSelection,
+    }
     : undefined;
 
   return (
@@ -80,7 +82,9 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           <Space>
             <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
             <Button onClick={handleDelete}>Delete</Button>
-            <Button onClick={handleHide}>Hide</Button>
+            {!hideHideButton && (<Button onClick={handleToggleStatus}>
+              Toggle Status 
+            </Button>)}
           </Space>
         </div>
       )}
