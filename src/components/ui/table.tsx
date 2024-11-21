@@ -10,11 +10,15 @@ interface CommonTableProps<T> extends TableProps<T> {
   dataSource: T[];
   rowKey: string;
   rowSelection?: any;
-  onAddNew?: () => void; // Add a prop for the "Add New" button handler
+  onRow?: (record: T) => React.HTMLProps<HTMLElement>;
+  onAddNew?: () => void;
+  onUpdate?: (updated: T) => void;
+  hideAddButton?: boolean;
+  hideHideButton?: boolean;//nhưng form không cần nút "toggle status" thì cho nút này ẩn đi
 }
 
 function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T>) {
-  const { columns, dataSource, rowKey, rowSelection, onAddNew, ...restProps } = props;
+  const { columns, dataSource, rowKey, rowSelection, onAddNew, hideAddButton = false, hideHideButton = false, ...restProps } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState(dataSource);
   const [searchText, setSearchText] = useState('');
@@ -32,17 +36,32 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
   const handleSearch = (value: string) => {
     setSearchText(value);
     const filteredData = dataSource.filter(item =>
-      item.name.toLowerCase().includes(value.toLowerCase())
+      Object.values(item).some(val =>
+        String(val).toLowerCase().includes(value.toLowerCase())
+      )
     );
     setTableData(filteredData);
   };
 
+  //tương ứng với hideHidebutton để thay đổi trạng thái
+  const handleToggleStatus = () => {
+    setTableData(prevData =>
+      prevData.map(item =>
+        selectedRowKeys.includes(item[rowKey])
+          ? { ...item, status: !item.status } // Đảo ngược trạng thái `status`
+          : item
+      )
+    );
+    setSelectedRowKeys([]);
+    message.success("Toggled status of selected items");
+  };
+
   const mergedRowSelection = rowSelection
     ? {
-        selectedRowKeys,
-        onChange: onSelectChange,
-        ...rowSelection,
-      }
+      selectedRowKeys,
+      onChange: onSelectChange,
+      ...rowSelection,
+    }
     : undefined;
 
   return (
@@ -53,9 +72,9 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           onSearch={handleSearch}
           style={{ width: 200 }}
         />
-        <Button type="primary" onClick={onAddNew}>
+        {!hideAddButton && (<Button type="primary" onClick={onAddNew}>
           Add New
-        </Button>
+        </Button>)}
       </div>
 
       {selectedRowKeys.length > 0 && (
@@ -63,7 +82,9 @@ function CommonTable<T extends { [key: string]: any }>(props: CommonTableProps<T
           <Space>
             <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
             <Button onClick={handleDelete}>Delete</Button>
-            <Button>Hide</Button>
+            {!hideHideButton && (<Button onClick={handleToggleStatus}>
+              Toggle Status 
+            </Button>)}
           </Space>
         </div>
       )}

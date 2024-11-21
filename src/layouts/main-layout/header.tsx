@@ -6,7 +6,6 @@ import { AiOutlineUser } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
 import { useState } from "react";
-import axios from "axios";
 import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
 
@@ -20,7 +19,11 @@ export default function CustomerHeader() {
 
   // Function to handle hover events
   const handleProfileClick = () => {
-    showPopup ? setShowPopup(false) : setShowPopup(true);
+    if (user.auth.isLogin) {
+      setShowPopup(!showPopup);
+    } else {
+      navigate("/login");
+    }
   };
 
   const handleMouseLeave = () => {
@@ -134,19 +137,19 @@ export default function CustomerHeader() {
             {/* <!-- Account Icon --> */}
             <div className="flex-col items-center">
               <div
-                // to="/account"
-                className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
+                // to={user.auth.isLogin ? "/account" : "/login"}
+                className="flex items-center text-gray-700 hover:bg-gray-50 px- hover:rounded py-2 cursor-pointer"
                 onClick={handleProfileClick}
                 // onMouseLeave={handleMouseLeave}
               >
                 <AiOutlineUser className="w-5 h-5" />
               </div>
               {/* Popup (visible on hover) */}
-              {showPopup && (
+              {showPopup && user.auth.isLogin && (
                 <div
                   className="absolute mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
-                  onClick={handleProfileClick}
-                  // onMouseLeave={handleMouseLeave}
+                  // onClick={handleProfileClick}
+                  onMouseLeave={handleMouseLeave}
                 >
                   <Link
                     to="/account"
@@ -165,15 +168,17 @@ export default function CustomerHeader() {
             </div>
 
             {/* <!-- Cart Icon --> */}
-            <Link
-              to="/cart"
-              className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
-            >
-              <IoBagHandleOutline className="w-5 h-5" />
-              <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
-                0
-              </div>
-            </Link>
+            {user && (
+              <Link
+                to={user.auth.isLogin ? "/cart" : "/login"}
+                className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
+              >
+                <IoBagHandleOutline className="w-5 h-5" />
+                <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
+                  0
+                </div>
+              </Link>
+            )}
           </div>
         </div>
       </div>

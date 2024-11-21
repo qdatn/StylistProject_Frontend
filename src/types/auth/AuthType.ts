@@ -16,3 +16,10 @@ export interface UserLogin {
   user: User;
   token: string;
 }
+
+export interface RegisterUser {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+}

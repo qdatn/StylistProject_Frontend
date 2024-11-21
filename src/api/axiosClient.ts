@@ -47,7 +47,7 @@ function createApiClient() {
         });
         return response.data;
       } catch (error) {
-        throw new Error(`POST request to ${endpoint} failed: ${error}`);
+        throw new Error(`GET request to ${endpoint} failed: ${error}`);
       }
     },
 
@@ -59,7 +59,7 @@ function createApiClient() {
         const response: AxiosResponse<T> = await client.post(endpoint, data);
         return response.data;
       } catch (error) {
-        throw new Error(`PUT request to ${endpoint} failed: ${error}`);
+        throw new Error(`POST request to ${endpoint} failed: ${error}`);
       }
     },
 

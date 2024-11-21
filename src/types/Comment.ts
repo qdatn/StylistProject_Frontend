@@ -1,41 +1,51 @@
-import { Attribute } from './Attribute';
-import mockProducts, { Product } from './Product';
+import { UserInfo } from "os";
+import { Attribute } from "./Attribute";
+import { User } from "./auth/AuthType";
+import { Pagination } from "./Pagination";
+import mockProducts, { Product } from "./Product";
+import { UserAccount } from "./UserAccount";
 export interface Comment {
-    _id: string;
-    username: string;
-    review: string;
-    rating: number;
-    attributes: Attribute[];
-    created_date: string;
-    product: Product;
+  _id: string;
+  product: Product;
+  //   user: UserAccount;
+  user_info: UserAccount;
+  rating: number;
+  review: string;
+  attributes: Attribute[];
+  createdAt: Date;
+  updatedAt: Date;
 }
-const mockComments: Comment[] = [
-    { 
-        _id: '1', 
-        username: "Alice", 
-        review: "Great product! Loved the quality.", 
-        rating: 5,
-        attributes: [
-            { key: "Color", value: ["Red"] },
-            { key: "Material", value: ["Cotton"] },
-            { key: "Size", value: ["M"] }
-        ],
-        created_date: "2024-10-01",
-        product: mockProducts[1] // Add the product ID
-    },
-    { 
-        _id: '2', 
-        username: "Bob", 
-        review: "The fit was perfect. Would recommend!", 
-        rating: 4,
-        attributes: [
-            { key: "Color", value: ["Blue"] },
-            { key: "Material", value: ["Polyester"] },
-            { key: "Size", value: ["L"] }
-        ],
-        created_date: "2024-10-05",
-        product:mockProducts[2] // Add the product ID
-    },
-    
-];
-export default mockComments;
+
+export interface CommentList {
+  data: Comment[];
+  pagination: Pagination;
+}
+// const mockComments: Comment[] = [
+//   {
+//     _id: "1",
+//     user: "Alice",
+//     review: "Great product! Loved the quality.",
+//     rating: 5,
+//     attributes: [
+//       { key: "Color", value: ["Red"] },
+//       { key: "Material", value: ["Cotton"] },
+//       { key: "Size", value: ["M"] },
+//     ],
+//     created_date: "2024-10-01",
+//     product: mockProducts[1], // Add the product ID
+//   },
+//   {
+//     _id: "2",
+//     user: "Bob",
+//     review: "The fit was perfect. Would recommend!",
+//     rating: 4,
+//     attributes: [
+//       { key: "Color", value: ["Blue"] },
+//       { key: "Material", value: ["Polyester"] },
+//       { key: "Size", value: ["L"] },
+//     ],
+//     created_date: "2024-10-05",
+//     product: mockProducts[2], // Add the product ID
+//   },
+// ];
+// export default mockComments;

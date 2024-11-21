@@ -1,29 +1,151 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Product } from '@src/types/Product';
 import { Category, mockCategories } from '@src/types/Category';
-import { IoAddSharp } from "react-icons/io5";
+import { IoAddSharp, IoRemove } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-import { Upload, Button, Input, message, Modal } from 'antd';
+import { Upload, Button, Input, message, Modal, Checkbox } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-
+import { Attribute, mockAttributes } from '@src/types/Attribute';
 
 interface ProductFormProps {
     initialProduct?: Partial<Product>;
     onSave: (product: Partial<Product>) => void;
+    onCancel: () => void;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }) => {
+const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, onCancel }) => {
     const [product, setProduct] = useState<Partial<Product>>(initialProduct);
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [newCategory, setNewCategory] = useState<Category>({ _id: '', category_name: '', description: '' });
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [newCategory, setNewCategory] = useState<Category>({
+        _id: '',
+        category_name: '',
+        description: '',
+    });
     const [showNewCategoryForm, setShowNewCategoryForm] = useState<boolean>(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [categories, setCategories] = useState<Category[]>(mockCategories);
-    //const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [fileList, setFileList] = useState<any[]>([]);
     const [newImageUrl, setNewImageUrl] = useState<string>('');
     const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
+    const [attributes, setAttributes] = useState<Attribute[]>(mockAttributes);
+    const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+    const [newKey, setNewKey] = useState<string>('');
+    const [newValues, setNewValues] = useState<Record<string, string>>({});
+    const [selectedValues, setSelectedValues] = useState<Record<string, Set<string>>>({});
+    // Thêm key mới
+    const handleAddKey = () => {
+        if (!newKey.trim()) return;
+        if (attributes.some((attr) => attr.key === newKey)) {
+            alert('This attribute already exists.');
+            return;
+        }
+        setAttributes((prev) => [...prev, { key: newKey, value: [] }]);
+        setNewKey('');
+    };
 
+    // Xóa key
+    const handleDeleteKey = (key: string) => {
+        setAttributes((prev) => prev.filter((attr) => attr.key !== key));
+        setSelectedValues((prev) => {
+            const updated = { ...prev };
+            delete updated[key];
+            return updated;
+        });
+    };
+
+    // Toggle hiển thị giá trị của một key
+    const toggleKey = (key: string) => {
+        setExpandedKeys((prev) => {
+            const newExpanded = new Set(prev);
+            if (newExpanded.has(key)) {
+                newExpanded.delete(key);
+            } else {
+                newExpanded.add(key);
+            }
+            return newExpanded;
+        });
+    };
+
+    // Thêm giá trị vào một key
+    const handleAddValue = (key: string) => {
+        if (!newValues[key]?.trim()) return;
+        setAttributes((prev) =>
+            prev.map((attr) =>
+                attr.key === key
+                    ? { ...attr, value: [...attr.value, newValues[key].trim()] }
+                    : attr
+            )
+        );
+        setNewValues((prev) => ({ ...prev, [key]: '' }));
+    };
+
+    // Xóa giá trị khỏi một key
+    const handleDeleteValue = (key: string, value: string) => {
+        setAttributes((prev) =>
+            prev.map((attr) =>
+                attr.key === key ? { ...attr, value: attr.value.filter((v) => v !== value) } : attr
+            )
+        );
+        setSelectedValues((prev) => {
+            const updated = { ...prev };
+            if (updated[key]) {
+                updated[key].delete(value);
+            }
+            return updated;
+        });
+    };
+
+    // Xử lý checkbox thay đổi
+    const handleCheckboxChange = (key: string, value: string) => {
+        setSelectedValues((prev) => {
+            const updated = { ...prev };
+            if (!updated[key]) {
+                updated[key] = new Set();
+            }
+            if (updated[key].has(value)) {
+                updated[key].delete(value);
+            } else {
+                updated[key].add(value);
+            }
+            return updated;
+        });
+    };
+    useEffect(() => {
+        if (initialProduct?.image) {
+            // Chuyển đổi URL sang format fileList
+            const formattedImages = initialProduct.image.map((url, index) => ({
+                uid: `${index}`,
+                name: `Image-${index + 1}`,
+                status: 'done',
+                url: url, // URL của ảnh
+            }));
+            setFileList(formattedImages);
+        }
+        if (initialProduct?.categories) {
+            const categoryIds = initialProduct.categories.map((category) => category._id);
+            setSelectedCategories(categoryIds);
+        }
+        if (initialProduct?.attributes) {
+            // Cập nhật attributes dựa trên sản phẩm
+            const productAttributes: Attribute[] = product.attributes || [];
+            setAttributes((prevAttributes) => {
+                return prevAttributes.map((attr) => {
+                    const productAttr = productAttributes.find((pa) => pa.key === attr.key);
+                    return productAttr
+                        ? { ...attr, value: Array.from(new Set([...attr.value, ...productAttr.value])) }
+                        : attr;
+                });
+            });
+
+            // Cập nhật các giá trị đã được chọn (checkbox)
+            const selected = productAttributes.reduce((acc, attr) => {
+                acc[attr.key] = new Set(attr.value);
+                return acc;
+            }, {} as Record<string, Set<string>>);
+
+            setSelectedValues(selected);
+        }
+    }, [initialProduct]);
     // Xử lý upload file
     const handleUploadChange = (info: any) => {
         let newFileList = [...info.fileList];
@@ -66,11 +188,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
         message.info('Image removed.');
     };
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCategory(e.target.value);
-        setShowNewCategoryForm(false);
+    const handleCategoryCheckboxChange = (categoryId: string) => {
+        setSelectedCategories((prev) =>
+            prev.includes(categoryId)
+                ? prev.filter((id) => id !== categoryId) // Bỏ chọn nếu đã tồn tại
+                : [...prev, categoryId] // Thêm nếu chưa tồn tại
+        );
     };
-
     const handleNewCategoryFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewCategory((prev) => ({ ...prev, [name]: value }));
@@ -83,7 +207,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
             [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
         }));
     };
-
 
     const toggleNewCategoryForm = () => {
         setShowNewCategoryForm((prev) => !prev);
@@ -100,7 +223,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
             return;
         }
         setCategories([...categories, newCategory]);
-        setSelectedCategory(newCategory._id);
+
         setShowNewCategoryForm(false);
     };
 
@@ -108,36 +231,47 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
         const newErrors: Record<string, string> = {};
         if (!product._id) newErrors.id = 'Product ID is required.';
         if (!product.product_name) newErrors.name = 'Product name is required.';
-        if (!product.originalPrice || product.originalPrice <= 0) newErrors.originalPrice = 'Original price must be greater than 0.';
-        if (product.discountedPrice === undefined || product.discountedPrice < 0) newErrors.discountedPrice = 'Discounted price must not be negative.';
+        if (!product.originalPrice || product.originalPrice <= 0)
+            newErrors.originalPrice = 'Original price must be greater than 0.';
+        if (product.discountedPrice === undefined || product.discountedPrice < 0)
+            newErrors.discountedPrice = 'Discounted price must not be negative.';
         if (!product.brand) newErrors.brand = 'Brand is required.';
-        if (product.stock_quantity !== undefined && product.stock_quantity < 0) newErrors.stock_quantity = 'Stock quantity cannot be negative.';
-        if (!selectedCategory && !showNewCategoryForm) newErrors.categories = 'Please select or add at least one category.';
+        if (product.stock_quantity !== undefined && product.stock_quantity < 0)
+            newErrors.stock_quantity = 'Stock quantity cannot be negative.';
+        if (selectedCategories.length === 0) newErrors.categories = 'Please select at least one category.';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSave = () => {
         if (validate()) {
-            const selectedCategoryObj = categories.find((cat) => cat._id === selectedCategory);
+            const updatedAttributes = attributes.map((attr) => ({
+                key: attr.key,
+                value: Array.from(selectedValues[attr.key] || []),
+            }));
+            const selectedCategoryObjects = categories.filter((cat) =>
+                selectedCategories.includes(cat._id)
+            );
             const finalProduct: Partial<Product> = {
                 ...product,
-                categories: selectedCategoryObj ? [selectedCategoryObj] : [],
-                image: fileList,
+                attributes: updatedAttributes,
+                categories: selectedCategoryObjects,
+                image: fileList.map((file) => file.url || file.response?.url || ''), // Lấy URL từ fileList
             };
             onSave(finalProduct);
         }
     };
     const today = new Date().toISOString().split('T')[0];
+
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
                 <div>
                     <label className="block font-medium">Product ID</label>
                     <input
                         type="text"
-                        name="id"
+                        name="_id"
                         value={product._id || ''}
                         onChange={handleChange}
                         placeholder="Enter product ID"
@@ -150,7 +284,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                     <label className="block font-medium">Product Name</label>
                     <input
                         type="text"
-                        name="name"
+                        name="product_name"
                         value={product.product_name || ''}
                         onChange={handleChange}
                         placeholder="Enter product name"
@@ -204,11 +338,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                     {errors.brand && <p className="text-red-500 text-sm">{errors.brand}</p>}
                 </div>
             </div>
-             
-            
+
+
             <div >
                 <div className="justify-center mt-2 pt-2 space-y-4">
-                <label className="block font-medium">Product Images</label>
+                    <label className="block font-medium">Product Images</label>
 
                     {/* Upload nhiều ảnh */}
                     <Upload
@@ -256,15 +390,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                     <label className=" block font-medium">Decription</label>
                     <textarea
                         className="w-full mt-1 p-3 border rounded"
-                        value={product.description}
-
-                        placeholder="Write decription."
+                        name="description"
+                        value={product.description || ''}
+                        onChange={handleChange} // Thêm sự kiện onChange
+                        placeholder="Write description."
                     />
+                    {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
                 </div>
             </div>
 
-            <div className="mt-6 flex flex-row gap-6">
-                <div className='w-1/2 justify-center'>
+            <div className="mt-6 flex flex-row ">
+                <div className='w-1/2 justify-center pr-6'>
 
                     <div>
                         <label className="block font-medium">Stock Quantity</label>
@@ -319,34 +455,126 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                         {errors.create_date && <p className="text-red-500 text-sm">{errors.create_date}</p>}
                     </div>
                 </div>
-                <div className='w-1/2 justify-center'>
 
-
-
-                    <label className="block font-medium">Category</label>
-                    <div className='flex flex-row pt-2'>
-                        <select
-                            name="categories"
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                            className={`w-full mt-1 p-2 border rounded-md ${errors.categories ? 'border-red-500' : ''}`}
-                        >
-                            <option value="">Select a category</option>
-                            {categories.map((category) => (
-                                <option key={category._id} value={category._id}>
-                                    {category.category_name}
-                                </option>
-                            ))}
-                        </select>
+            </div>
+            <div className="mt-6 grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
+                {/* Các attribute */}
+                <div>
+                    <label className="font-medium">Attributes</label>
+                    <div className="flex items-center gap-2 mb-4">
+                        <Input
+                            type="text"
+                            className="p-2 border rounded-md"
+                            value={newKey}
+                            placeholder="Enter new attribute (e.g., Color)"
+                            onChange={(e) => setNewKey(e.target.value)}
+                        />
                         <button
-
-                            onClick={toggleNewCategoryForm}
-                            className=" text-black p-2 rounded-md"
+                            type="button"
+                            onClick={handleAddKey}
+                            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                         >
-                            {showNewCategoryForm ? <IoClose /> : <IoAddSharp />}
+                            <IoAddSharp />
                         </button>
                     </div>
+
+                    {/* Hiển thị danh sách attribute */}
+                    {attributes.map((attr) => (
+                        <div key={attr.key} className="border-b border-gray-200 pb-4 mb-4">
+                            <div className="flex justify-between items-center">
+                                {/* Key của attribute */}
+                                <span
+                                    className="cursor-pointer text-[15px] text-gray-800 flex items-center gap-1"
+                                    onClick={() => toggleKey(attr.key)}
+                                >
+                                    {attr.key} {expandedKeys.has(attr.key) ? <IoRemove /> : <IoAddSharp />}
+                                </span>
+
+                                {/* Nút xóa key */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteKey(attr.key)}
+                                    className="text-gray-500 hover:underline"
+                                >
+                                    <IoClose />
+                                </button>
+                            </div>
+
+                            {/* Hiển thị giá trị (value) nếu key được mở rộng */}
+                            {expandedKeys.has(attr.key) && (
+                                <div>
+                                    <div className="flex flex-wrap gap-4 mt-2">
+                                        {attr.value.map((val) => (
+                                            <div key={val} className="group flex items-center gap-2 bg-gray-100 px-2 py-1 rounded">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedValues[attr.key]?.has(val) || false}
+                                                    onChange={() => handleCheckboxChange(attr.key, val)}
+                                                    className="form-checkbox"
+                                                />
+                                                <span>{val}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteValue(attr.key, val)}
+                                                    className=" text-gray-300 group-hover:text-gray-800"
+                                                >
+                                                    <IoClose />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Thêm giá trị mới */}
+                                    <div className="flex items-center gap-2 mt-4">
+                                        <Input
+                                            type="text"
+                                            value={newValues[attr.key] || ''}
+                                            placeholder={`Add value to ${attr.key}`}
+                                            className=" border rounded-md w-1/2"
+                                            onChange={(e) =>
+                                                setNewValues((prev) => ({ ...prev, [attr.key]: e.target.value }))
+                                            }
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleAddValue(attr.key)}
+                                            className="p-1.5 bg-gray-400 text-white rounded hover:bg-gray-500"
+                                        >
+                                            <IoAddSharp />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                <div >
+                    <label className="block font-medium">Category</label>
+                    <div className='flex flex-row pt-3 pb-3'>
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-2">
+                            {categories.map((category) => (
+                                <div key={category._id} className="flex items-center text-[15px]">
+                                    <input
+                                        type="checkbox"
+                                        id={category._id}
+                                        value={category._id}
+                                        checked={selectedCategories.includes(category._id)}
+                                        onChange={() => handleCategoryCheckboxChange(category._id)}
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor={category._id}>{category.category_name}</label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                     <div>
+                        <button
+                            onClick={toggleNewCategoryForm}
+                            className=" text-black pt-2 text-[15px] rounded-md flex flex-row gap-2 justify-center items-center"
+                        >Add new category
+                            {showNewCategoryForm ? <IoClose /> : <IoAddSharp />}
+                        </button>
                         {showNewCategoryForm ? (
                             <div>
                                 <input
@@ -383,11 +611,31 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave }
                         {errors.categories && <p className="text-red-500 text-sm">{errors.categories}</p>}
                     </div>
                 </div>
+                <div>
+                    <label className="block font-medium">Status</label>
+                    <Checkbox
+                        checked={product.status}
+                        onChange={(e) => setProduct({ ...product, status: e.target.checked })}
+                        className={`mt-1 ${errors.status ? 'text-red-500' : ''}`}
+                    >
+                        Active
+                    </Checkbox>
+                    {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
+                </div>
             </div>
-            <div className='flex justify-end'>
-                <Button className=' text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
-                    Save Product
-                </Button>
+            <div className='flex flex-row gap-2 justify-end'>
+                <div className='flex '>
+                    <Button className=' text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
+                        Save
+                    </Button>
+                </div>
+                <div className='flex justify-end'>
+                    <Button
+                        className=' text-[16px] p-4 w-32 mt-6'
+                        onClick={onCancel}>
+                        Cancel
+                    </Button>
+                </div>
             </div>
 
         </div>

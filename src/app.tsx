@@ -14,16 +14,22 @@ import { AdminLayout } from "@layouts/admin-layout/admin-layout";
 import AdminHome from "@app/admin/home";
 import { OTPForm } from "@app/password/OTP";
 import StoragePage from "@app/admin/storage";
-import ProductList from "@app/admin/product/ProductList";
 import Categories from "@app/admin/product/Categories";
 import CustomerList from "@app/admin/customer/CustomerList";
 import OrderManagement from "@app/admin/order";
 import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
 import ResetPasswordForm from "@app/password/ResetPasswordForm";
 import NewProduct from "@app/admin/product/NewProduct";
-import ProductEdit from "@app/admin/product/ProductEdit";
-
-const items: Product[] = [];
+import EditProduct from "@app/admin/product/ProductEdit";
+import EditProductStorage from "@app/admin/storage/ProductEdit";
+import NewCategory from "@app/admin/product/NewCategories";
+import EditCategory from "@app/admin/product/CategoriesEdit";
+import NewOrder from "@app/admin/order/OrderNew";
+import EditOrder from "@app/admin/order/OrderEdit";
+import DiscountManagement from "@app/admin/discount";
+import NewDiscount from "@app/admin/discount/NewDiscount";
+import EditDiscount from "@app/admin/discount/DiscountEdit";
+import ProductListPage from "@app/customer/product";
 
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
@@ -35,7 +41,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<AccountPage />} />
-          <Route path="/OTPpassword" element={<OTPForm />} />
+          <Route path="/OTP" element={<OTPForm />} />
           <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
           <Route path="/resetpassword" element={<ResetPasswordForm />} />
 
@@ -44,20 +50,41 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<CartPage items={items} />} />
+            <Route path="/cart" element={<CartPage />} />
           </Route>
           <Route element={<AdminLayout />}>
             <Route path="/admin/" element={<AdminHome />} />
             <Route path="/admin/storage" element={<StoragePage />} />
-            <Route path="/admin/product/list" element={<ProductList />} />
+            <Route path="/admin/product/list" element={<ProductListPage />} />
             <Route path="/admin/product/categories" element={<Categories />} />
             <Route path="admin/product/list/new" element={<NewProduct />} />
             <Route path="/admin/order" element={<OrderManagement />} />
+            <Route path="/admin/discount" element={<DiscountManagement />} />
             <Route path="/admin/customer" element={<CustomerList />} />
             <Route
               path="/admin/product/list/edit/:id"
-              element={<ProductEdit />}
+              element={<EditProduct />}
             />
+            <Route
+              path="/admin/storage/edit/:id"
+              element={<EditProductStorage />}
+            />
+            <Route
+              path="/admin/product/categories/edit/:id"
+              element={<EditCategory />}
+            />
+            <Route path="/admin/order/edit/:id" element={<EditOrder />} />
+            <Route
+              path="/admin/product/categories/new"
+              element={<NewCategory />}
+            />
+            <Route
+              path="/admin/discount/edit/:id"
+              element={<EditDiscount />}
+            />
+            <Route path="/admin/product/categories/new" element={<NewCategory />} />
+            <Route path="/admin/order/new" element={<NewOrder/>} />
+            <Route path="/admin/discount/new" element={<NewDiscount/>} />
           </Route>
         </Routes>
       </BrowserRouter>

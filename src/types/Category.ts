@@ -20,4 +20,5 @@ export interface Category {
       category_name: "Accessories",
       description: "Various accessories",
     },
+    { _id: '4', category_name: "Dresses", description: "Women's dresses" }
 ]

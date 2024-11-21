@@ -5,7 +5,8 @@ import * as Yup from "yup";
 import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axiosClient from "@api/axiosClient";
 // import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
@@ -40,7 +41,13 @@ const initialValues = {
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const formDataRef = useRef({ email: "", password: "", role: "customer" });
+  const formDataRef = useRef({
+    name: "",
+    email: "",
+    password: "",
+    role: "customer",
+  });
+  const navigate = useNavigate();
 
   const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:5000";
 
@@ -55,20 +62,42 @@ export default function Register() {
     console.log("Registration data:", values);
     // Logic to handle registration, e.g., call registration API
     formDataRef.current = {
+      name: values.name,
       email: values.email,
       password: values.password,
       role: "customer",
     };
+    console.log(formDataRef.current.email.toString());
     try {
-      const response = await axios.post(
-        `${apiUrl}/api/auth/register`,
-        formDataRef.current
+      const sendOTP = axiosClient.getOne(
+        `${apiUrl}/api/auth/send-verification`,
+        { email: formDataRef.current.email.toString() }
       );
-      alert("Registration successful!");
-      // router.push("/login");
+      alert("OTP have been sent to your email!");
+      navigate("/OTP", {
+        state: {
+          registerData: formDataRef.current,
+          status: "register",
+        },
+      });
     } catch (err: any) {
       alert("Error: " + err.response.data.message);
     }
+    // try {
+    //   // const response = await axios.post(
+    //   //   `${apiUrl}/api/auth/register`,
+    //   //   formDataRef.current
+    //   // );
+
+    //   const userRegister = axiosClient.post(
+    //     `${apiUrl}/api/auth/register`,
+    //     formDataRef.current
+    //   );
+    //   alert("Registration successful!");
+    //   // router.push("/login");
+    // } catch (err: any) {
+    //   alert("Error: " + err.response.data.message);
+    // }
   };
 
   // if (!user) {

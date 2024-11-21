@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 if (appElement) {
   const root = createRoot(appElement);
   root.render(
-    <React.StrictMode>
+    // <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
@@ -20,7 +20,7 @@ if (appElement) {
           </PersistGate>
         </Provider>
       </QueryClientProvider>
-    </React.StrictMode>
+    // </React.StrictMode>
   );
 } else {
   console.error("App root element not found");

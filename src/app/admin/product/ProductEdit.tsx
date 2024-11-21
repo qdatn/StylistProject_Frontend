@@ -1,48 +1,67 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import ProductForm from '@components/ProductForm'; // Giả sử đây là form chỉnh sửa sản phẩm
-import { Product } from '@src/types/Product'; // Import kiểu Product
+// app/admin/product/EditProduct.tsx
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ProductForm from "@components/ProductForm";
+import mockProducts, { Product } from "@src/types/Product";
 
-function ProductEdit() {
-  const { productId } = useParams<{ productId: string }>(); // Lấy productId từ URL parameters
-
+const EditProduct: React.FC = () => {
+  const { id } = useParams<{ id: string }>(); // Lấy ID sản phẩm từ URL
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    if (!productId) return; // Nếu không có productId thì không thực hiện fetch
+    // Tìm sản phẩm theo ID trong mockProducts
+    const existingProduct = mockProducts.find((prod) => prod._id === id);
+    if (existingProduct) {
+      setProduct(existingProduct);
+    } else {
+      alert("Không tìm thấy sản phẩm.");
+      navigate("/admin/product/list"); // Quay lại danh sách nếu không tìm thấy sản phẩm
+    }
+  }, [id, navigate]);
 
-    // Fetch thông tin sản phẩm từ API
-    fetch(`/api/products/${productId}`)
-      .then((response) => response.json())
-      .then((data) => setProduct(data))
-      .catch((error) => console.error('Error fetching product:', error));
-  }, [productId]);
+  const handleUpdateProduct = (updatedProduct: Partial<Product>) => {
+    if (product) {
+      // Đảm bảo rằng _id luôn có giá trị và không bị mất khi cập nhật
+      const updatedProductWithId: Product = {
+        ...product,
+        ...updatedProduct,
+        _id: product._id, // Đảm bảo rằng _id không bị mất
+      };
 
-  const handleSave = (updatedProduct: Partial<Product>) => {
-    if (!productId) return; // Kiểm tra productId hợp lệ
+      // Cập nhật danh mục trong mockCategories (nếu cần)
+      const index = mockProducts.findIndex((cat) => cat._id === product._id);
+      if (index !== -1) {
+        mockProducts[index] = { ...mockProducts[index], ...updatedProduct };
+      }
 
-    // Gửi request cập nhật sản phẩm
-    fetch(`/api/products/${productId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedProduct),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Product updated:', data);
-        // Sau khi lưu thành công, có thể redirect hoặc làm gì đó
-      })
-      .catch((error) => console.error('Error updating product:', error));
+      // Cập nhật lại danh mục trong state
+      setProduct(updatedProductWithId);
+
+      // Thông báo thành công
+      console.log("Updated Product:", updatedProductWithId);
+      alert("Product updated successfully!");
+      navigate("/admin/product/list"); // Chuyển hướng về danh sách sản phẩm
+    }
+  };
+  const handelCancel = () => {
+    navigate("/admin/product/list");
   };
 
-  if (!product) return <div>Loading...</div>; // Hiển thị loading khi chưa có dữ liệu sản phẩm
-
   return (
-    <div>
-      <h1>Edit Product</h1>
-      <ProductForm initialProduct={product} onSave={handleSave} />
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
+      {product ? (
+        <ProductForm
+          initialProduct={product}
+          onSave={handleUpdateProduct}
+          onCancel={handelCancel}
+        />
+      ) : (
+        <p>Đang tải dữ liệu sản phẩm...</p>
+      )}
     </div>
   );
-}
+};
 
-export default ProductEdit;
+export default EditProduct;
