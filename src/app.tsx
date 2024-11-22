@@ -30,6 +30,7 @@ import DiscountManagement from "@app/admin/discount";
 import NewDiscount from "@app/admin/discount/NewDiscount";
 import EditDiscount from "@app/admin/discount/DiscountEdit";
 import ProductList from "@app/admin/product/ProductList";
+import DashboardPage from "@app/admin/statistics";
 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
             <Route path="admin/product/list/new" element={<NewProduct />} />
             <Route path="/admin/order" element={<OrderManagement />} />
             <Route path="/admin/discount" element={<DiscountManagement />} />
+            <Route path="/admin/statistic" element={<DashboardPage />} />
             <Route path="/admin/customer" element={<CustomerList />} />
             <Route
               path="/admin/product/list/edit/:id"

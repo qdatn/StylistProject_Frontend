@@ -55,6 +55,9 @@ const Sidebar = () => {
           <Link to="/admin/discount">Discount</Link>
         </li>
         <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
+          <Link to="/admin/statistic">Statistic</Link>
+        </li>
+        <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
           <Link to="/admin/customer">Customer</Link>
         </li>
       </ul>
