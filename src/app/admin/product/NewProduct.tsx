@@ -10,9 +10,12 @@ const NewProduct: React.FC = () => {
 
   const handleAddProduct = (newProduct: Partial<Product>) => {
     // Since we're working with Partial<Product>, we ensure it has an 'id' before pushing
-    const productToAdd: Product = { ...newProduct, id: newProduct._id || `prod-${Date.now()}` } as Product;
+    const productToAdd: Product = {
+      ...newProduct,
+      id: newProduct._id || `prod-${Date.now()}`,
+    } as Product;
     setProducts((prevProducts) => [...prevProducts, productToAdd]);
-    alert('Add successfully');
+    alert("Add successfully");
     navigate("/admin/product/list"); // Chuyển hướng về danh sách sản phẩm
   };
   const handelCancel = () => {
@@ -24,9 +27,10 @@ const NewProduct: React.FC = () => {
       <div className="font-semibold text-xl p-6">New Product</div>
       {/* Product Form */}
       <div className="w-full">
-        <ProductForm 
-        onSave={handleAddProduct}
-        onCancel={handelCancel} />
+        <ProductForm
+          onSave={handleAddProduct}
+          onCancel={handelCancel}
+        />
       </div>
     </div>
   );

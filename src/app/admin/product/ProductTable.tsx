@@ -65,8 +65,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const navigate = useNavigate();
 
   const handleRowClick = (record: Product) => {
-    // Điều hướng đến trang chỉnh sửa sản phẩm với ID của sản phẩm
-    navigate(`/admin/product/list/edit/${record._id}`);
+    // Điều hướng đến trang chỉnh sửa sản phẩm với ID của sản phẩm và đưa data của dòng được chọn qua để edit
+    navigate(`/admin/product/list/edit/${record._id}`, {
+      state: { product: record },
+    });
+    // console.log(record);
   };
 
   const handleAddNewProduct = () => {
@@ -80,7 +83,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
 
   return (
     <div>
-      <CommonTable 
+      <CommonTable
         columns={productColumns}
         dataSource={products.data}
         rowKey="_id"
