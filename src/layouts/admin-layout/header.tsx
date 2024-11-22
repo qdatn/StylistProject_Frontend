@@ -60,11 +60,11 @@ const AdminHeader = () => {
       <div className="flex items-center space-x-4">
         <IoNotificationsOutline className=" text-gray-800 hover:text-yellow-500 w-7 h-7" />
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 relative">
           <span className="text-gray-800 font-semibold">Admin StylistLeo</span>
           <div className="flex-col relative">
             <div
-              className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white"
+              className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white cursor-pointer"
               onClick={handleProfileClick}
             >
               St
@@ -72,7 +72,7 @@ const AdminHeader = () => {
             {/* Popup (visible on hover) */}
             {showPopup && user.auth.isLogin && (
               <div
-                className="absolute left-0 mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
+                className="absolute top-12 right-0 mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
                 // onClick={handleProfileClick}
                 onMouseLeave={handleMouseLeave}
               >
