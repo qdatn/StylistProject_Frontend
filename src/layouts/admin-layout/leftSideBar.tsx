@@ -1,14 +1,24 @@
 // components/Sidebar.tsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { RootState } from "@redux/store";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   const [isProductOpen, setIsProductOpen] = useState(false);
+  const user = useSelector((state: RootState) => state.auth);
+  const isLogin = useSelector((state: RootState) => state.auth.auth.isLogin);
+  const role = useSelector(
+    (state: RootState) => state.auth.auth.user?.user.role
+  );
 
   return (
     <div className="w-1/5 bg-white h-full shadow-lg flex flex-col">
       <div className="p-6">
-        <Link to="/" className="text-2xl font-bold text-yellow-500">
+        <Link
+          to={role === "admin" ? "/admin" : "/"}
+          className="text-2xl font-bold text-yellow-500"
+        >
           Style
         </Link>
       </div>

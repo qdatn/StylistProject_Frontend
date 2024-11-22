@@ -22,13 +22,13 @@ const CartPage = () => {
     paymentMethod: "",
   });
   const [errors, setErrors] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    city: '',
-    district: '',
-    paymentMethod: '',
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    district: "",
+    paymentMethod: "",
   });
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
@@ -38,7 +38,9 @@ const CartPage = () => {
   const fetchCartItem = async () => {
     const userId = user.auth.user?.user._id;
     try {
-      const cartItem = await axiosClient.getOne<Cart>(`${urlPath}/api/cart/${userId}`);
+      const cartItem = await axiosClient.getOne<Cart>(
+        `${urlPath}/api/cart/${userId}`
+      );
       setCartItems(cartItem.products);
       const initialQuantities = cartItem.products.reduce((acc, product) => {
         acc[product._id] = 1; // Khởi tạo số lượng mặc định là 1
@@ -77,8 +79,13 @@ const CartPage = () => {
   };
 
   const removeItem = (itemId: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
-    setSelectedItems((prevSelected) => prevSelected.filter((_id) => _id !== itemId));
+    console.log(itemId);
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item._id !== itemId)
+    );
+    setSelectedItems((prevSelected) =>
+      prevSelected.filter((_id) => _id !== itemId)
+    );
     setQuantities((prevQuantities) => {
       const updatedQuantities = { ...prevQuantities };
       delete updatedQuantities[itemId];
@@ -109,8 +116,13 @@ const CartPage = () => {
         quantity: quantities[item._id] || 1,
       }));
     if (!validateForm()) return;
-    console.log("Order submitted:", order);
+    if (!order.length) {
+      alert("Please choose product to place order");
+    } else {
+      console.log("Order submitted:", order);
+    }
   };
+
   const validateForm = () => {
     const newErrors: typeof errors = {
       name: "",
@@ -123,12 +135,15 @@ const CartPage = () => {
     };
 
     if (!formData.name.trim()) newErrors.name = "Full name is required.";
-    if (!formData.phone.match(/^\d{10}$/)) newErrors.phone = "Phone number must be 10 digits.";
-    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = "Invalid email address.";
+    if (!formData.phone.match(/^\d{10}$/))
+      newErrors.phone = "Phone number must be 10 digits.";
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
+      newErrors.email = "Invalid email address.";
     if (!formData.address.trim()) newErrors.address = "Address is required.";
     if (!formData.city.trim()) newErrors.city = "City is required.";
     if (!formData.district.trim()) newErrors.district = "District is required.";
-    if (!formData.paymentMethod) newErrors.paymentMethod = "Please select a payment method.";
+    if (!formData.paymentMethod)
+      newErrors.paymentMethod = "Please select a payment method.";
 
     setErrors(newErrors);
     return Object.values(newErrors).every((error) => !error); // Kiểm tra không có lỗi nào
@@ -142,7 +157,9 @@ const CartPage = () => {
             key={item._id}
             product={item}
             quantity={quantities[item._id] || 1}
-            onUpdateQuantity={(newQuantity) => updateQuantity(item._id, newQuantity)}
+            onUpdateQuantity={(newQuantity) =>
+              updateQuantity(item._id, newQuantity)
+            }
             onRemove={() => removeItem(item._id)}
             onSelect={(selected) => toggleSelectItem(item._id, selected)}
           />
@@ -188,7 +205,9 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+          {errors.phone && (
+            <p className="text-red-500 text-sm">{errors.phone}</p>
+          )}
         </div>
         <div>
           <Input
@@ -199,7 +218,9 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email}</p>
+          )}
         </div>
         <div>
           <Input
@@ -210,7 +231,9 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+          {errors.address && (
+            <p className="text-red-500 text-sm">{errors.address}</p>
+          )}
         </div>
         <div>
           <Input
@@ -232,7 +255,9 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          {errors.district && <p className="text-red-500 text-sm">{errors.district}</p>}
+          {errors.district && (
+            <p className="text-red-500 text-sm">{errors.district}</p>
+          )}
         </div>
         <div>
           <select
@@ -245,7 +270,9 @@ const CartPage = () => {
             <option value="COD">COD - Cash On Delivery</option>
             <option value="CreditCard">Credit Card</option>
           </select>
-          {errors.paymentMethod && <p className="text-red-500 text-sm">{errors.paymentMethod}</p>}
+          {errors.paymentMethod && (
+            <p className="text-red-500 text-sm">{errors.paymentMethod}</p>
+          )}
         </div>
         <button
           onClick={handleSubmit}
