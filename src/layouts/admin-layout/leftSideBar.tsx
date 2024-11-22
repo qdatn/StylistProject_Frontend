@@ -43,9 +43,9 @@ const Sidebar = () => {
             <li className="py-2 px-4 text-gray-600 hover:bg-gray-200">
               <Link to="/admin/product/categories">Categories</Link>
             </li>
-            <li className="py-2 px-4 text-gray-600 hover:bg-gray-200">
+            {/* <li className="py-2 px-4 text-gray-600 hover:bg-gray-200">
               <Link to="/admin/product/pricelist">Price List</Link>
-            </li>
+            </li> */}
           </ul>
         )}
         <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
@@ -57,9 +57,9 @@ const Sidebar = () => {
         <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
           <Link to="/admin/statistic">Statistic</Link>
         </li>
-        <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
+        {/* <li className="py-3 px-4 text-gray-600 hover:bg-gray-200">
           <Link to="/admin/customer">Customer</Link>
-        </li>
+        </li> */}
       </ul>
     </div>
   );
