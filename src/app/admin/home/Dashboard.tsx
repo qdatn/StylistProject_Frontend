@@ -1,31 +1,39 @@
 // pages/admin/DashboardPage.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import ProductTable from '../product/ProductTable';
+import mockProducts, { Product } from '@src/types/Product';
+import CardItem from '@components/statistic/CardItem';
+import { calculateStats } from '@utils/calculateStats';
+import DashboardCharts from '@components/statistic/DashboardChart';
+import StatsSummary from '@components/statistic/StatsSummary';
+interface StatsSummaryProps {
+  startDate: Date;
+  endDate: Date;
+}
+const DashboardPage: React.FC<StatsSummaryProps> = ({ startDate, endDate }) => {
+  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const { totalRevenue, totalOrders, avgOrderValue, totalProducts, totalSold } = calculateStats(
+    startDate, endDate
+  );
 
-const DashboardPage = () => {
   return (
-    
-      <div className="grid grid-cols-3 gap-4">
-        {/* Thông tin kinh doanh */}
-        <div className="col-span-1 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-bold">Result</h2>
-          <p className="text-3xl text-yellow-500 font-semibold">00,000đ</p>
-          {/* Thêm các thông tin khác tương tự */}
-        </div>
 
-        {/* Biểu đồ doanh thu */}
-        <div className="col-span-2 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-bold">Chart Revenue</h2>
-          {/* Thêm biểu đồ hoặc ảnh biểu đồ tại đây */}
-          <div className="h-64 bg-gray-200 rounded-lg"></div>
-        </div>
-
-        {/* Thống kê truy cập */}
-        <div className="col-span-3 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-bold"></h2>
-          {/* Thêm thống kê hoặc bảng dữ liệu tại đây */}
-          <div className="h-48 bg-gray-200 rounded-lg"></div>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <div className='text-2xl font-bold mb-6'>General</div>
+      {/* Thông tin kinh doanh */}
+      <div className="col-span-1 bg-white p-6 rounded-lg shadow">
+        <div className="mt-6">
+          <StatsSummary startDate={new Date('2023-01-01')} endDate={new Date('2025-01-01')} />
         </div>
       </div>
+
+      {/* Biểu đồ doanh thu */}
+      <div className="mt-6 col-span-2 bg-white p-6 rounded-lg shadow">
+        <div className="">
+          <DashboardCharts startDate={new Date('2023-01-01')} endDate={new Date('2025-01-01')} filterType={'custom'} />
+        </div>
+      </div>
+    </div>
   );
 };
 
