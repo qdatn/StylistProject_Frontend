@@ -1,26 +1,60 @@
 import React, { useState, useEffect } from "react";
 import ProductTable from "./ProductTable";
-import { Product } from "@src/types/Product";
+import { Product, ProductList } from "@src/types/Product";
 import mockProducts from "@src/types/Product"; // Import hàm cập nhật sản phẩm
+import { PaginationType } from "@src/types/Pagination";
+import axiosClient from "@api/axiosClient";
 
-const ProductList: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+const urlPath = import.meta.env.VITE_API_URL;
 
-  // Lấy lại danh sách từ `mockProducts` mỗi khi component được render
+const ProductListAdminPage: React.FC = () => {
+  // const [products, setProducts] = useState<Product[]>(mockProducts);
+
+  const [products, setProducts] = useState<ProductList>({
+    data: [],
+    pagination: {},
+  });
+  const [pagination, setPagination] = useState<PaginationType>({
+    currentPage: 1,
+    pageSize: 8,
+    totalItems: 0,
+    totalPages: 0,
+  });
+
+  const fetchProductItem = async (page: number, pageSize: number) => {
+    try {
+      const response = await axiosClient.getOne<ProductList>(
+        `${urlPath}/api/product/`,
+        //pagination params
+        { page: page, limit: pageSize }
+      );
+
+      setProducts(response);
+
+      setPagination(response.pagination);
+      // setHasMore(page < response.pagination.totalPages!);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   useEffect(() => {
-    setProducts([...mockProducts]);
+    fetchProductItem(pagination.currentPage!, pagination.pageSize!);
   }, []);
+
+  // useEffect(() => {
+  //   console.log("PRODUCT", products);
+  //   console.log("pagination", pagination);
+  // }, [products]);
 
   return (
     <div>
       <div className="font-semibold text-xl p-6">Product List</div>
       <div>
-        <ProductTable
-          products={products}
-        />
+        <ProductTable products={products} />
       </div>
     </div>
   );
 };
 
-export default ProductList;
+export default ProductListAdminPage;

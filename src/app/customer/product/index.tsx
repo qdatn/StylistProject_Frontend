@@ -6,7 +6,7 @@ import ProductItem from "@components/productItem"; // Nhập component ProductIt
 import mockProducts, { ProductList } from "@src/types/Product";
 import { Product } from "@src/types/Product";
 import axiosClient from "@api/axiosClient";
-import { Pagination } from "@src/types/Pagination";
+import { PaginationType } from "@src/types/Pagination";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Spin } from "antd";
 
@@ -15,7 +15,7 @@ export default function ProductListPage() {
     data: [],
     pagination: {},
   });
-  const [pagination, setPagination] = useState<Pagination>({
+  const [pagination, setPagination] = useState<PaginationType>({
     currentPage: 1,
     pageSize: 10,
     totalItems: 0,
