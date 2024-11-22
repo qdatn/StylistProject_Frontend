@@ -111,9 +111,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
         });
     };
     useEffect(() => {
-        if (initialProduct?.image) {
+        if (initialProduct?.images) {
             // Chuyển đổi URL sang format fileList
-            const formattedImages = initialProduct.image.map((url, index) => ({
+            const formattedImages = initialProduct.images.map((url, index) => ({
                 uid: `${index}`,
                 name: `Image-${index + 1}`,
                 status: 'done',
@@ -231,7 +231,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
         const newErrors: Record<string, string> = {};
         if (!product._id) newErrors.id = 'Product ID is required.';
         if (!product.product_name) newErrors.name = 'Product name is required.';
-        if (!product.originalPrice || product.originalPrice <= 0)
+        if (!product.price || product.price <= 0)
             newErrors.originalPrice = 'Original price must be greater than 0.';
         if (product.discountedPrice === undefined || product.discountedPrice < 0)
             newErrors.discountedPrice = 'Discounted price must not be negative.';
@@ -256,7 +256,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                 ...product,
                 attributes: updatedAttributes,
                 categories: selectedCategoryObjects,
-                image: fileList.map((file) => file.url || file.response?.url || ''), // Lấy URL từ fileList
+                images: fileList.map((file) => file.url || file.response?.url || ''), // Lấy URL từ fileList
             };
             onSave(finalProduct);
         }
@@ -298,8 +298,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                     <label className="block font-medium">Original Price</label>
                     <input
                         type="number"
-                        name="originalPrice"
-                        value={product.originalPrice || 0}
+                        name="price"
+                        value={product.price || 0}
                         onChange={handleChange}
                         min="0"
                         required
@@ -447,12 +447,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialProduct = {}, onSave, 
                         <label className="block font-medium">Create Date</label>
                         <input
                             type="date"
-                            name="create_date"
+                            name="createdAt"
                             value={today} // Giá trị là ngày hiện tại
                             disabled // Không cho phép thay đổi
-                            className={`w-full mt-1 p-2 border rounded-md ${errors.create_date ? 'border-red-500' : ''}`}
+                            className={`w-full mt-1 p-2 border rounded-md ${errors.createdAt ? 'border-red-500' : ''}`}
                         />
-                        {errors.create_date && <p className="text-red-500 text-sm">{errors.create_date}</p>}
+                        {errors.createdAt && <p className="text-red-500 text-sm">{errors.createdAt}</p>}
                     </div>
                 </div>
 

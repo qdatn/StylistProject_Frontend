@@ -28,7 +28,7 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
         const newErrors: Record<string, string> = {};
         if (!product._id) newErrors.id = 'Product ID is required.';
         if (!product.product_name) newErrors.name = 'Product name is required.';
-        if (!product.originalPrice || product.originalPrice <= 0)
+        if (!product.price || product.price <= 0)
             newErrors.originalPrice = 'Original price must be greater than 0.';
         if (product.discountedPrice === undefined || product.discountedPrice < 0)
             newErrors.discountedPrice = 'Discounted price must not be negative.';
