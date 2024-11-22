@@ -38,7 +38,8 @@ const initialValues = {
 export default function Login() {
   // Call auth reducer from redux to store user that
   const dispatch: AppDispatch = useDispatch();
-  const useritem = useSelector((state: RootState) => state.auth);
+  // const useritem = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.auth);
 
   const [showPassword, setShowPassword] = useState(false);
   const formDataRef = useRef({ email: "", password: "" });
@@ -64,20 +65,40 @@ export default function Login() {
       console.log("User login: ", userLogin);
       try {
         dispatch(setUser(userLogin));
+        alert("Login successful!");
+
+        // if (user.auth.user?.user.role === "admin") {
+        //   navigate("/admin");
+        // } else if (user.auth.user?.user.role === "customer") {
+        //   navigate("/");
+        // }
       } catch {
         alert("cant set redux");
       }
-
-      alert("Login successful!");
-      navigate("/");
     } catch (err: any) {
       alert("Error: " + "Something went wrong");
     }
   };
 
   useEffect(() => {
-    console.log("User redux:", useritem);
-  }, [useritem]);
+    if (user) {
+      if (user.auth.user?.user.role === "admin") {
+        navigate("/admin");
+      } else if (user.auth.user?.user.role === "customer") {
+        navigate("/");
+      }
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    console.log("User redux:", user);
+  }, [user]);
+
+  useEffect(() => {
+    // Xoá lịch sử để ngăn quay lại trang trước
+    window.history.replaceState(null, "", "/login");
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">

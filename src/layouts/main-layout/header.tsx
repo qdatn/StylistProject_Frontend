@@ -5,12 +5,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineUser } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
 
 export default function CustomerHeader() {
   const user = useSelector((state: RootState) => state.auth);
+  const isLogin = useSelector((state: RootState) => state.auth.auth.isLogin);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,10 +32,20 @@ export default function CustomerHeader() {
   };
 
   const handleLogout = () => {
-    const logout = axiosClient.post("http://localhost:5000/api/auth/login", {});
     dispatch(clearUser());
+    const logout = axiosClient.post(
+      "http://localhost:5000/api/auth/logout",
+      {}
+    );
     navigate("/login");
   };
+
+  // useEffect(() => {
+  //   // Nếu người dùng chưa xác thực, chuyển hướng về trang /home
+  //   if (!isLogin) {
+  //     navigate("/", { replace: true });
+  //   }
+  // }, [isLogin, navigate]);
 
   return (
     // <!-- header -->
@@ -44,7 +55,7 @@ export default function CustomerHeader() {
         <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 flex-wrap">
           {/* <!-- Logo and Brand Name on the left side --> */}
           <div className="flex items-center">
-            <Link to="/" className="text-lg font-bold text-gray-800">
+            <Link to= "/" className="text-lg font-bold text-gray-800">
               STYLE
             </Link>
           </div>
