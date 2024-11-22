@@ -29,7 +29,8 @@ import EditOrder from "@app/admin/order/OrderEdit";
 import DiscountManagement from "@app/admin/discount";
 import NewDiscount from "@app/admin/discount/NewDiscount";
 import EditDiscount from "@app/admin/discount/DiscountEdit";
-import ProductListPage from "@app/customer/product";
+import ProductList from "@app/admin/product/ProductList";
+
 
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
@@ -55,7 +56,7 @@ function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin/" element={<AdminHome />} />
             <Route path="/admin/storage" element={<StoragePage />} />
-            <Route path="/admin/product/list" element={<ProductListPage />} />
+            <Route path="/admin/product/list" element={<ProductList />} />
             <Route path="/admin/product/categories" element={<Categories />} />
             <Route path="admin/product/list/new" element={<NewProduct />} />
             <Route path="/admin/order" element={<OrderManagement />} />

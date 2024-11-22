@@ -6,11 +6,12 @@ import axiosClient from "@api/axiosClient";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
+import { Input } from "antd";
 
 const CartPage = () => {
   const user = useSelector((state: RootState) => state.auth);
   const urlPath = import.meta.env.VITE_API_URL;
-  // Giả định bạn sẽ nhận items từ props
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -20,9 +21,19 @@ const CartPage = () => {
     district: "",
     paymentMethod: "",
   });
-  const [cartItems, setCartItems] = useState<Product[]>([]); // Sử dụng sản phẩm từ props
-  const [discountCode, setDiscountCode] = useState<string>(""); // Giảm giá
-  const [selectedItems, setSelectedItems] = useState<string[]>([]); // Sản phẩm được chọn
+  const [errors, setErrors] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    district: "",
+    paymentMethod: "",
+  });
+  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [discountCode, setDiscountCode] = useState<string>("");
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const fetchCartItem = async () => {
     const userId = user.auth.user?.user._id;
@@ -31,6 +42,11 @@ const CartPage = () => {
         `${urlPath}/api/cart/${userId}`
       );
       setCartItems(cartItem.products);
+      const initialQuantities = cartItem.products.reduce((acc, product) => {
+        acc[product._id] = 1; // Khởi tạo số lượng mặc định là 1
+        return acc;
+      }, {} as { [key: string]: number });
+      setQuantities(initialQuantities);
     } catch (error) {
       alert(error);
     }
@@ -40,53 +56,43 @@ const CartPage = () => {
     fetchCartItem();
   }, []);
 
-  // Hàm áp dụng giảm giá
   const applyDiscount = (amount: number) => {
-    if (discountCode === "10%") {
-      return amount * 0.9; // Giảm giá 10%
-    } else if (discountCode === "20%") {
-      return amount * 0.8; // Giảm giá 20%
-    }
-    return amount; // Không có giảm giá
+    if (discountCode === "10%") return amount * 0.9;
+    if (discountCode === "20%") return amount * 0.8;
+    return amount;
   };
 
-  // Tính tổng giá của các sản phẩm trong giỏ hàng đã chọn
   const totalAmount = applyDiscount(
     cartItems.reduce((total, item) => {
       if (selectedItems.includes(item._id)) {
-        return total + item.discountedPrice * item.stock_quantity;
+        return total + item.price * (quantities[item._id] || 1);
       }
       return total;
     }, 0)
   );
 
-  // Cập nhật số lượng sản phẩm
-  const updateQuantity = (itemId: string, increment: boolean) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item._id === itemId
-          ? {
-              ...item,
-              stock_quantity: increment
-                ? item.stock_quantity + 1
-                : Math.max(item.stock_quantity - 1, 1),
-            }
-          : item
-      )
-    );
+  const updateQuantity = (itemId: string, newQuantity: number) => {
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [itemId]: newQuantity,
+    }));
   };
 
-  // Xóa sản phẩm khỏi giỏ hàng
   const removeItem = (itemId: string) => {
+    console.log(itemId);
     setCartItems((prevItems) =>
       prevItems.filter((item) => item._id !== itemId)
     );
     setSelectedItems((prevSelected) =>
       prevSelected.filter((_id) => _id !== itemId)
     );
+    setQuantities((prevQuantities) => {
+      const updatedQuantities = { ...prevQuantities };
+      delete updatedQuantities[itemId];
+      return updatedQuantities;
+    });
   };
 
-  // Chọn hoặc bỏ chọn sản phẩm
   const toggleSelectItem = (itemId: string, selected: boolean) => {
     setSelectedItems((prevSelected) =>
       selected
@@ -95,7 +101,6 @@ const CartPage = () => {
     );
   };
 
-  // Xử lý thay đổi thông tin đơn hàng
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -103,51 +108,85 @@ const CartPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Xử lý gửi đơn hàng
   const handleSubmit = () => {
-    console.log("Order submitted with payment method:", formData.paymentMethod);
+    const order = cartItems
+      .filter((item) => selectedItems.includes(item._id))
+      .map((item) => ({
+        productId: item._id,
+        quantity: quantities[item._id] || 1,
+      }));
+    if (!validateForm()) return;
+    if (!order.length) {
+      alert("Please choose product to place order");
+    } else {
+      console.log("Order submitted:", order);
+    }
   };
 
-  return (
-    <>
-      <div className="container mx-auto p-4 flex flex-col md:flex-row bg-white">
-        {/* Danh sách sản phẩm trong giỏ hàng */}
-        <div className="md:w-2/3 p-4 border-r text-gray-700">
-          <h1 className="text-lg font-semibold mb-4">Shopping Cart</h1>
-          {cartItems.map((item) => (
-            <CartItem
-              key={item._id} // Thêm key cho mỗi CartItem
-              product={item}
-              quantity={item.stock_quantity}
-              onUpdateQuantity={(increment) =>
-                updateQuantity(item._id, increment)
-              }
-              onRemove={() => removeItem(item._id)}
-              onSelect={(selected) => toggleSelectItem(item._id, selected)}
-            />
-          ))}
-          <div className="flex justify-between font-semibold mt-4">
-            <span>Total Amount:</span>
-            <span>£{totalAmount.toFixed(2)}</span>
-          </div>
-          <div className="mt-2">
-            <label className="block">Choose Discount:</label>
-            <select
-              value={discountCode}
-              onChange={(e) => setDiscountCode(e.target.value)}
-              className="border p-2 w-full"
-            >
-              <option value="">Select Discount</option>
-              <option value="10%">10% Discount</option>
-              <option value="20%">20% Discount</option>
-            </select>
-          </div>
-        </div>
+  const validateForm = () => {
+    const newErrors: typeof errors = {
+      name: "",
+      phone: "",
+      email: "",
+      address: "",
+      city: "",
+      district: "",
+      paymentMethod: "",
+    };
 
-        {/* Form nhập thông tin đặt hàng */}
-        <div className="md:w-1/3 p-4 text-gray-700">
-          <h2 className="text-lg font-semibold mb-4">Information</h2>
-          <input
+    if (!formData.name.trim()) newErrors.name = "Full name is required.";
+    if (!formData.phone.match(/^\d{10}$/))
+      newErrors.phone = "Phone number must be 10 digits.";
+    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
+      newErrors.email = "Invalid email address.";
+    if (!formData.address.trim()) newErrors.address = "Address is required.";
+    if (!formData.city.trim()) newErrors.city = "City is required.";
+    if (!formData.district.trim()) newErrors.district = "District is required.";
+    if (!formData.paymentMethod)
+      newErrors.paymentMethod = "Please select a payment method.";
+
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => !error); // Kiểm tra không có lỗi nào
+  };
+  return (
+    <div className="container mx-auto p-4 flex flex-col md:flex-row bg-white">
+      <div className="md:w-2/3 p-4 border-r text-gray-700">
+        <h1 className="text-lg font-semibold mb-4">Shopping Cart</h1>
+        {cartItems.map((item) => (
+          <CartItem
+            key={item._id}
+            product={item}
+            quantity={quantities[item._id] || 1}
+            onUpdateQuantity={(newQuantity) =>
+              updateQuantity(item._id, newQuantity)
+            }
+            onRemove={() => removeItem(item._id)}
+            onSelect={(selected) => toggleSelectItem(item._id, selected)}
+          />
+        ))}
+        <div className="flex justify-between font-semibold mt-4">
+          <span>Total Amount:</span>
+          <span>£{totalAmount.toFixed(2)}</span>
+        </div>
+        <div className="mt-2">
+          <label className="block">Choose Discount:</label>
+          <select
+            value={discountCode}
+            onChange={(e) => setDiscountCode(e.target.value)}
+            className="border p-2 w-full"
+          >
+            <option value="">Select Discount</option>
+            <option value="10%">10% Discount</option>
+            <option value="20%">20% Discount</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Form nhập thông tin đặt hàng */}
+      <div className="md:w-1/3 p-4 text-gray-700">
+        <h2 className="text-lg font-semibold mb-4">Information</h2>
+        <div>
+          <Input
             type="text"
             name="name"
             placeholder="Full Name"
@@ -155,7 +194,10 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          <input
+          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+        </div>
+        <div>
+          <Input
             type="text"
             name="phone"
             placeholder="Phone Number"
@@ -163,7 +205,12 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          <input
+          {errors.phone && (
+            <p className="text-red-500 text-sm">{errors.phone}</p>
+          )}
+        </div>
+        <div>
+          <Input
             type="email"
             name="email"
             placeholder="Email"
@@ -171,7 +218,12 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          <input
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email}</p>
+          )}
+        </div>
+        <div>
+          <Input
             type="text"
             name="address"
             placeholder="Address"
@@ -179,7 +231,12 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          <input
+          {errors.address && (
+            <p className="text-red-500 text-sm">{errors.address}</p>
+          )}
+        </div>
+        <div>
+          <Input
             type="text"
             name="city"
             placeholder="City"
@@ -187,7 +244,10 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
-          <input
+          {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+        </div>
+        <div>
+          <Input
             type="text"
             name="district"
             placeholder="District"
@@ -195,6 +255,11 @@ const CartPage = () => {
             onChange={handleChange}
             className="border p-2 w-full mb-4"
           />
+          {errors.district && (
+            <p className="text-red-500 text-sm">{errors.district}</p>
+          )}
+        </div>
+        <div>
           <select
             name="paymentMethod"
             value={formData.paymentMethod}
@@ -205,29 +270,32 @@ const CartPage = () => {
             <option value="COD">COD - Cash On Delivery</option>
             <option value="CreditCard">Credit Card</option>
           </select>
+          {errors.paymentMethod && (
+            <p className="text-red-500 text-sm">{errors.paymentMethod}</p>
+          )}
+        </div>
+        <button
+          onClick={handleSubmit}
+          className="bg-yellow-500 text-white py-2 px-4 rounded w-full"
+        >
+          Place Order
+        </button>
+
+        {/* Nút Đặt Hàng */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 h-20 shadow-lg flex flex-row gap-2 hidden md:flex justify-end">
+          <div className="flex flex-row gap-2 text-lg font-medium items-center">
+            <div className="truncate">Total Amount:</div>
+            <div>£{totalAmount.toFixed(2)}</div>
+          </div>
           <button
             onClick={handleSubmit}
-            className="bg-yellow-500 text-white py-2 px-4 rounded w-full"
+            className="bg-yellow-500 text-lg font-medium text-white py-2 px-4 rounded w-[400px] h-full"
           >
             Place Order
           </button>
-
-          {/* Nút Đặt Hàng */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white p-4 h-20 shadow-lg flex flex-row gap-2 hidden md:flex justify-end">
-            <div className="flex flex-row gap-2 text-lg font-medium items-center">
-              <div className="truncate">Total Amount:</div>
-              <div>£{totalAmount.toFixed(2)}</div>
-            </div>
-            <button
-              onClick={handleSubmit}
-              className="bg-yellow-500 text-lg font-medium text-white py-2 px-4 rounded w-[400px] h-full"
-            >
-              Place Order
-            </button>
-          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
