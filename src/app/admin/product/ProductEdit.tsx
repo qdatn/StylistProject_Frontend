@@ -79,6 +79,7 @@ const EditProduct: React.FC = () => {
           initialProduct={product}
           onSave={handleUpdateProduct}
           onCancel={handelCancel}
+          type="edit"
         />
       ) : (
         <p>Đang tải dữ liệu sản phẩm...</p>

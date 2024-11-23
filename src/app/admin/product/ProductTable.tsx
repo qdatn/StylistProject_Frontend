@@ -10,6 +10,7 @@ import { Console } from "console";
 
 interface ProductTableProps {
   products: ProductList;
+  onDeleteSuccess: () => void;
 }
 
 const productColumns: ColumnsType<Product> = [
@@ -61,7 +62,10 @@ const productColumns: ColumnsType<Product> = [
   },
 ];
 
-const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
+const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  onDeleteSuccess,
+}) => {
   const navigate = useNavigate();
 
   const handleRowClick = (record: Product) => {
@@ -95,6 +99,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
         })}
         onAddNew={handleAddNewProduct}
         pagination={products.pagination}
+        onDeleteSuccess={onDeleteSuccess}
       />
     </div>
   );
