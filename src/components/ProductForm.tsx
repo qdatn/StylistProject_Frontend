@@ -11,12 +11,14 @@ interface ProductFormProps {
   initialProduct?: Partial<Product>;
   onSave: (product: Partial<Product>) => void;
   onCancel: () => void;
+  type: string;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
   initialProduct = {},
   onSave,
   onCancel,
+  type,
 }) => {
   const [product, setProduct] = useState<Partial<Product>>(initialProduct);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -253,7 +255,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!product._id) newErrors.id = "Product ID is required.";
+    if (type != "add" && !product._id) newErrors.id = "Product ID is required.";
     if (!product.product_name) newErrors.name = "Product name is required.";
     if (!product.price || product.price <= 0)
       newErrors.originalPrice = "Original price must be greater than 0.";
@@ -506,7 +508,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <input
               type="date"
               name="createdAt"
-              value={today} // Giá trị là ngày hiện tại
+              value={type == "add" ? today : product.createdAt?.toISOString()} // Giá trị là ngày hiện tại
               disabled // Không cho phép thay đổi
               className={`w-full mt-1 p-2 border rounded-md ${
                 errors.createdAt ? "border-red-500" : ""

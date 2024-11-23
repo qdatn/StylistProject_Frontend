@@ -46,12 +46,16 @@ const ProductListAdminPage: React.FC = () => {
   //   console.log("PRODUCT", products);
   //   console.log("pagination", pagination);
   // }, [products]);
+  const refreshData = () => {
+    // Fetch the updated data and set it to the state that controls `dataSource`
+    fetchProductItem(pagination.currentPage!, pagination.pageSize!); // Your existing function to fetch updated data
+  };
 
   return (
     <div>
       <div className="font-semibold text-xl p-6">Product List</div>
       <div>
-        <ProductTable products={products} />
+        <ProductTable products={products} onDeleteSuccess={refreshData} />
       </div>
     </div>
   );
