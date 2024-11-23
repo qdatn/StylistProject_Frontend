@@ -168,9 +168,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }, [initialProduct]);
   // Xử lý upload file
   const handleUploadChange = (info: any) => {
-    let newFileList = [...info.fileList];
+    // const newFileList = [...info.fileList];
+    const newFileList = info.fileList.map((file: any) => {
+      // Nếu file có sẵn URL thì dùng nó, nếu không thì tạo URL tạm từ file
+      if (!file.url) {
+        file.url = URL.createObjectURL(file.originFileObj);
+      }
+      return file;
+    });
+    console.log(newFileList);
     setFileList(newFileList);
-
     // Kiểm tra trạng thái upload
     if (info.file.status === "done") {
       message.success(`${info.file.name} uploaded successfully.`);
@@ -178,6 +185,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
       message.error(`${info.file.name} upload failed.`);
     }
   };
+
+  useEffect(() => {
+    console.log(fileList);
+  }, [fileList]);
 
   // Thêm ảnh từ URL
   const handleAddImageFromUrl = () => {
