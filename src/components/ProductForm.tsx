@@ -171,9 +171,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
     // const newFileList = [...info.fileList];
     const newFileList = info.fileList.map((file: any) => {
       // Nếu file có sẵn URL thì dùng nó, nếu không thì tạo URL tạm từ file
-      if (!file.url) {
-        file.url = URL.createObjectURL(file.originFileObj);
-      }
+      // if (!file.url) {
+      //   // file.url = URL.createObjectURL(file.originFileObj);
+
+      //   file.url = file.originFileObj;
+      // }
       return file;
     });
     console.log(newFileList);
@@ -525,7 +527,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={
                 type == "add"
                   ? today
-                  : new Date(product.createdAt!).toISOString().split("T")[0]
+                  : product.createdAt
+                  ? new Date(product.createdAt).toISOString().split("T")[0]
+                  : ""
               } // Giá trị là ngày hiện tại
               disabled // Không cho phép thay đổi
               className={`w-full mt-1 p-2 border rounded-md ${
