@@ -14,6 +14,7 @@ import ErrorBoundary from "antd/es/alert/ErrorBoundary";
 import axiosClient from "@api/axiosClient";
 import { UserLogin } from "@src/types/auth/AuthType";
 import { Link, Navigate, redirect, useNavigate } from "react-router-dom";
+import { Alert } from "antd";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -39,7 +40,7 @@ export default function Login() {
   // Call auth reducer from redux to store user that
   const dispatch: AppDispatch = useDispatch();
   // const useritem = useSelector((state: RootState) => state.auth);
-  const user = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.persist.auth);
 
   const [showPassword, setShowPassword] = useState(false);
   const formDataRef = useRef({ email: "", password: "" });
@@ -66,6 +67,7 @@ export default function Login() {
       try {
         dispatch(setUser(userLogin));
         alert("Login successful!");
+        return <Alert message="Login successful!" type="success" />;
 
         // if (user.auth.user?.user.role === "admin") {
         //   navigate("/admin");
@@ -73,18 +75,20 @@ export default function Login() {
         //   navigate("/");
         // }
       } catch {
-        alert("cant set redux");
+        // alert("cant set redux");
+        return <Alert message="Can't set redux" type="error" />;
       }
     } catch (err: any) {
-      alert("Error: " + "Something went wrong");
+      // alert("Error: " + "Something went wrong");
+      return <Alert message={`Error: ${err}`} type="error" />;
     }
   };
 
   useEffect(() => {
     if (user) {
-      if (user.auth.user?.user.role === "admin") {
+      if (user.user?.user.role === "admin") {
         navigate("/admin");
-      } else if (user.auth.user?.user.role === "customer") {
+      } else if (user.user?.user.role === "customer") {
         navigate("/");
       }
     }

@@ -8,8 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 const AdminHeader = () => {
-  const user = useSelector((state: RootState) => state.auth);
-  const isLogin = useSelector((state: RootState) => state.auth.auth.isLogin);
+  const user = useSelector((state: RootState) => state.persist.auth);
+  const isLogin = useSelector((state: RootState) => state.persist.auth.isLogin);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ const AdminHeader = () => {
   const [showPopup, setShowPopup] = useState(false);
 
   const handleProfileClick = () => {
-    if (user.auth.isLogin) {
+    if (isLogin) {
       setShowPopup(!showPopup);
     }
     // else {
@@ -70,7 +70,7 @@ const AdminHeader = () => {
               St
             </div>
             {/* Popup (visible on hover) */}
-            {showPopup && user.auth.isLogin && (
+            {showPopup && user.isLogin && (
               <div
                 className="absolute top-12 right-0 mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
                 // onClick={handleProfileClick}

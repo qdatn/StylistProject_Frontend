@@ -8,9 +8,12 @@ import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
 import { Input } from "antd";
 
+const baseUrl = import.meta.env.VITE_API_URL;
+
 const CartPage = () => {
-  const user = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.persist.auth);
   const urlPath = import.meta.env.VITE_API_URL;
+  const userId = user.user?.user._id;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -36,7 +39,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const fetchCartItem = async () => {
-    const userId = user.auth.user?.user._id;
+    const userId = user.user?.user._id;
     try {
       const cartItem = await axiosClient.getOne<Cart>(
         `${urlPath}/api/cart/${userId}`
@@ -78,19 +81,35 @@ const CartPage = () => {
     }));
   };
 
+  const deleteProductInCart = async (productId: string) => {
+    try {
+      const res = await axiosClient.put<Product>(
+        `${baseUrl}/api/cart/deleteProduct/${userId}`,
+        { product: productId }
+      );
+      console.log(res);
+    } catch (error) {
+      alert(error);
+    }
+  };
   const removeItem = (itemId: string) => {
-    console.log(itemId);
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item._id !== itemId)
-    );
-    setSelectedItems((prevSelected) =>
-      prevSelected.filter((_id) => _id !== itemId)
-    );
-    setQuantities((prevQuantities) => {
-      const updatedQuantities = { ...prevQuantities };
-      delete updatedQuantities[itemId];
-      return updatedQuantities;
-    });
+    try {
+      console.log(itemId);
+      deleteProductInCart(itemId);
+      setCartItems((prevItems) =>
+        prevItems.filter((item) => item._id !== itemId)
+      );
+      setSelectedItems((prevSelected) =>
+        prevSelected.filter((_id) => _id !== itemId)
+      );
+      setQuantities((prevQuantities) => {
+        const updatedQuantities = { ...prevQuantities };
+        delete updatedQuantities[itemId];
+        return updatedQuantities;
+      });
+    } catch (error) {
+      alert(error);
+    }
   };
 
   const toggleSelectItem = (itemId: string, selected: boolean) => {

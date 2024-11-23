@@ -10,8 +10,8 @@ import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
 
 export default function CustomerHeader() {
-  const user = useSelector((state: RootState) => state.auth);
-  const isLogin = useSelector((state: RootState) => state.auth.auth.isLogin);
+  const user = useSelector((state: RootState) => state.persist.auth);
+  const isLogin = useSelector((state: RootState) => state.persist.auth.isLogin);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ export default function CustomerHeader() {
 
   // Function to handle hover events
   const handleProfileClick = () => {
-    if (user.auth.isLogin) {
+    if (isLogin) {
       setShowPopup(!showPopup);
     } else {
       navigate("/login");
@@ -55,7 +55,7 @@ export default function CustomerHeader() {
         <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 flex-wrap">
           {/* <!-- Logo and Brand Name on the left side --> */}
           <div className="flex items-center">
-            <Link to= "/" className="text-lg font-bold text-gray-800">
+            <Link to="/" className="text-lg font-bold text-gray-800">
               STYLE
             </Link>
           </div>
@@ -68,7 +68,7 @@ export default function CustomerHeader() {
               Need help?
             </Link>
             {/* Chỉ hiển thị "Log in" và "Sign up" nếu người dùng chưa đăng nhập */}
-            {!user.auth.isLogin ? (
+            {!user.isLogin ? (
               <>
                 <Link
                   to="/login"
@@ -156,7 +156,7 @@ export default function CustomerHeader() {
                 <AiOutlineUser className="w-5 h-5" />
               </div>
               {/* Popup (visible on hover) */}
-              {showPopup && user.auth.isLogin && (
+              {showPopup && user.isLogin && (
                 <div
                   className="absolute mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
                   // onClick={handleProfileClick}
@@ -181,7 +181,7 @@ export default function CustomerHeader() {
             {/* <!-- Cart Icon --> */}
             {user && (
               <Link
-                to={user.auth.isLogin ? "/cart" : "/login"}
+                to={user.isLogin ? "/cart" : "/login"}
                 className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
               >
                 <IoBagHandleOutline className="w-5 h-5" />

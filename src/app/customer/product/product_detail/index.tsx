@@ -27,7 +27,7 @@ const ProductDetail: React.FC = () => {
     [key: string]: string;
   }>({});
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.persist.auth);
 
   console.log(id);
   const urlPath = import.meta.env.VITE_API_URL;
@@ -77,17 +77,27 @@ const ProductDetail: React.FC = () => {
   const [addToCartSuccess, setAddToCartSuccess] = useState(true);
 
   // Cập nhật handleAddToCart để hiển thị thông báo
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product) {
       // Kiểm tra product có phải là null không
       // Gọi action addToCart để thêm sản phẩm vào giỏ hàng
-      // dispatch(addToCart({ product, quantity }));
       try {
         const productId = product._id;
-        const userId = user.auth.user?.user._id;
-        const res = axiosClient.put<Cart>(`${urlPath}/api/cart/${userId}`, {
-          products: [productId.toString()],
-        });
+        const userId = user.user?.user._id;
+        const res = await axiosClient.put<Cart>(
+          `${urlPath}/api/cart/${userId}`,
+          {
+            products: [productId.toString()],
+          }
+        );
+
+        const getProduct = await axiosClient.getOne<Product>(
+          `${urlPath}/api/product/${productId}`
+        );
+        await setProduct(getProduct);
+
+        dispatch(addToCart({ product, quantity }));
+        console.log(res);
       } catch (error) {
         alert(error);
       }
