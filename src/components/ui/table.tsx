@@ -4,10 +4,11 @@ import { TableProps } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";
-import { ProductList } from "@src/types/Product";
+import { Product, ProductList } from "@src/types/Product";
 
 const { Search } = Input;
 const urlPath = import.meta.env.VITE_API_URL;
+const baseUrl = import.meta.env.VITE_API_URL;
 
 interface CommonTableProps<T> extends TableProps<T> {
   columns: ColumnsType<T>;
@@ -20,6 +21,7 @@ interface CommonTableProps<T> extends TableProps<T> {
   hideAddButton?: boolean;
   hideHideButton?: boolean; //nhưng form không cần nút "toggle status" thì cho nút này ẩn đi
   pagination?: PaginationType;
+  onDeleteSuccess: () => void;
 }
 
 function CommonTable<T extends { [key: string]: any }>(
@@ -33,6 +35,7 @@ function CommonTable<T extends { [key: string]: any }>(
     onAddNew,
     hideAddButton = false,
     hideHideButton = false,
+    onDeleteSuccess,
     ...restProps
   } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -46,14 +49,38 @@ function CommonTable<T extends { [key: string]: any }>(
   useEffect(() => {
     setPagination(props.pagination);
     setTableData(dataSource);
+  }, [props.dataSource, props.pagination]);
+
+  useEffect(() => {
     console.log("dtsrc", dataSource);
     console.log("tabdata", tableData);
     console.log("[pagi]", pagination);
-  }, [props.dataSource, props.pagination]);
+  }, [pagination]);
+
+  const deleteProductInDB = async (productId: string) => {
+    try {
+      const updateProduct = await axiosClient.delete<Product>(
+        `${baseUrl}/api/product/${productId}`
+      );
+    } catch (error) {
+      console.log(error);
+      alert(error);
+    }
+  };
   const handleDelete = () => {
     setTableData((prevData) =>
-      prevData.filter((item) => !selectedRowKeys.includes(item[rowKey]))
+      prevData.filter((item) => {
+        if (selectedRowKeys.includes(item[rowKey])) {
+          console.log("rowkey:", item[rowKey]);
+          deleteProductInDB(item[rowKey]);
+        }
+        if (onDeleteSuccess) {
+          onDeleteSuccess();
+        }
+        // !selectedRowKeys.includes(item[rowKey]);
+      })
     );
+
     setSelectedRowKeys([]);
     message.success("Selected items deleted");
   };
@@ -109,13 +136,15 @@ function CommonTable<T extends { [key: string]: any }>(
 
   const handlePageChange = (page: number) => {
     // Update the pagination state
-    setPagination({
-      ...pagination,
-      currentPage: page,
-    });
+    if (page <= pagination?.totalPages!) {
+      setPagination({
+        ...pagination,
+        currentPage: page,
+      });
+    }
 
     // Simulate data fetching for the new page
-    fetchProductItem(page, pagination?.pageSize!);
+    fetchProductItem(page, props.pagination?.pageSize!);
   };
 
   return (
@@ -161,7 +190,7 @@ function CommonTable<T extends { [key: string]: any }>(
         align="end"
         defaultCurrent={1}
         current={pagination?.currentPage}
-        pageSize={pagination?.pageSize}
+        pageSize={props.pagination?.pageSize}
         total={pagination?.totalItems}
         onChange={handlePageChange}
         showSizeChanger={false}
