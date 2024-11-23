@@ -1,24 +1,45 @@
 // app/admin/product/EditProduct.tsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ProductForm from "@components/ProductForm";
 import mockProducts, { Product } from "@src/types/Product";
+import axiosClient from "@api/axiosClient";
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 const EditProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Lấy ID sản phẩm từ URL
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
 
-  useEffect(() => {
-    // Tìm sản phẩm theo ID trong mockProducts
-    const existingProduct = mockProducts.find((prod) => prod._id === id);
-    if (existingProduct) {
-      setProduct(existingProduct);
-    } else {
-      alert("Không tìm thấy sản phẩm.");
-      navigate("/admin/product/list"); // Quay lại danh sách nếu không tìm thấy sản phẩm
+  // Lấy product từ state nếu có, nếu không thì có thể fetch từ server
+  const location = useLocation();
+  const productFromState = location.state?.product || null;
+
+  const [product, setProduct] = useState<Product | null>(productFromState);
+
+  // useEffect(() => {
+  //   // Tìm sản phẩm theo ID trong mockProducts
+  //   console.log(product)
+  //   const existingProduct = mockProducts.find((prod) => prod._id === id);
+  //   if (existingProduct) {
+  //     setProduct(existingProduct);
+  //   } else {
+  //     alert("Không tìm thấy sản phẩm.");
+  //     navigate("/admin/product/list"); // Quay lại danh sách nếu không tìm thấy sản phẩm
+  //   }
+  // }, [id, navigate]);
+
+  const updateProductInDB = async (updatedProduct: Product) => {
+    try {
+      const updateProduct = await axiosClient.put<Product>(
+        `${baseUrl}/api/product/${id}`,
+        updatedProduct
+      );
+    } catch (error) {
+      console.log(error);
+      alert(error);
     }
-  }, [id, navigate]);
+  };
 
   const handleUpdateProduct = (updatedProduct: Partial<Product>) => {
     if (product) {
@@ -37,6 +58,8 @@ const EditProduct: React.FC = () => {
 
       // Cập nhật lại danh mục trong state
       setProduct(updatedProductWithId);
+
+      updateProductInDB(updatedProductWithId);
 
       // Thông báo thành công
       console.log("Updated Product:", updatedProductWithId);

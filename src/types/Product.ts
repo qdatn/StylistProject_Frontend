@@ -1,7 +1,7 @@
 // models/Product.ts
 import { Attribute } from "./Attribute";
 import { Category } from "./Category";
-import { Pagination } from "./Pagination";
+import { PaginationType } from "./Pagination";
 export interface Product {
   _id: string;
   product_name: string;
@@ -12,7 +12,7 @@ export interface Product {
   stock_quantity: number;
   min_quantity?: number;
   sold_quantity?: number;
-  categories: Category[];
+  categories: Category[] | string[];
   stock_update_date?: Date;
   status: boolean;
   images: string[];
@@ -23,7 +23,7 @@ export interface Product {
 
 export interface ProductList {
   data: Product[];
-  pagination: Pagination;
+  pagination: PaginationType;
 }
 
 // Dữ liệu giả cho sản phẩm
@@ -110,73 +110,72 @@ const mockProducts: Product[] = [
     attributes: [
       { key: "Color", value: ["Green"] },
       { key: "Material", value: ["Silk"] },
-      { key: "Size", value: ["S"] }
+      { key: "Size", value: ["S"] },
     ],
     brand: null, // Có thể là null
-    createdAt: new Date('2024-10-31'), // Sử dụng Date cho ngày tạo
+    createdAt: new Date("2024-10-31"), // Sử dụng Date cho ngày tạo
     status: true, // Trạng thái sản phẩm
   },
   {
-    _id: '5',
-    product_name: 'Classic denim jacket',
-    price: 60.00,
-    discountedPrice: 45.00,
-    description: 'A detailed description of the Classic denim jacket.',
-    images: ['https://via.placeholder.com/300x400'],
+    _id: "5",
+    product_name: "Classic denim jacket",
+    price: 60.0,
+    discountedPrice: 45.0,
+    description: "A detailed description of the Classic denim jacket.",
+    images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,
     categories: [
-      { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+      { _id: "1", category_name: "Dresses", description: "Women's dresses" },
     ],
     attributes: [
       { key: "Color", value: ["Green"] },
       { key: "Material", value: ["Silk"] },
-      { key: "Size", value: ["S"] }
+      { key: "Size", value: ["S"] },
     ],
     brand: null, // Có thể là null
-    createdAt: new Date('2024-10-31'), // Sử dụng Date cho ngày tạo
+    createdAt: new Date("2024-10-31"), // Sử dụng Date cho ngày tạo
     status: true, // Trạng thái sản phẩm
   },
   {
-    _id: '6',
-    product_name: 'Classic denim jacket',
-    price: 60.00,
-    discountedPrice: 45.00,
-    description: 'A detailed description of the Classic denim jacket.',
-    images: ['https://via.placeholder.com/300x400'],
+    _id: "6",
+    product_name: "Classic denim jacket",
+    price: 60.0,
+    discountedPrice: 45.0,
+    description: "A detailed description of the Classic denim jacket.",
+    images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,
     categories: [
-      { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+      { _id: "1", category_name: "Dresses", description: "Women's dresses" },
     ],
     attributes: [
       { key: "Color", value: ["Green"] },
       { key: "Material", value: ["Silk"] },
-      { key: "Size", value: ["S"] }
+      { key: "Size", value: ["S"] },
     ],
     brand: null, // Có thể là null
-    createdAt: new Date('2024-10-31'), // Sử dụng Date cho ngày tạo
+    createdAt: new Date("2024-10-31"), // Sử dụng Date cho ngày tạo
     status: true, // Trạng thái sản phẩm
   },
   {
-    _id: '7',
-    product_name: 'Classic denim jacket',
-    price: 60.00,
-    discountedPrice: 45.00,
-    description: 'A detailed description of the Classic denim jacket.',
-    images: ['https://via.placeholder.com/300x400'],
+    _id: "7",
+    product_name: "Classic denim jacket",
+    price: 60.0,
+    discountedPrice: 45.0,
+    description: "A detailed description of the Classic denim jacket.",
+    images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,
     categories: [
-      { _id: '1', category_name: "Dresses", description: "Women's dresses" }
+      { _id: "1", category_name: "Dresses", description: "Women's dresses" },
     ],
     attributes: [
       { key: "Color", value: ["Green"] },
       { key: "Material", value: ["Silk"] },
-      { key: "Size", value: ["S"] }
+      { key: "Size", value: ["S"] },
     ],
     brand: null, // Có thể là null
-    createdAt: new Date('2024-10-31'), // Sử dụng Date cho ngày tạo
+    createdAt: new Date("2024-10-31"), // Sử dụng Date cho ngày tạo
     status: true, // Trạng thái sản phẩm
   },
-
 ];
 
 export default mockProducts;

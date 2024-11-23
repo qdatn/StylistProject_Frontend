@@ -7,7 +7,6 @@ import Register from "@app/register";
 import OrderPage from "@app/customer/order";
 import ProductDetail from "@app/customer/product/product_detail";
 import CartPage from "@app/customer/cart";
-import { Product } from "@src/types/Product";
 import AccountPage from "@app/customer/account";
 import { MainLayout } from "@layouts/main-layout/customer-layout";
 import { AdminLayout } from "@layouts/admin-layout/admin-layout";
@@ -29,10 +28,10 @@ import EditOrder from "@app/admin/order/OrderEdit";
 import DiscountManagement from "@app/admin/discount";
 import NewDiscount from "@app/admin/discount/NewDiscount";
 import EditDiscount from "@app/admin/discount/DiscountEdit";
-import ProductList from "@app/admin/product/ProductList";
 import DashboardPage from "@app/admin/statistics";
 
-
+import RequireAuth from "@components/auth/auth_require";
+import ProductListAdminPage from "@app/admin/product/ProductList";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -42,22 +41,31 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/account" element={<AccountPage />} />
-          <Route path="/OTP" element={<OTPForm />} />
-          <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
-          <Route path="/resetpassword" element={<ResetPasswordForm />} />
 
-          {/* Định nghĩa MainLayout và các route con */}
-          <Route element={<MainLayout />}>
+          {/* Public layout - guest */}
+          <Route element={<RequireAuth role="guest" />}>
             <Route path="/" element={<Home />} />
-            <Route path="/order" element={<OrderPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+          </Route>
+
+          {/* Protected layout - customer */}
+          <Route element={<RequireAuth role="customer" />}>
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/OTP" element={<OTPForm />} />
+            <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
+            <Route path="/resetpassword" element={<ResetPasswordForm />} />
+            <Route path="/order" element={<OrderPage />} />
             <Route path="/cart" element={<CartPage />} />
           </Route>
-          <Route element={<AdminLayout />}>
+
+          {/* Protected layout - admin */}
+          <Route element={<RequireAuth role="admin" />}>
             <Route path="/admin/" element={<AdminHome />} />
             <Route path="/admin/storage" element={<StoragePage />} />
-            <Route path="/admin/product/list" element={<ProductList />} />
+            <Route
+              path="/admin/product/list"
+              element={<ProductListAdminPage />}
+            />
             <Route path="/admin/product/categories" element={<Categories />} />
             <Route path="admin/product/list/new" element={<NewProduct />} />
             <Route path="/admin/order" element={<OrderManagement />} />
@@ -81,14 +89,18 @@ function App() {
               path="/admin/product/categories/new"
               element={<NewCategory />}
             />
+            <Route path="/admin/discount/edit/:id" element={<EditDiscount />} />
             <Route
-              path="/admin/discount/edit/:id"
-              element={<EditDiscount />}
+              path="/admin/product/categories/new"
+              element={<NewCategory />}
             />
-            <Route path="/admin/product/categories/new" element={<NewCategory />} />
-            <Route path="/admin/order/new" element={<NewOrder/>} />
-            <Route path="/admin/discount/new" element={<NewDiscount/>} />
+            <Route path="/admin/order/new" element={<NewOrder />} />
+            <Route path="/admin/discount/new" element={<NewDiscount />} />
           </Route>
+
+          {/* Public layout - guest */}
+          <Route element={<MainLayout />}></Route>
+          <Route element={<AdminLayout />}></Route>
         </Routes>
       </BrowserRouter>
     </RootLayout>
