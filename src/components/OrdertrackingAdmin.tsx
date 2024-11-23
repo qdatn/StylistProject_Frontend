@@ -25,7 +25,7 @@ const OrdertrackingAdmin: React.FC<OrdertrackingProps> = ({ order }) => {
 
       {/* Tổng tiền - căn phải */}
       <div className="order-total flex justify-end pt-4">
-        <span className="text-lg font-medium mr-2">Thành tiền:</span>
+        <span className="text-lg font-medium mr-2">Total Price:</span>
         <span className="text-lg font-bold text-red-500">£{order.total_price.toFixed(2)}</span>
       </div>
 

@@ -1,7 +1,7 @@
 import { UserInfo } from "os";
 import { Attribute } from "./Attribute";
 import { User } from "./auth/AuthType";
-import { Pagination } from "./Pagination";
+import { PaginationType } from "./Pagination";
 import mockProducts, { Product } from "./Product";
 import { UserAccount } from "./UserAccount";
 export interface Comment {
@@ -18,7 +18,7 @@ export interface Comment {
 
 export interface CommentList {
   data: Comment[];
-  pagination: Pagination;
+  pagination: PaginationType;
 }
 // const mockComments: Comment[] = [
 //   {
