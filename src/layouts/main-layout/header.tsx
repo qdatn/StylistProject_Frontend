@@ -10,7 +10,9 @@ import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
 import { Badge, notification } from "antd";
 import { selectCartCount } from "@redux/reducers/cartReducer";
+import { ProductList } from "@src/types/Product";
 
+const baseUrl = import.meta.env.VITE_API_URL;
 export default function CustomerHeader() {
   const user = useSelector((state: RootState) => state.persist.auth);
   const isLogin = useSelector((state: RootState) => state.persist.auth.isLogin);
@@ -18,8 +20,29 @@ export default function CustomerHeader() {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   // State to manage hover visibility
   const [showPopup, setShowPopup] = useState(false);
+
+  // Search click
+  const handleSearch = async (e: any) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      try {
+        // Gọi API tìm kiếm
+        const response = await axiosClient.getOne<ProductList>(
+          `${baseUrl}/api/product/search?name=${searchTerm}`
+        );
+        console.log("SEARCH", response);
+        console.log("SEARCHQUERY", searchTerm);
+
+        // Chuyển tới trang kết quả và truyền dữ liệu sản phẩm nếu cần
+        navigate("/product/search", { state: { searchquery: searchTerm } });
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    }
+  };
 
   // Function to handle hover events
   const handleProfileClick = () => {
@@ -149,8 +172,13 @@ export default function CustomerHeader() {
                 type="text"
                 placeholder="Search"
                 className="pl-5 pr-5 py-2 border border-gray-300 rounded-full w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleSearch}
               />
-              <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <button
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                onClick={() => handleSearch({ key: "Enter" })}
+              >
                 <IoIosSearch />
               </button>
             </div>
