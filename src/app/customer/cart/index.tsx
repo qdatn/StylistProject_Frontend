@@ -3,17 +3,24 @@ import React, { useEffect, useState } from "react";
 import CartItem from "@components/CartItem";
 import { Product } from "@src/types/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
 import axiosClient from "@api/axiosClient";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
 import { Input } from "antd";
+import {
+  deleteItemFromCart,
+  updateProductQuantity,
+} from "@redux/reducers/cartReducer";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const CartPage = () => {
   const user = useSelector((state: RootState) => state.persist.auth);
+  const cart = useSelector((state: RootState) => state.persist.cart.items);
   const urlPath = import.meta.env.VITE_API_URL;
   const userId = user.user?.user._id;
+
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -40,19 +47,20 @@ const CartPage = () => {
 
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
-    try {
-      const cartItem = await axiosClient.getOne<Cart>(
-        `${urlPath}/api/cart/${userId}`
-      );
-      setCartItems(cartItem.products);
-      const initialQuantities = cartItem.products.reduce((acc, product) => {
-        acc[product._id] = 1; // Khởi tạo số lượng mặc định là 1
-        return acc;
-      }, {} as { [key: string]: number });
-      setQuantities(initialQuantities);
-    } catch (error) {
-      alert(error);
-    }
+    // try {
+    //   const cartItem = await axiosClient.getOne<Cart>(
+    //     `${urlPath}/api/cart/${userId}`
+    //   );
+    //   setCartItems(cartItem.products);
+    //   const initialQuantities = cartItem.products.reduce((acc, product) => {
+    //     acc[product._id] = 1; // Khởi tạo số lượng mặc định là 1
+    //     return acc;
+    //   }, {} as { [key: string]: number });
+    //   setQuantities(initialQuantities);
+    // } catch (error) {
+    //   alert(error);
+    // }
+    setCartItems(cart);
   };
 
   useEffect(() => {
@@ -79,6 +87,11 @@ const CartPage = () => {
       ...prevQuantities,
       [itemId]: newQuantity,
     }));
+
+    //Cập nhật lại sl vào redux
+    dispatch(
+      updateProductQuantity({ productId: itemId, quantity: newQuantity })
+    );
   };
 
   const deleteProductInCart = async (productId: string) => {
@@ -96,6 +109,7 @@ const CartPage = () => {
     try {
       console.log(itemId);
       deleteProductInCart(itemId);
+      dispatch(deleteItemFromCart({ productId: itemId }));
       setCartItems((prevItems) =>
         prevItems.filter((item) => item._id !== itemId)
       );
@@ -171,11 +185,12 @@ const CartPage = () => {
     <div className="container mx-auto p-4 flex flex-col md:flex-row bg-white">
       <div className="md:w-2/3 p-4 border-r text-gray-700">
         <h1 className="text-lg font-semibold mb-4">Shopping Cart</h1>
-        {cartItems.map((item) => (
+        {/* {cartItems.map((item) => ( */}
+        {cart.map((item) => (
           <CartItem
             key={item._id}
             product={item}
-            quantity={quantities[item._id] || 1}
+            quantity={item.quantity || 1}
             onUpdateQuantity={(newQuantity) =>
               updateQuantity(item._id, newQuantity)
             }
@@ -301,7 +316,7 @@ const CartPage = () => {
         </button>
 
         {/* Nút Đặt Hàng */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 h-20 shadow-lg flex flex-row gap-2 hidden md:flex justify-end">
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 h-20 shadow-lg flex flex-row gap-2 md:flex justify-end">
           <div className="flex flex-row gap-2 text-lg font-medium items-center">
             <div className="truncate">Total Amount:</div>
             <div>£{totalAmount.toFixed(2)}</div>

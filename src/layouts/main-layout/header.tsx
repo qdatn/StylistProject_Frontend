@@ -8,10 +8,13 @@ import { AppDispatch, RootState } from "@redux/store";
 import { useEffect, useState } from "react";
 import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
+import { Badge } from "antd";
+import { selectCartCount } from "@redux/reducers/cartReducer";
 
 export default function CustomerHeader() {
   const user = useSelector((state: RootState) => state.persist.auth);
   const isLogin = useSelector((state: RootState) => state.persist.auth.isLogin);
+  const cartCount = useSelector(selectCartCount);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -153,7 +156,10 @@ export default function CustomerHeader() {
                 onClick={handleProfileClick}
                 // onMouseLeave={handleMouseLeave}
               >
-                <AiOutlineUser className="w-5 h-5" />
+                <Badge offset={[10, 0]}>
+                  <AiOutlineUser className="text-2xl" />
+                </Badge>
+                {/* <AiOutlineUser className="w-5 h-5" /> */}
               </div>
               {/* Popup (visible on hover) */}
               {showPopup && user.isLogin && (
@@ -184,10 +190,13 @@ export default function CustomerHeader() {
                 to={user.isLogin ? "/cart" : "/login"}
                 className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
               >
-                <IoBagHandleOutline className="w-5 h-5" />
+                {/* <IoBagHandleOutline className="w-5 h-5" />
                 <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
-                  0
-                </div>
+                  {cartCount}
+                </div>  */}
+                <Badge count={cartCount} offset={[10, 0]}>
+                  <IoBagHandleOutline className="text-2xl" />
+                </Badge>
               </Link>
             )}
           </div>

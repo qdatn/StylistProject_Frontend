@@ -28,6 +28,7 @@ const ProductDetail: React.FC = () => {
   }>({});
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.persist.auth);
+  const cart = useSelector((state: RootState) => state.persist.cart.items);
 
   console.log(id);
   const urlPath = import.meta.env.VITE_API_URL;
@@ -97,7 +98,8 @@ const ProductDetail: React.FC = () => {
         await setProduct(getProduct);
 
         dispatch(addToCart({ product, quantity }));
-        console.log(res);
+        console.log("PRODDDUCTT + quantity", product, quantity);
+        console.log("CART REDUX:",cart);
       } catch (error) {
         alert(error);
       }
