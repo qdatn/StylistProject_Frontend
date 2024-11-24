@@ -8,7 +8,7 @@ import { AppDispatch, RootState } from "@redux/store";
 import { useEffect, useState } from "react";
 import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
-import { Badge } from "antd";
+import { Badge, notification } from "antd";
 import { selectCartCount } from "@redux/reducers/cartReducer";
 
 export default function CustomerHeader() {
@@ -35,20 +35,27 @@ export default function CustomerHeader() {
   };
 
   const handleLogout = () => {
-    dispatch(clearUser());
-    const logout = axiosClient.post(
-      "http://localhost:5000/api/auth/logout",
-      {}
-    );
-    navigate("/login");
+    try {
+      dispatch(clearUser());
+      const logout = axiosClient.post(
+        "http://localhost:5000/api/auth/logout",
+        {}
+      );
+      navigate("/login");
+      notification.success({
+        message: "Logout successful!",
+        description: "You have successfully logged out!",
+        placement: "topRight",
+        duration: 1,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "Can't set redux state properly.",
+        placement: "topRight",
+      });
+    }
   };
-
-  // useEffect(() => {
-  //   // Nếu người dùng chưa xác thực, chuyển hướng về trang /home
-  //   if (!isLogin) {
-  //     navigate("/", { replace: true });
-  //   }
-  // }, [isLogin, navigate]);
 
   return (
     // <!-- header -->

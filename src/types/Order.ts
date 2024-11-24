@@ -6,14 +6,14 @@ import mockProducts from "./Product";
 export interface Order {
   _id: string;
   user: string;
-  order_items: OrderItem[];
+  // order_items: OrderItem[];
   status: string;
   discount?: number;
   total_price: number;
   method?: string;
   receive_date?: number;
-  create_date?: Date;
-  update_date?: Date;
+  createdDate?: Date;
+  updatedDate?: Date;
 }
 export interface OrderTracking {
   order: Order;

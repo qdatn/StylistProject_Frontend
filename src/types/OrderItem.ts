@@ -3,7 +3,7 @@ import { Product } from "@src/types/Product";
 
 export interface OrderItem {
   _id: string;
-  //order?: string;
+  order?: string;
   product: Product;
   //product_name: string;
   quantity: number;

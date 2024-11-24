@@ -8,13 +8,13 @@ interface OrderItemProps {
 
 const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
   const { product, quantity, attributes } = item;
-  console.log("ITEM",item)
-  console.log(attributes)
+  console.log("ITEM", item);
+  console.log(attributes);
   return (
     <div className="flex items-center border-b py-4 text-gray-700">
       {/* Hình ảnh sản phẩm */}
       <img
-        src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
+        src={product.images ? product.images?.[0] : ""} // Sử dụng ảnh đầu tiên trong mảng image
         alt={product.product_name}
         className="w-20 h-24 object-cover mr-4"
       />
