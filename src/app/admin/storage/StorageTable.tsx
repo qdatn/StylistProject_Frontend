@@ -1,18 +1,15 @@
 import React from 'react';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
 import { Tag } from 'antd';
-import { Product } from '@src/types/Product';
+import { Product, ProductList } from '@src/types/Product';
 import { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 interface StorageTableProps {
-    products: Product[];
+    products: ProductList;
+    onDeleteSuccess: () => void;
 }
 const productColumns: ColumnsType<Product> = [
-    {
-        title: 'ID',
-        dataIndex: '_id',
-    },
     {
         title: 'Image',
         dataIndex: 'images',
@@ -58,17 +55,20 @@ const productColumns: ColumnsType<Product> = [
 
 const StorageTable: React.FC<StorageTableProps> = ({
     products,
+    onDeleteSuccess
 }) => {
     const navigate = useNavigate();
 
     const handleRowClick = (record: Product) => {
-        navigate(`/admin/storage/edit/${record._id}`);
+        navigate(`/admin/storage/edit/${record._id}`, {
+            state: { product: record },
+        });
     };
     return (
         <div>
             <CommonTable
                 columns={productColumns}
-                dataSource={products}
+                dataSource={products.data}
                 rowKey="_id"
                 rowSelection={{
                     type: 'checkbox',
@@ -77,6 +77,8 @@ const StorageTable: React.FC<StorageTableProps> = ({
                     onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
                 })}
                 hideAddButton={true}
+                pagination={products.pagination}
+                onDeleteSuccess={onDeleteSuccess}
             />
         </div>
     );

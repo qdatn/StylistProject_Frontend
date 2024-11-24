@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { Order } from '@src/types/Order';
-import Ordertracking from '@components/Ordertracking';
 import OrdertrackingAdmin from './OrdertrackingAdmin';
 
 interface OrderFormProps {
     initialOrder?: Partial<Order>;
     onSave: (order: Partial<Order>) => void;
     onCancel: () => void;
+    type: string;
 }
 
-const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCancel }) => {
+const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCancel, type }) => {
     const [order, setOrder] = useState<Partial<Order>>(initialOrder);
     const [errors, setErrors] = useState<Record<string, string>>({});
 

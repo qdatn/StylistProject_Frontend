@@ -1,4 +1,5 @@
 // models/Order.ts
+import { PaginationType } from "./Pagination";
 import { OrderItem } from './OrderItem';
 import mockProducts from './Product';
 
@@ -21,6 +22,10 @@ const calculateTotalPrice = (orderItems: OrderItem[], discount?: number): number
   }, 0);
   return discount ? subtotal * ((100 - discount) / 100) : subtotal;
 };
+export interface OrderList {
+  data: Order[];
+  pagination: PaginationType;
+}
 const mockOrderItem: OrderItem[] = [
   {
     product: mockProducts[0],

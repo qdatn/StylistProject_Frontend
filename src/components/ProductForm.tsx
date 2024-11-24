@@ -277,8 +277,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     if (!product.brand) newErrors.brand = "Brand is required.";
     if (product.stock_quantity !== undefined && product.stock_quantity < 0)
       newErrors.stock_quantity = "Stock quantity cannot be negative.";
-    if (selectedCategories.length === 0)
-      newErrors.categories = "Please select at least one category.";
+    // if (selectedCategories.length === 0)
+    //   newErrors.categories = "Please select at least one category.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -302,7 +302,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         attributes: updatedAttributes,
         // categories: selectedCategoryObjects,
         categories: categoryIds,
-        images: fileList.map((file) => file.url || file.response?.url || ""), // Lấy URL từ fileList
+        images: fileList.map((file) => file.url || file.response?.url), // Lấy URL từ fileList
       };
       console.log("FINAL", finalProduct);
       onSave(finalProduct);

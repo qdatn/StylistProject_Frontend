@@ -1,25 +1,39 @@
 // app/admin/order/EditOrder.tsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import OrderForm from "@components/OrderForm"; // Import form để chỉnh sửa thông tin đơn hàng
 import mockOrders, { Order } from "@src/types/Order"; // Giả lập dữ liệu đơn hàng
+import axiosClient from "@api/axiosClient";
 
+const baseUrl = import.meta.env.VITE_API_URL;
 const EditOrder: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Lấy ID đơn hàng từ URL
   const navigate = useNavigate();
-  const [order, setOrder] = useState<Order | null>(null);
+  const location = useLocation();
+  const orderFromState = location.state?.order || null;
+  const [order, setOrder] = useState<Order | null>(orderFromState);
 
-  useEffect(() => {
-    // Tìm đơn hàng theo ID trong mockOrders
-    const existingOrder = mockOrders.find((ord) => ord._id === id);
-    if (existingOrder) {
-      setOrder(existingOrder);
-    } else {
-      alert("Không tìm thấy đơn hàng.");
-      navigate("/admin/order"); // Quay lại danh sách nếu không tìm thấy đơn hàng
+  // useEffect(() => {
+  //   // Tìm đơn hàng theo ID trong mockOrders
+  //   const existingOrder = mockOrders.find((ord) => ord._id === id);
+  //   if (existingOrder) {
+  //     setOrder(existingOrder);
+  //   } else {
+  //     alert("Không tìm thấy đơn hàng.");
+  //     navigate("/admin/order"); // Quay lại danh sách nếu không tìm thấy đơn hàng
+  //   }
+  // }, [id, navigate]);
+  const updateOrderInDB = async (updatedOrder: Order) => {
+    try {
+      const updateOrder = await axiosClient.put<Order>(
+        `${baseUrl}/api/order/${id}`,
+        updatedOrder
+      );
+    } catch (error) {
+      console.log(error);
+      alert(error);
     }
-  }, [id, navigate]);
-
+  };
   const handleUpdateOrder = (updatedOrder: Partial<Order>) => {
     if (order) {
       // Đảm bảo rằng _id luôn có giá trị và không bị mất khi cập nhật
@@ -37,6 +51,7 @@ const EditOrder: React.FC = () => {
 
       // Cập nhật lại đơn hàng trong state
       setOrder(updatedOrderWithId);
+      updateOrderInDB(updatedOrderWithId);
 
       // Thông báo thành công
       console.log("Updated Order:", updatedOrderWithId);
@@ -57,6 +72,7 @@ const EditOrder: React.FC = () => {
           initialOrder={order}
           onSave={handleUpdateOrder}
           onCancel={handleCancel}
+          type="edit"
         />
       ) : (
         <p>Đang tải dữ liệu đơn hàng...</p>
