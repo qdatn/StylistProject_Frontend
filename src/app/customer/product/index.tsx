@@ -21,7 +21,7 @@ export default function ProductListPage() {
     totalItems: 0,
     totalPages: 0,
   });
-  const [loading, setLoading] = useState<boolean>(false);
+
   const [hasMore, setHasMore] = useState(true);
 
   const urlPath = import.meta.env.VITE_API_URL;
@@ -31,7 +31,7 @@ export default function ProductListPage() {
       const response = await axiosClient.getOne<ProductList>(
         `${urlPath}/api/product/`,
         //pagination params
-        { page: page, limit: pageSize }
+        { params: { page, limit: pageSize } }
       );
 
       setProducts((prev) => ({
