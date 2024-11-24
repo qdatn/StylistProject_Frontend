@@ -9,7 +9,7 @@ interface RequireAuthProps {
 }
 
 const RequireAuth: React.FC<RequireAuthProps> = ({ role }) => {
-  const user = useSelector((state: RootState) => state.auth.auth);
+  const user = useSelector((state: RootState) => state.persist.auth);
   const location = useLocation();
 
   if (role === "guest") {

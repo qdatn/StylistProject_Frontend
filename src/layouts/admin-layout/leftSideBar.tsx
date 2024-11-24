@@ -6,10 +6,10 @@ import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   const [isProductOpen, setIsProductOpen] = useState(false);
-  const user = useSelector((state: RootState) => state.auth);
-  const isLogin = useSelector((state: RootState) => state.auth.auth.isLogin);
+  const user = useSelector((state: RootState) => state.persist);
+  const isLogin = useSelector((state: RootState) => state.persist.auth.isLogin);
   const role = useSelector(
-    (state: RootState) => state.auth.auth.user?.user.role
+    (state: RootState) => state.persist.auth.user?.user.role
   );
 
   return (

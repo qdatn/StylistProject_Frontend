@@ -1,5 +1,5 @@
 import axiosClient from "@api/axiosClient";
-import { Input } from "antd";
+import { Input, notification } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -38,12 +38,14 @@ export const OTPForm = () => {
 
         // Step 3: Handle the response for account creation
         // if (createAccountRes.status === 200) {
-        alert("Registration success!");
+        // alert("Registration success!");
         navigate("/login");
-        // } else {
-        // console.error("Registration failed");
-        // }
-        // }
+        notification.success({
+          message: "Account have been Register. Please login!",
+          // description: "You have successfully logged out!",
+          placement: "topRight",
+          duration: 2,
+        });
       } catch (err: any) {
         alert("Error: " + err.response.data.message);
       } finally {

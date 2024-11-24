@@ -22,8 +22,8 @@ const AccountPage = () => {
   //   }
   // }, []);
 
-  const userItem = useSelector((state: RootState) => state.auth);
-  const userId: string = userItem.auth.user?.user._id || "";
+  const userItem = useSelector((state: RootState) => state.persist.auth);
+  const userId: string = userItem.user?.user._id || "";
 
   useEffect(() => {
     const fetchUserInfo = async () => {

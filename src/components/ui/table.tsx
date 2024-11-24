@@ -21,7 +21,7 @@ interface CommonTableProps<T> extends TableProps<T> {
   hideAddButton?: boolean;
   hideHideButton?: boolean; //nhưng form không cần nút "toggle status" thì cho nút này ẩn đi
   pagination?: PaginationType;
-  onDeleteSuccess: () => void;
+  onDeleteSuccess?: () => void;
 }
 
 function CommonTable<T extends { [key: string]: any }>(
