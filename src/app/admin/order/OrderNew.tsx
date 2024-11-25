@@ -31,7 +31,10 @@ const NewOrder: React.FC = () => {
             <div className="font-semibold text-xl p-6">New Order</div>
             {/* Order Form */}
             <div className="w-full">
-                <OrderForm onSave={handleAddOrder} onCancel={handleCancel} />
+                <OrderForm 
+                onSave={handleAddOrder} 
+                onCancel={handleCancel} 
+                type="add"/>
             </div>
         </div>
     );

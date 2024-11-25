@@ -2,11 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
 import { Tag } from 'antd';
-import { Order, OrderList } from '@src/types/Order'; // Import type của Order
+import { Order, OrderList, OrderListAdmin, OrderTracking } from '@src/types/Order'; // Import type của Order
 import { ColumnsType } from 'antd/es/table';
 
 interface OrderTableProps {
-  orders: OrderList; // Prop chứa danh sách đơn hàng
+  orders: OrderListAdmin; // Prop chứa danh sách đơn hàng
   onDeleteSuccess: () => void;
 }
 
@@ -53,7 +53,7 @@ const orderColumns:  ColumnsType<Order>=[
 
 const OrderTable: React.FC<OrderTableProps> = ({ orders, onDeleteSuccess }) => {
   const navigate = useNavigate();
-
+  
   const handleRowClick = (record: Order) => {
     // Điều hướng đến trang chi tiết hoặc chỉnh sửa đơn hàng
     navigate(`/admin/order/edit/${record._id}`,{
@@ -67,9 +67,6 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onDeleteSuccess }) => {
   };
   return (
     <div>
-      <div>
-
-      </div>
       <CommonTable
         columns={orderColumns}
         dataSource={orders.data}

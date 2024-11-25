@@ -10,6 +10,7 @@ interface DiscountFormProps {
   onCancel: () => void;
   mockProducts: { _id: string; product_name: string }[]; // Đảm bảo mockProducts là mảng đối tượng Product
   mockCategories: { _id: string; category_name: string }[]; // Đảm bảo mockCategories là mảng đối tượng Category
+  type: string;
 }
 
 const DiscountForm: React.FC<DiscountFormProps> = ({
@@ -18,6 +19,7 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   onCancel,
   mockProducts,
   mockCategories,
+  type
 }) => {
   const [discount, setDiscount] = useState<Partial<Discount>>(initialDiscount);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -260,8 +262,8 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
         </div>
       </div>
       <div className="flex justify-end gap-2">
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button type="primary" onClick={handleSave}>Save</Button>
+        <Button className="text-[16px] p-4 w-32" onClick={onCancel}>Cancel</Button>
+        <Button className="text-[16px] p-4 w-32" onClick={handleSave}>Save</Button>
       </div>
     </div>
   );

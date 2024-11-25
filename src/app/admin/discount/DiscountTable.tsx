@@ -2,11 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
 import { Tag } from 'antd';
-import { Discount } from '@src/types/Discount'; // Import type của Discount
+import { Discount, DiscountList } from '@src/types/Discount'; // Import type của Discount
 import { ColumnsType } from 'antd/es/table';
 
 interface DiscountTableProps {
-  discounts: Discount[]; // Prop chứa danh sách mã giảm giá
+  discounts: DiscountList; // Prop chứa danh sách mã giảm giá
+  onDeleteSuccess: () => void;
 }
 
 const discountColumns: ColumnsType<Discount> = [
@@ -66,12 +67,14 @@ const discountColumns: ColumnsType<Discount> = [
   },
 ];
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ discounts }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({ discounts, onDeleteSuccess }) => {
   const navigate = useNavigate();
 
   const handleRowClick = (record: Discount) => {
     // Điều hướng đến trang chi tiết hoặc chỉnh sửa mã giảm giá
-    navigate(`/admin/discount/edit/${record._id}`);
+    navigate(`/admin/discount/edit/${record._id}`,{
+      state: { discount: record },
+    });
   };
 
   const handleAddNewDiscount = () => {
@@ -83,7 +86,7 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ discounts }) => {
     <div>
       <CommonTable
         columns={discountColumns}
-        dataSource={discounts}
+        dataSource={discounts.data}
         rowKey="_id"
         rowSelection={{
           type: 'checkbox',
@@ -92,6 +95,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ discounts }) => {
           onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
         })}
         onAddNew={handleAddNewDiscount} // Hàm thêm mới mã giảm giá
+        pagination={discounts.pagination}
+        onDeleteSuccess={onDeleteSuccess}
       />
     </div>
   );

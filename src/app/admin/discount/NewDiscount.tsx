@@ -38,6 +38,7 @@ const NewDiscount: React.FC = () => {
                     onCancel={handleCancel}
                     mockProducts={mockProducts} // Truyền mockProducts
                     mockCategories={mockCategories} // Truyền mockCategories
+                    type="add"
                 />
             </div>
         </div>
