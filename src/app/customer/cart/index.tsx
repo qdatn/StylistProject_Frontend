@@ -15,6 +15,7 @@ import { Order } from "@src/types/Order";
 import { OrderItem } from "@src/types/OrderItem";
 import * as Yup from "yup";
 import { ErrorMessage, Field, Form, Formik } from "formik";
+import { Address } from "@src/types/Address";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -158,14 +159,36 @@ const CartPage = () => {
     }
   };
 
-  const handleSubmit = (values: any) => {
+  const createNewAddress = async (addressData: Address) => {
+    try {
+      const address: Address = await axiosClient.post(
+        `${baseUrl}/api/address`,
+        addressData
+      );
+
+      return address;
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const handleSubmit = async (values: any) => {
+    const addressData: Address = {
+      name: values.name,
+      user: userId as string,
+      address: values.address,
+      phone_num: values.phone,
+    };
+    const address = await createNewAddress(addressData);
     const order = {
       // _id: "",
       user: userId ?? "",
-      status: "Pending",
+      status:
+        values.paymentMethod == "COD" ? "Pending" : "Waiting for payment!",
       discount: 20,
       total_price: totalAmount,
       method: values.paymentMethod,
+      address: address?._id,
     };
 
     const order_items = cartItems
@@ -200,37 +223,37 @@ const CartPage = () => {
       .matches(/^\d{10}$/, "Phone number must be exactly 10 digits.")
       .required("Phone number is required."),
 
-    email: Yup.string()
-      .email("Invalid email address.")
-      .required("Email is required."),
+    // email: Yup.string()
+    //   .email("Invalid email address.")
+    //   .required("Email is required."),
 
     address: Yup.string()
       .trim()
       .min(5, "Address must be at least 5 characters.")
       .required("Address is required."),
 
-    city: Yup.string()
-      .trim()
-      .min(3, "City name must be at least 3 characters.")
-      .required("City is required."),
+    // city: Yup.string()
+    //   .trim()
+    //   .min(3, "City name must be at least 3 characters.")
+    //   .required("City is required."),
 
-    district: Yup.string()
-      .trim()
-      .min(3, "District name must be at least 3 characters.")
-      .required("District is required."),
+    // district: Yup.string()
+    //   .trim()
+    //   .min(3, "District name must be at least 3 characters.")
+    //   .required("District is required."),
 
     paymentMethod: Yup.string()
-      .oneOf(["COD", "CreditCard"], "Please select a valid payment method.")
+      .oneOf(["COD", "Momo", "VNPay"], "Please select a valid payment method.")
       .required("Please select a payment method."),
   });
 
   const initialValues = {
     name: "",
     phone: "",
-    email: "",
+    // email: "",
     address: "",
-    city: "",
-    district: "",
+    // city: "",
+    // district: "",
     paymentMethod: "",
   };
 
@@ -339,7 +362,7 @@ const CartPage = () => {
                 <p className="text-red-500 text-sm">{errors.phone}</p>
               )} */}
             </div>
-            <div>
+            {/* <div>
               <Field
                 type="email"
                 name="email"
@@ -353,10 +376,7 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email}</p>
-              )} */}
-            </div>
+            </div> */}
             <div>
               <Field
                 type="text"
@@ -375,7 +395,7 @@ const CartPage = () => {
                 <p className="text-red-500 text-sm">{errors.address}</p>
               )} */}
             </div>
-            <div>
+            {/* <div>
               <Field
                 type="text"
                 name="city"
@@ -389,11 +409,8 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.city && (
-                <p className="text-red-500 text-sm">{errors.city}</p>
-              )} */}
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <Field
                 type="text"
                 name="district"
@@ -407,21 +424,19 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.district && (
-                <p className="text-red-500 text-sm">{errors.district}</p>
-              )} */}
-            </div>
+            </div> */}
             <div>
               <Field
                 as="select"
                 name="paymentMethod"
+                placeholder="Select Payment Method"
                 // value={formData.paymentMethod}
                 // onChange={handleChange}
                 className="border p-2 w-full my-4"
               >
-                <option value="">Select Payment Method</option>
                 <option value="COD">COD - Cash On Delivery</option>
-                <option value="CreditCard">Credit Card</option>
+                <option value="Momo">Momo</option>
+                <option value="VNPay">VNPay</option>
               </Field>
               <ErrorMessage
                 name="paymentMethod"

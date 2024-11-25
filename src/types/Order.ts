@@ -1,4 +1,5 @@
 // models/Order.ts
+import { Address } from "./Address";
 import { OrderItem } from "./OrderItem";
 import { PaginationType } from "./Pagination";
 import mockProducts from "./Product";
@@ -11,6 +12,7 @@ export interface Order {
   discount?: number;
   total_price: number;
   method?: string;
+  address: Address;
   receive_date?: number;
   createdDate?: Date;
   updatedDate?: Date;

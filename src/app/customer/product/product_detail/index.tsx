@@ -99,7 +99,7 @@ const ProductDetail: React.FC = () => {
 
         dispatch(addToCart({ product, quantity }));
         console.log("PRODDDUCTT + quantity", product, quantity);
-        console.log("CART REDUX:",cart);
+        console.log("CART REDUX:", cart);
       } catch (error) {
         alert(error);
       }
@@ -253,12 +253,12 @@ const ProductDetail: React.FC = () => {
               {comments?.data.map((comment) => (
                 <CommentItem
                   key={comment._id}
-                  username={comment.user_info?.name}
+                  username={comment.user_info?.name!}
                   //   username="Test user"
                   rating={comment.rating}
                   attributes={comment.attributes}
                   review={comment.review}
-                  created_date={formatDateTime(comment.createdAt)}
+                  created_date={formatDateTime(comment.createdAt!)}
                 />
               ))}
             </div>
