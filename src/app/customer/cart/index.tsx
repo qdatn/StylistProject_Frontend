@@ -184,7 +184,8 @@ const CartPage = () => {
     const order = {
       // _id: "",
       user: userId ?? "",
-      status: "Pending",
+      status:
+        values.paymentMethod == "COD" ? "Pending" : "Waiting for payment!",
       discount: 20,
       total_price: totalAmount,
       method: values.paymentMethod,
@@ -243,7 +244,7 @@ const CartPage = () => {
     //   .required("District is required."),
 
     paymentMethod: Yup.string()
-      .oneOf(["COD", "CreditCard"], "Please select a valid payment method.")
+      .oneOf(["COD", "Momo", "VNPay"], "Please select a valid payment method.")
       .required("Please select a payment method."),
   });
 
@@ -435,7 +436,8 @@ const CartPage = () => {
                 className="border p-2 w-full my-4"
               >
                 <option value="COD">COD - Cash On Delivery</option>
-                <option value="CreditCard">Momo</option>
+                <option value="Momo">Momo</option>
+                <option value="VNPay">VNPay</option>
               </Field>
               <ErrorMessage
                 name="paymentMethod"
