@@ -1,6 +1,7 @@
 // components/OrderItem.tsx
 import React from "react";
 import { OrderItem as OrderItemType } from "@src/types/OrderItem";
+import { Link, useNavigate } from "react-router-dom";
 
 interface OrderItemProps {
   item: OrderItemType;
@@ -10,14 +11,17 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
   const { product, quantity, attributes } = item;
   console.log("ITEM", item);
   console.log(attributes);
+  const navigate = useNavigate();
   return (
     <div className="flex items-center border-b py-4 text-gray-700">
       {/* Hình ảnh sản phẩm */}
-      <img
-        src={product.images ? product.images?.[0] : ""} // Sử dụng ảnh đầu tiên trong mảng image
-        alt={product.product_name}
-        className="w-20 h-24 object-cover mr-4"
-      />
+      <Link to={`/product/${product._id}`}>
+        <img
+          src={product.images ? product.images?.[0] : ""} // Sử dụng ảnh đầu tiên trong mảng image
+          alt={product.product_name}
+          className="w-20 h-24 object-cover mr-4"
+        />
+      </Link>
 
       {/* Thông tin sản phẩm */}
       <div className="flex-1">
