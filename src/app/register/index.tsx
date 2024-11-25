@@ -7,6 +7,7 @@ import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 // import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
@@ -74,35 +75,23 @@ export default function Register() {
         { email: formDataRef.current.email.toString() }
       );
       alert("OTP have been sent to your email!");
+
       navigate("/OTP", {
         state: {
           registerData: formDataRef.current,
           status: "register",
         },
       });
+      notification.warning({
+        message: "OTP have been sent to your email!",
+        // description: "You have successfully logged out!",
+        placement: "topRight",
+        duration: 3,
+      });
     } catch (err: any) {
       alert("Error: " + err.response.data.message);
     }
-    // try {
-    //   // const response = await axios.post(
-    //   //   `${apiUrl}/api/auth/register`,
-    //   //   formDataRef.current
-    //   // );
-
-    //   const userRegister = axiosClient.post(
-    //     `${apiUrl}/api/auth/register`,
-    //     formDataRef.current
-    //   );
-    //   alert("Registration successful!");
-    //   // router.push("/login");
-    // } catch (err: any) {
-    //   alert("Error: " + err.response.data.message);
-    // }
   };
-
-  // if (!user) {
-  //   return <p>No user logged in</p>;
-  // }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">

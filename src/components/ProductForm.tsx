@@ -168,9 +168,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }, [initialProduct]);
   // Xử lý upload file
   const handleUploadChange = (info: any) => {
-    let newFileList = [...info.fileList];
-    setFileList(newFileList);
+    // const newFileList = [...info.fileList];
+    const newFileList = info.fileList.map((file: any) => {
+      // Nếu file có sẵn URL thì dùng nó, nếu không thì tạo URL tạm từ file
+      // if (!file.url) {
+      //   // file.url = URL.createObjectURL(file.originFileObj);
 
+      //   file.url = file.originFileObj;
+      // }
+      return file;
+    });
+    console.log(newFileList);
+    setFileList(newFileList);
     // Kiểm tra trạng thái upload
     if (info.file.status === "done") {
       message.success(`${info.file.name} uploaded successfully.`);
@@ -178,6 +187,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
       message.error(`${info.file.name} upload failed.`);
     }
   };
+
+  useEffect(() => {
+    console.log(fileList);
+  }, [fileList]);
 
   // Thêm ảnh từ URL
   const handleAddImageFromUrl = () => {
@@ -259,7 +272,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     if (!product.product_name) newErrors.name = "Product name is required.";
     if (!product.price || product.price <= 0)
       newErrors.originalPrice = "Original price must be greater than 0.";
-    if (product.discountedPrice === undefined || product.discountedPrice < 0)
+    if (product.discountedPrice !== undefined && product.discountedPrice < 0)
       newErrors.discountedPrice = "Discounted price must not be negative.";
     if (!product.brand) newErrors.brand = "Brand is required.";
     if (product.stock_quantity !== undefined && product.stock_quantity < 0)
@@ -291,10 +304,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
         categories: categoryIds,
         images: fileList.map((file) => file.url || file.response?.url || ""), // Lấy URL từ fileList
       };
+      console.log("FINAL", finalProduct);
       onSave(finalProduct);
     }
   };
   const today = new Date().toISOString().split("T")[0];
+  const createdDate = new Date().toISOString().split("T")[0];
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
@@ -354,9 +369,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <input
             type="number"
             name="discountedPrice"
-            value={product.discountedPrice || 0}
+            value={product.discountedPrice || product.price}
             onChange={handleChange}
             min="0"
+            max={product.price}
             required
             placeholder="Enter discounted price"
             className={`w-full mt-1 p-2 border rounded-md ${
@@ -508,7 +524,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <input
               type="date"
               name="createdAt"
-              value={type == "add" ? today : product.createdAt?.toISOString()} // Giá trị là ngày hiện tại
+              value={
+                type == "add"
+                  ? today
+                  : product.createdAt
+                  ? new Date(product.createdAt).toISOString().split("T")[0]
+                  : ""
+              } // Giá trị là ngày hiện tại
               disabled // Không cho phép thay đổi
               className={`w-full mt-1 p-2 border rounded-md ${
                 errors.createdAt ? "border-red-500" : ""

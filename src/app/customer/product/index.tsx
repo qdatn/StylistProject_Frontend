@@ -9,6 +9,7 @@ import axiosClient from "@api/axiosClient";
 import { PaginationType } from "@src/types/Pagination";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Spin } from "antd";
+import { useLocation } from "react-router-dom";
 
 export default function ProductListPage() {
   const [products, setProducts] = useState<ProductList>({
@@ -26,13 +27,23 @@ export default function ProductListPage() {
 
   const urlPath = import.meta.env.VITE_API_URL;
 
+  const location = useLocation();
+  const searchquery = location.state?.searchquery || "";
+  console.log("SERRRR", searchquery);
   const fetchProductItem = async (page: number, pageSize: number) => {
     try {
-      const response = await axiosClient.getOne<ProductList>(
-        `${urlPath}/api/product/`,
-        //pagination params
-        { page: page, limit: pageSize }
-      );
+      const response = searchquery
+        ? await axiosClient.getOne<ProductList>(
+            `${urlPath}/api/product/search?name=${searchquery}`,
+            {
+              params: { page, limit: pageSize },
+            }
+          )
+        : await axiosClient.getOne<ProductList>(
+            `${urlPath}/api/product/`,
+            //pagination params
+            { page: page, limit: pageSize }
+          );
 
       setProducts((prev) => ({
         data:
@@ -43,6 +54,7 @@ export default function ProductListPage() {
       }));
       setPagination(response.pagination);
       setHasMore(page < response.pagination.totalPages!);
+      console.log(response);
     } catch (error) {
       alert(error);
     }
@@ -61,7 +73,7 @@ export default function ProductListPage() {
   useEffect(() => {
     fetchProductItem(pagination?.currentPage ?? 1, pagination.pageSize!);
     // fetchData();
-  }, []);
+  }, [searchquery]);
 
   useEffect(() => {
     console.log("PRODUCT", products);

@@ -66,6 +66,6 @@ jobs:
 
       # Example for deploying to Vercel (assuming VERCEL_TOKEN is stored as a secret in GitHub)
       - name: Deploy to Vercel
-        run: vercel --prod --token=$VERCEL_TOKEN
+        run: vercel --prod --token=$VERCEL_TOKEN --yes
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

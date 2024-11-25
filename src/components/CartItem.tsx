@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { Product } from "@src/types/Product";
-import { AiOutlineCheck, AiOutlineClose, AiOutlineDown, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import {
+  AiOutlineCheck,
+  AiOutlineClose,
+  AiOutlineDown,
+  AiOutlineMinus,
+  AiOutlinePlus,
+} from "react-icons/ai";
 import { Input } from "antd";
+import { Link } from "react-router-dom";
 
 export interface CartItemProps {
   product: Product; // Dữ liệu sản phẩm từ Cart
@@ -20,11 +27,13 @@ const CartItem: React.FC<CartItemProps> = ({
   onSelect,
   quantity,
 }) => {
-  const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
+  const [selectedAttributes, setSelectedAttributes] = useState<{
+    [key: string]: string;
+  }>({});
   const [isSelected, setIsSelected] = useState(false);
 
   const handleAttributeChange = (key: string, value: string) => {
-    setSelectedAttributes(prev => ({ ...prev, [key]: value }));
+    setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
   };
 
   const toggleSelect = () => {
@@ -34,35 +43,46 @@ const CartItem: React.FC<CartItemProps> = ({
   };
   return (
     <div className="flex flex-col sm:flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
-      <img
-        src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
-        alt={product.product_name}
-        className="w-20 h-20 object-cover rounded-lg mr-4"
-      />
+      <Link to={`/product/${product._id}`}>
+        <img
+          src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
+          alt={product.product_name}
+          className="w-20 h-20 object-cover rounded-lg mr-4"
+        />
+      </Link>
 
       <div className="flex flex-col flex-grow">
         <div className="flex justify-between items-start">
           <h2 className="font-semibold mb-1">{product.product_name}</h2>
-          <button onClick={onRemove} className="text-gray-300 hover:text-gray-700">
+          <button
+            onClick={onRemove}
+            className="text-gray-300 hover:text-gray-700"
+          >
             <AiOutlineClose size={20} />
           </button>
         </div>
         <div className="flex flex-row gap-2 font-bold mb-2">
-          <span className="text-gray-500 line-through">£{product.price.toFixed(2)}</span>
+          <span className="text-gray-500 line-through">
+            £{product.price.toFixed(2)}
+          </span>
           <span className="text-red-500">£{product.price.toFixed(2)}</span>
         </div>
         <div className="flex items-center mb-2 flex-wrap">
-          {product.attributes.map(attr => (
+          {product.attributes.map((attr) => (
             <div key={attr.key} className="flex items-center mr-4 mb-2">
               <label className="mr-2 text-[15px]">{attr.key}:</label>
               <div className="relative">
                 <select
                   value={selectedAttributes[attr.key] || attr.value[0]}
-                  onChange={(e) => handleAttributeChange(attr.key, e.target.value)}
+                  onChange={(e) =>
+                    handleAttributeChange(attr.key, e.target.value)
+                  }
                   className="text-[15px] appearance-none px-4 py-2 text-gray-700 focus:outline-none bg-white pr-6"
                 >
-                  {attr.value.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                  {attr.value.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
                 <AiOutlineDown className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500" />
@@ -84,7 +104,13 @@ const CartItem: React.FC<CartItemProps> = ({
             max={product.stock_quantity}
             value={quantity}
             onChange={(e) =>
-              onUpdateQuantity && onUpdateQuantity(Math.max(1, Math.min(Number(e.target.value), product.stock_quantity)))
+              onUpdateQuantity &&
+              onUpdateQuantity(
+                Math.max(
+                  1,
+                  Math.min(Number(e.target.value), product.stock_quantity)
+                )
+              )
             }
             className="text-center w-14 border"
           />
@@ -96,15 +122,20 @@ const CartItem: React.FC<CartItemProps> = ({
             <AiOutlinePlus />
           </button>
         </div>
-      </div >
+      </div>
       <button onClick={toggleSelect} className="ml-4">
-        <div className={`w-6 h-6 border rounded ${isSelected ? 'bg-gray-400' : 'bg-white'} flex items-center justify-center`}>
-          <AiOutlineCheck className={isSelected ? 'text-white' : 'text-transparent'} />
+        <div
+          className={`w-6 h-6 border rounded ${
+            isSelected ? "bg-gray-400" : "bg-white"
+          } flex items-center justify-center`}
+        >
+          <AiOutlineCheck
+            className={isSelected ? "text-white" : "text-transparent"}
+          />
         </div>
       </button>
-    </div >
+    </div>
   );
 };
-
 
 export default CartItem;

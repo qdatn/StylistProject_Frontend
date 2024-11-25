@@ -8,19 +8,45 @@ import { AppDispatch, RootState } from "@redux/store";
 import { useEffect, useState } from "react";
 import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
+import { Badge, notification } from "antd";
+import { selectCartCount } from "@redux/reducers/cartReducer";
+import { ProductList } from "@src/types/Product";
 
+const baseUrl = import.meta.env.VITE_API_URL;
 export default function CustomerHeader() {
-  const user = useSelector((state: RootState) => state.auth);
-  const isLogin = useSelector((state: RootState) => state.auth.auth.isLogin);
+  const user = useSelector((state: RootState) => state.persist.auth);
+  const isLogin = useSelector((state: RootState) => state.persist.auth.isLogin);
+  const cartCount = useSelector(selectCartCount);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   // State to manage hover visibility
   const [showPopup, setShowPopup] = useState(false);
 
+  // Search click
+  const handleSearch = async (e: any) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      try {
+        // Gọi API tìm kiếm
+        const response = await axiosClient.getOne<ProductList>(
+          `${baseUrl}/api/product/search?name=${searchTerm}`
+        );
+        console.log("SEARCH", response);
+        console.log("SEARCHQUERY", searchTerm);
+
+        // Chuyển tới trang kết quả và truyền dữ liệu sản phẩm nếu cần
+        navigate("/product/search", { state: { searchquery: searchTerm } });
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    }
+  };
+
   // Function to handle hover events
   const handleProfileClick = () => {
-    if (user.auth.isLogin) {
+    if (isLogin) {
       setShowPopup(!showPopup);
     } else {
       navigate("/login");
@@ -32,20 +58,27 @@ export default function CustomerHeader() {
   };
 
   const handleLogout = () => {
-    dispatch(clearUser());
-    const logout = axiosClient.post(
-      "http://localhost:5000/api/auth/logout",
-      {}
-    );
-    navigate("/login");
+    try {
+      dispatch(clearUser());
+      const logout = axiosClient.post(
+        "http://localhost:5000/api/auth/logout",
+        {}
+      );
+      navigate("/login");
+      notification.success({
+        message: "Logout successful!",
+        description: "You have successfully logged out!",
+        placement: "topRight",
+        duration: 1,
+      });
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: "Can't set redux state properly.",
+        placement: "topRight",
+      });
+    }
   };
-
-  // useEffect(() => {
-  //   // Nếu người dùng chưa xác thực, chuyển hướng về trang /home
-  //   if (!isLogin) {
-  //     navigate("/", { replace: true });
-  //   }
-  // }, [isLogin, navigate]);
 
   return (
     // <!-- header -->
@@ -55,7 +88,7 @@ export default function CustomerHeader() {
         <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 flex-wrap">
           {/* <!-- Logo and Brand Name on the left side --> */}
           <div className="flex items-center">
-            <Link to= "/" className="text-lg font-bold text-gray-800">
+            <Link to="/" className="text-lg font-bold text-gray-800">
               STYLE
             </Link>
           </div>
@@ -68,7 +101,7 @@ export default function CustomerHeader() {
               Need help?
             </Link>
             {/* Chỉ hiển thị "Log in" và "Sign up" nếu người dùng chưa đăng nhập */}
-            {!user.auth.isLogin ? (
+            {!user.isLogin ? (
               <>
                 <Link
                   to="/login"
@@ -139,8 +172,13 @@ export default function CustomerHeader() {
                 type="text"
                 placeholder="Search"
                 className="pl-5 pr-5 py-2 border border-gray-300 rounded-full w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleSearch}
               />
-              <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <button
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                onClick={() => handleSearch({ key: "Enter" })}
+              >
                 <IoIosSearch />
               </button>
             </div>
@@ -153,10 +191,13 @@ export default function CustomerHeader() {
                 onClick={handleProfileClick}
                 // onMouseLeave={handleMouseLeave}
               >
-                <AiOutlineUser className="w-5 h-5" />
+                <Badge offset={[10, 0]}>
+                  <AiOutlineUser className="text-2xl" />
+                </Badge>
+                {/* <AiOutlineUser className="w-5 h-5" /> */}
               </div>
               {/* Popup (visible on hover) */}
-              {showPopup && user.auth.isLogin && (
+              {showPopup && user.isLogin && (
                 <div
                   className="absolute mt-2 w-40 p-2 bg-white border rounded-lg shadow-md z-10"
                   // onClick={handleProfileClick}
@@ -181,13 +222,16 @@ export default function CustomerHeader() {
             {/* <!-- Cart Icon --> */}
             {user && (
               <Link
-                to={user.auth.isLogin ? "/cart" : "/login"}
+                to={user.isLogin ? "/cart" : "/login"}
                 className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded"
               >
-                <IoBagHandleOutline className="w-5 h-5" />
+                {/* <IoBagHandleOutline className="w-5 h-5" />
                 <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
-                  0
-                </div>
+                  {cartCount}
+                </div>  */}
+                <Badge count={cartCount} offset={[10, 0]}>
+                  <IoBagHandleOutline className="text-2xl" />
+                </Badge>
               </Link>
             )}
           </div>

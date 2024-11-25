@@ -32,6 +32,7 @@ import DashboardPage from "@app/admin/statistics";
 
 import RequireAuth from "@components/auth/auth_require";
 import ProductListAdminPage from "@app/admin/product/ProductList";
+import ProductListPage from "@app/customer/product";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -45,6 +46,7 @@ function App() {
           {/* Public layout - guest */}
           <Route element={<RequireAuth role="guest" />}>
             <Route path="/" element={<Home />} />
+            <Route path="/product/search" element={<ProductListPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
           </Route>
 

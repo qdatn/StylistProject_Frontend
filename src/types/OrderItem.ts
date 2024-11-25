@@ -1,17 +1,17 @@
 // src/types/OrderItem.ts
-import { Product } from '@src/types/Product';
+import { Product } from "@src/types/Product";
 
 export interface OrderItem {
-    //_id:string;
-    //order?: string;
-    product: Product;
-    //product_name: string;
-    orderitem_quantity: number;
-    note?: string;
-    //purchased_price: number;
-    //discounted_price: number;
-    attributes: { key: string; value: string }[];
-    //image: string[];
+  _id: string;
+  order?: string;
+  product: Product;
+  //product_name: string;
+  quantity: number;
+  note?: string;
+  //purchased_price: number;
+  //discounted_price: number;
+  attributes: { key: string; value: string }[];
+  //image: string[];
 }
 // Đã sửa kiểu dữ liệu imageURL -> image
 // Hàm để lấy dữ liệu sản phẩm theo product_id

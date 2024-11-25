@@ -16,6 +16,7 @@ const persistConfig = {
 // Kết hợp các reducer và áp dụng persistReducer
 const rootReducer = combineReducers({
   auth: authReducer,
+  cart: cartReducer,
   // các reducer khác
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -23,8 +24,8 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const store = configureStore({
   reducer: {
     // user: userReducer,
-    auth: persistedReducer,
-    cart: cartReducer,
+    persist: persistedReducer,
+    // cart: cartReducer,
   },
 });
 

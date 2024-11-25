@@ -14,6 +14,7 @@ import ErrorBoundary from "antd/es/alert/ErrorBoundary";
 import axiosClient from "@api/axiosClient";
 import { UserLogin } from "@src/types/auth/AuthType";
 import { Link, Navigate, redirect, useNavigate } from "react-router-dom";
+import { Alert, notification } from "antd";
 
 // Validation schema
 const validationSchema = Yup.object({
@@ -38,17 +39,14 @@ const initialValues = {
 export default function Login() {
   // Call auth reducer from redux to store user that
   const dispatch: AppDispatch = useDispatch();
-  // const useritem = useSelector((state: RootState) => state.auth);
-  const user = useSelector((state: RootState) => state.auth);
+
+  const user = useSelector((state: RootState) => state.persist.auth);
 
   const [showPassword, setShowPassword] = useState(false);
   const formDataRef = useRef({ email: "", password: "" });
   const navigate = useNavigate();
-  // const User = useSelector((state: RootState) => state.user);
 
   console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID);
-
-  // const router = useRouter(); // hook để chuyển hướng
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     formDataRef.current = {
@@ -65,26 +63,34 @@ export default function Login() {
       console.log("User login: ", userLogin);
       try {
         dispatch(setUser(userLogin));
-        alert("Login successful!");
-
-        // if (user.auth.user?.user.role === "admin") {
-        //   navigate("/admin");
-        // } else if (user.auth.user?.user.role === "customer") {
-        //   navigate("/");
-        // }
+        notification.success({
+          message: "Login successful!",
+          description: "You have successfully logged in.",
+          placement: "topRight",
+          duration: 2,
+        });
       } catch {
-        alert("cant set redux");
+        notification.error({
+          message: "Error",
+          description: "Can't set redux state properly.",
+          placement: "topRight",
+          duration: 1,
+        });
       }
     } catch (err: any) {
-      alert("Error: " + "Something went wrong");
+      notification.error({
+        message: "Error",
+        description: `Something went wrong: ${err.message || err}`,
+        placement: "topRight",
+      });
     }
   };
 
   useEffect(() => {
     if (user) {
-      if (user.auth.user?.user.role === "admin") {
+      if (user.user?.user.role === "admin") {
         navigate("/admin");
-      } else if (user.auth.user?.user.role === "customer") {
+      } else if (user.user?.user.role === "customer") {
         navigate("/");
       }
     }
