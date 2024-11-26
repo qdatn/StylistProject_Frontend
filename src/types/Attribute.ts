@@ -1,3 +1,5 @@
+import { PaginationType } from "./Pagination";
+
 // models/Attribute.ts
 export interface Attribute {
   key: string;
@@ -8,6 +10,11 @@ export interface OrderAttribute {
   key: string;
   value: string;
 }
+export interface AttributeList {
+  data: Attribute[];
+  pagination: PaginationType;
+}
+
 export const mockAttributes: Attribute[] = [
   {
     key: "Color",

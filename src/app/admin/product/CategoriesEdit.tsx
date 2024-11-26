@@ -1,24 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import CategoryForm from "@components/CategoryForm";
 import { Category, mockCategories } from "@src/types/Category";
+import axiosClient from "@api/axiosClient";
 
+const baseUrl = import.meta.env.VITE_API_URL;
 const EditCategory: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Lấy ID danh mục từ URL
   const navigate = useNavigate();
-  const [category, setCategory] = useState<Category | null>(null);
+  const location = useLocation();
+  const categoryFromState = location.state?.category || null;
 
-  useEffect(() => {
-    // Tìm danh mục theo ID trong mockCategories
-    const existingCategory = mockCategories.find((cat) => cat._id === id);
-    if (existingCategory) {
-      setCategory(existingCategory);
-    } else {
-      alert("Category not found.");
-      navigate("/admin/product/categories"); // Quay lại danh sách nếu không tìm thấy danh mục
+  const [category, setCategory] = useState<Category | null>(categoryFromState);
+
+  // useEffect(() => {
+  //   // Tìm danh mục theo ID trong mockCategories
+  //   const existingCategory = mockCategories.find((cat) => cat._id === id);
+  //   if (existingCategory) {
+  //     setCategory(existingCategory);
+  //   } else {
+  //     alert("Category not found.");
+  //     navigate("/admin/product/categories"); // Quay lại danh sách nếu không tìm thấy danh mục
+  //   }
+  // }, [id, navigate]);
+
+  const updateCategoryInDB = async (updatedCategory: Category) => {
+    try {
+      const updateCategory = await axiosClient.put<Category>(
+        `${baseUrl}/api/category/${id}`,
+        updatedCategory
+      );
+    } catch (error) {
+      console.log(error);
+      alert(error);
     }
-  }, [id, navigate]);
-
+  };
   const handleUpdateCategory = (updatedCategory: Partial<Category>) => {
     if (category) {
       // Đảm bảo rằng _id luôn có giá trị và không bị mất khi cập nhật
@@ -36,13 +52,13 @@ const EditCategory: React.FC = () => {
 
       // Cập nhật lại danh mục trong state
       setCategory(updatedCategoryWithId);
-
+      updateCategoryInDB(updatedCategoryWithId);
       // Thông báo thành công
       console.log("Updated Category:", updatedCategoryWithId);
       alert("Category updated successfully!");
 
       // Chuyển hướng về trang danh sách danh mục
-      setTimeout(() => navigate("/admin/product/categories"), 500);
+      navigate("/admin/product/categories");
     }
   };
 
@@ -58,6 +74,7 @@ const EditCategory: React.FC = () => {
           initialCategory={category}
           onSave={handleUpdateCategory}
           onCancel={handleCancel}
+          type="edit"
         />
       ) : (
         <p>Loading category...</p>

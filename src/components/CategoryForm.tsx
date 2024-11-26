@@ -4,12 +4,13 @@ import { Button } from 'antd';
 
 interface CategoryFormProps {
     initialCategory?: Partial<Category>;
-    onSave: (Category: Partial<Category>) => void;
+    onSave: (category: Partial<Category>) => void;
     onCancel: () => void;
+    type: string;
 }
 
-const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSave, onCancel }) => {
-    const [Category, setCategory] = useState<Partial<Category>>(initialCategory);
+const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSave, onCancel, type }) => {
+    const [category, setCategory] = useState<Partial<Category>>(initialCategory);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     // Xử lý thay đổi dữ liệu trong form
@@ -24,18 +25,19 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
     // Kiểm tra tính hợp lệ của dữ liệu trước khi lưu
     const validate = () => {
         const newErrors: Record<string, string> = {};
-        if (!Category._id) newErrors.id = 'Category ID is required.';
-        if (!Category.category_name) newErrors.name = 'Category name is required.';
+        //if (!Category._id) newErrors.id = 'Category ID is required.';
+        if (!category.category_name) newErrors.name = 'Category name is required.';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     // Lưu dữ liệu và gọi hàm onSave
     const handleSave = () => {
+        
         if (validate()) {
-            console.log('Saving category:', Category);
+            console.log('Saving category:', category);
             // Chỉ cần gọi onSave và truyền dữ liệu đã cập nhật
-            onSave(Category);
+            onSave(category);
         }
     };
 
@@ -47,10 +49,11 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
                     <input
                         type="text"
                         name="_id"
-                        value={Category._id || ''}
+                        value={category._id || ''}
                         onChange={handleChange}
                         placeholder="Enter Category ID"
                         required
+                        disabled
                         className={`w-full mt-1 p-2 border rounded-md ${errors.id ? 'border-red-500' : ''}`}
                     />
                     {errors.id && <p className="text-red-500 text-sm">{errors.id}</p>}
@@ -60,7 +63,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
                     <input
                         type="text"
                         name="category_name" // Đảm bảo tên này khớp với trường trong Category
-                        value={Category.category_name || ''}
+                        value={category.category_name || ''}
                         onChange={handleChange}
                         placeholder="Enter Category name"
                         className={`w-full mt-1 p-2 border rounded-md ${errors.name ? 'border-red-500' : ''}`}
@@ -72,7 +75,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
                     <textarea
                         className="w-full mt-1 p-3 border rounded"
                         name="description"
-                        value={Category.description || ''}
+                        value={category.description || ''}
                         onChange={handleChange}
                         placeholder="Write description."
                     />

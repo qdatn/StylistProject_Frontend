@@ -2,9 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
 import { Tag } from 'antd';
-import { Category, mockCategories } from '@src/types/Category'; // Import mock data của category
+import { Category, CategoryList, mockCategories } from '@src/types/Category'; // Import mock data của category
 interface CategoryTableProps {
-  categories: Category[]; // Prop chứa danh sách danh mục
+  categories: CategoryList; // Prop chứa danh sách danh mục
+  onDeleteSuccess: () => void;
 }
 const categoryColumns = [
   {
@@ -24,13 +25,15 @@ const categoryColumns = [
 
 const CategoryTable: React.FC<CategoryTableProps> = ({
   categories,
-
+  onDeleteSuccess,
 }) => {
   const navigate = useNavigate();
 
   const handleRowClick = (record: Category) => {
     // Điều hướng đến trang chỉnh sửa danh mục với ID
-    navigate(`/admin/product/categories/edit/${record._id}`);
+    navigate(`/admin/product/categories/edit/${record._id}`,
+      {state: {category: record}}
+    );
   };
 
   const handleAddNewCategory = () => {
@@ -41,7 +44,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
     <div>
       <CommonTable
         columns={categoryColumns}
-        dataSource={categories}
+        dataSource={categories.data}
         rowKey="_id"
         rowSelection={{
           type: 'checkbox',
@@ -51,6 +54,8 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         })}
         onAddNew={handleAddNewCategory} // Hàm thêm mới danh mục
         hideHideButton={true}
+        pagination={categories.pagination}
+        onDeleteSuccess={onDeleteSuccess}
       />
     </div>
   );
