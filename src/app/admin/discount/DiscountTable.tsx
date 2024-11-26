@@ -11,10 +11,10 @@ interface DiscountTableProps {
 }
 
 const discountColumns: ColumnsType<Discount> = [
-  {
-    title: 'ID',
-    dataIndex: '_id',
-  },
+  // {
+  //   title: 'ID',
+  //   dataIndex: '_id',
+  // },
   {
     title: 'Code',
     dataIndex: 'code',
@@ -36,11 +36,6 @@ const discountColumns: ColumnsType<Discount> = [
     title: 'Value',
     dataIndex: 'value',
     render: (value: number) => `${value}%`,
-  },
-  {
-    title: 'Minimum Value',
-    dataIndex: 'minimum_value',
-    render: (value: number) => `${value.toFixed(2)}£`,
   },
   {
     title: 'Start Date',

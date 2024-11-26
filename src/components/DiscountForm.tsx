@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Input, Checkbox, message } from 'antd';
+import { Form, Button, Select, Input, Checkbox, message } from 'antd';
 import { Discount } from '@src/types/Discount';
 import { Product } from '@src/types/Product';
 import { Category } from '@src/types/Category';
 
 const { Option } = Select;
 
+type DiscountType = 'all' | 'product' | 'category' ;
+
 interface DiscountFormProps {
   initialDiscount?: Partial<Discount>;
   onSave: (discount: Partial<Discount>) => void;
   onCancel: () => void;
-  products: Product[]; // Đảm bảo mockProducts là mảng đối tượng Product
-  categories: Category[]; // Đảm bảo mockCategories là mảng đối tượng Category
+  products: Product[]; // Mock data for products
+  categories: Category[]; // Mock data for categories
   type: string;
 }
 
@@ -21,35 +23,50 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   onCancel,
   products,
   categories,
-  type
+  type,
 }) => {
   const [discount, setDiscount] = useState<Partial<Discount>>(initialDiscount);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [appliesToType, setAppliesToType] = useState<string>('all');
-  const [appliesToItems, setAppliesToItems] = useState<string[]>([]);
+  const [appliesToType, setAppliesToType] = useState<DiscountType>('all');
+  const [appliesToItems, setAppliesToItems] = useState<(string | Product | Category)[]>([]);
+
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (initialDiscount) {
+      form.setFieldsValue({
+        ...initialDiscount,
+        apply_items: initialDiscount.apply_items?.map((item) =>
+          typeof item === "string"
+            ? item // If it's a string (ID), keep as is
+            : appliesToType === "product"
+              ? (item as Product).product_name // If it's a product object, map to its name
+              : (item as Category).category_name // If it's a category object, map to its name
+        ),
+      });
+    }
+  }, [initialDiscount, appliesToType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setDiscount((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === 'code' ? value.toUpperCase() : value,
     }));
   };
-  const handleTypeChange = (value: string) => {
+
+
+  const handleTypeChange = (value: DiscountType) => {
+    setAppliesToType(value);
     setDiscount((prev) => ({
       ...prev,
-      type: value,  // Ensure the type is updated in the discount state
+      type: value,
     }));
-    setAppliesToType(value); // This updates the appliesToType as well, which controls conditional rendering
-    setAppliesToItems([]); // Reset the selected items when the type changes
-  };
-  // Khi thay đổi discount.type, reset selectedItems
-  useEffect(() => {
-    if (initialDiscount) {
-      setAppliesToType(initialDiscount.type || 'all'); // Loại giảm giá (product, category, all)
-      setAppliesToItems(initialDiscount.apply_items || []); // Danh sách sản phẩm/danh mục được áp dụng
+    if (value === 'all') {
+      form.setFieldsValue({ apply_items: undefined });
     }
-  }, [initialDiscount]);
+    setAppliesToItems(initialDiscount.apply_items || []); // Danh sách sản phẩm/danh mục được áp dụng
+  };
 
   const handleSelectChange = (values: string[]) => {
     setAppliesToItems(values);
@@ -58,18 +75,17 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    // Kiểm tra các trường bắt buộc
+    // Validate required fields
     if (!discount.code) newErrors.code = 'Discount code is required.';
     if (!discount.type) newErrors.type = 'Discount type is required.';
     if (!discount.value) newErrors.value = 'Discount value is required.';
 
-
-    // Nếu type là 1 hoặc 2, bắt buộc phải chọn product hoặc category
-    if ((discount.type === '1' || discount.type === '2') && appliesToItems.length === 0) {
-      newErrors.appliesTo = 'Please select at least one product or category.';
+    // If type is "product" or "category", at least one item must be selected
+    if ((discount.type === 'product' || discount.type === 'category') && appliesToItems.length === 0) {
+      newErrors.appliesTo = `Please select at least one ${discount.type}.`;
     }
 
-    // Kiểm tra các trường không bắt buộc (nếu có dữ liệu nhập vào)
+    // Validate optional fields
     if (discount.minimum_value !== undefined && discount.minimum_value < 0) {
       newErrors.minimum_value = 'Minimum value must be a positive number.';
     }
@@ -83,7 +99,7 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
       newErrors.used_count = 'Used count must be a positive number.';
     }
 
-    // Kiểm tra status
+    // Validate boolean status
     if (discount.status !== undefined && typeof discount.status !== 'boolean') {
       newErrors.status = 'Status must be true or false.';
     }
@@ -94,15 +110,17 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
 
   const handleSave = () => {
     if (validate()) {
+      const formattedApplyItems = appliesToItems.map((item) =>
+        typeof item === 'string' ? item : item._id
+      );
+
       onSave({
         ...discount,
-        apply_items: appliesToType === 'all' ? []: appliesToItems,
+        apply_items: appliesToType === 'all' ? [] : formattedApplyItems,
       });
       message.success('Discount saved successfully!');
     }
   };
-  console.log("apply",appliesToItems);
-
   return (
     <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
       <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
@@ -157,62 +175,63 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           {errors.max_discount && <p className="text-red-500 text-sm">{errors.max_discount}</p>}
         </div>
       </div>
-      <div className='pb-5 w-full md:w-1/2 lg:w-1/2 justify-center pr-6 '>
-        <div className='pb-5'>
+
+      <div className="pb-5 w-full md:w-1/2 lg:w-1/2 justify-center pr-6">
+        <div className="pb-5">
           <label className="block font-medium">Discount Type</label>
           <Select
-            value={discount.type || '0'}
+            value={discount.type as DiscountType || 'all'}
             onChange={handleTypeChange}
             className="w-full mt-1"
           >
-            <Option value="0">Select Type</Option>
+            <Option value="all">All</Option>
             <Option value="product">Product</Option>
             <Option value="category">Category</Option>
-            <Option value="all">All</Option>
           </Select>
           {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
         </div>
-        {discount.type === 'product' || discount.type === 'category' ? (
-          <div>
+
+        {(discount.type === 'product' || discount.type === 'category') && (
+          <div className="pb-5">
             <label className="block font-medium">
               {discount.type === 'product' ? 'Products' : 'Categories'}
             </label>
             <Select
               mode="multiple"
-              placeholder={`Select ${discount.type === 'product' ? 'product' : 'category'}`}
+              placeholder={`Select ${discount.type === 'product' ? 'products' : 'categories'}`}
               onChange={handleSelectChange}
+              value={appliesToItems.map((item) =>
+                typeof item === 'string' ? item : item._id
+              )}
               className="w-full mt-1"
-              value={appliesToItems} // Hiển thị giá trị hiện tại
-              showSearch // Tìm kiếm
-              optionFilterProp="children" // Tìm kiếm dựa trên nội dung hiển thị
+              showSearch
+              optionFilterProp="children"
             >
               {discount.type === 'product'
                 ? products.map((product) => (
-                  <Option key={product._id } value={product._id}>
-                    {product.product_name}  {/* Hiển thị tên sản phẩm */}
-                  </Option>
-                ))
+                    <Option key={product._id} value={product._id}>
+                      {product.product_name}
+                    </Option>
+                  ))
                 : categories.map((category) => (
-                  <Option key={category._id } value={category._id}>
-                    {category.category_name}  {/* Hiển thị tên danh mục */}
-                  </Option>
-                ))}
+                    <Option key={category._id} value={category._id}>
+                      {category.category_name}
+                    </Option>
+                  ))}
             </Select>
             {errors.appliesTo && <p className="text-red-500 text-sm">{errors.appliesTo}</p>}
           </div>
-        ) : null}
-
+        )}
       </div>
-      <div className='grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2'>
-
+      <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
         <div>
           <label className="block font-medium">Usage Limit</label>
           <Input
             type="number"
             name="usage_limit"
-            value={discount.usage_limit || 1}
-            min="1"
+            value={discount.usage_limit || 0}
             onChange={handleChange}
+            min="0"
             className={`w-full mt-1 p-2 border rounded-md ${errors.usage_limit ? 'border-red-500' : ''}`}
           />
           {errors.usage_limit && <p className="text-red-500 text-sm">{errors.usage_limit}</p>}
@@ -263,9 +282,12 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
         </div>
       </div>
-      <div className="flex justify-end gap-2">
-        <Button className="text-[16px] p-4 w-32" onClick={onCancel}>Cancel</Button>
-        <Button className="text-[16px] p-4 w-32" onClick={handleSave}>Save</Button>
+
+      <div className="mt-6 flex justify-between">
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button type="primary" onClick={handleSave}>
+          Save
+        </Button>
       </div>
     </div>
   );

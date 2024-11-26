@@ -46,16 +46,6 @@ const EditDiscount: React.FC = () => {
     fetchProducts();
     fetchCategories();
   }, []);
-  // useEffect(() => {
-  //   // Tìm discount theo ID trong mockDiscounts
-  //   const existingDiscount = mockDiscounts.find((disc) => disc._id === id);
-  //   if (existingDiscount) {
-  //     setDiscount(existingDiscount);
-  //   } else {
-  //     alert("Không tìm thấy discount.");
-  //     navigate("/admin/discount"); // Quay lại danh sách nếu không tìm thấy discount
-  //   }
-  // }, [id, navigate]);
   const updateDiscountInDB = async (updatedDiscount: Discount) => {
     try {
       const updateProduct = await axiosClient.put<Discount>(
@@ -75,12 +65,6 @@ const EditDiscount: React.FC = () => {
         ...updatedDiscount,
         _id: discount._id, // Đảm bảo rằng _id không bị mất
       };
-
-      // Cập nhật discount trong mockDiscounts
-      const index = mockDiscounts.findIndex((disc) => disc._id === discount._id);
-      if (index !== -1) {
-        mockDiscounts[index] = { ...mockDiscounts[index], ...updatedDiscount };
-      }
 
       // Cập nhật lại discount trong state
       updateDiscountInDB(updatedDiscountWithId);
