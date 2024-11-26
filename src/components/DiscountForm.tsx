@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Select, Input, Checkbox, message } from 'antd';
 import { Discount } from '@src/types/Discount';
+import { Product } from '@src/types/Product';
+import { Category } from '@src/types/Category';
 
 const { Option } = Select;
 
@@ -8,8 +10,8 @@ interface DiscountFormProps {
   initialDiscount?: Partial<Discount>;
   onSave: (discount: Partial<Discount>) => void;
   onCancel: () => void;
-  mockProducts: { _id: string; product_name: string }[]; // Đảm bảo mockProducts là mảng đối tượng Product
-  mockCategories: { _id: string; category_name: string }[]; // Đảm bảo mockCategories là mảng đối tượng Category
+  products: Product[]; // Đảm bảo mockProducts là mảng đối tượng Product
+  categories: Category[]; // Đảm bảo mockCategories là mảng đối tượng Category
   type: string;
 }
 
@@ -17,8 +19,8 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   initialDiscount = {},
   onSave,
   onCancel,
-  mockProducts,
-  mockCategories,
+  products,
+  categories,
   type
 }) => {
   const [discount, setDiscount] = useState<Partial<Discount>>(initialDiscount);
@@ -33,7 +35,6 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
       [name]: value,
     }));
   };
-
   const handleTypeChange = (value: string) => {
     setDiscount((prev) => ({
       ...prev,
@@ -45,7 +46,6 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   // Khi thay đổi discount.type, reset selectedItems
   useEffect(() => {
     if (initialDiscount) {
-      setDiscount(initialDiscount);
       setAppliesToType(initialDiscount.type || 'all'); // Loại giảm giá (product, category, all)
       setAppliesToItems(initialDiscount.apply_items || []); // Danh sách sản phẩm/danh mục được áp dụng
     }
@@ -96,11 +96,12 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
     if (validate()) {
       onSave({
         ...discount,
-        apply_items: appliesToType === 'all' ? undefined : appliesToItems,
+        apply_items: appliesToType === 'all' ? []: appliesToItems,
       });
       message.success('Discount saved successfully!');
     }
   };
+  console.log("apply",appliesToItems);
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
@@ -182,17 +183,17 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
               onChange={handleSelectChange}
               className="w-full mt-1"
               value={appliesToItems} // Hiển thị giá trị hiện tại
-              showSearch // Thêm thuộc tính này để kích hoạt chức năng tìm kiếm
-              optionFilterProp="children" // Tìm kiếm dựa trên nội dung hiển thị của Option
+              showSearch // Tìm kiếm
+              optionFilterProp="children" // Tìm kiếm dựa trên nội dung hiển thị
             >
               {discount.type === 'product'
-                ? mockProducts.map((product) => (
-                  <Option key={product._id || product.product_name} value={product._id}>
+                ? products.map((product) => (
+                  <Option key={product._id } value={product._id}>
                     {product.product_name}  {/* Hiển thị tên sản phẩm */}
                   </Option>
                 ))
-                : mockCategories.map((category) => (
-                  <Option key={category._id || category.category_name} value={category._id}>
+                : categories.map((category) => (
+                  <Option key={category._id } value={category._id}>
                     {category.category_name}  {/* Hiển thị tên danh mục */}
                   </Option>
                 ))}
@@ -200,6 +201,7 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
             {errors.appliesTo && <p className="text-red-500 text-sm">{errors.appliesTo}</p>}
           </div>
         ) : null}
+
       </div>
       <div className='grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2'>
 
