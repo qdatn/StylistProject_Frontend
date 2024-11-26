@@ -1,9 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
-import { Tag } from 'antd';
+import { message, Tag } from 'antd';
 import { Order, OrderList, OrderListAdmin, OrderTracking } from '@src/types/Order'; // Import type của Order
 import { ColumnsType } from 'antd/es/table';
+import axiosClient from '@api/axiosClient';
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 interface OrderTableProps {
   orders: OrderListAdmin; // Prop chứa danh sách đơn hàng
@@ -65,6 +68,19 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onDeleteSuccess }) => {
     // Điều hướng đến trang thêm mới đơn hàng
     navigate('new');
   };
+  const handleDeleteOrders = async (selectedKeys: React.Key[]) => {
+    try {
+      await Promise.all(
+        selectedKeys.map((id) =>
+          axiosClient.delete(`${baseUrl}/api/order/${id}`)
+        )
+      );
+      message.success("Orders deleted successfully");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to delete Orders");
+    }
+  };
   return (
     <div>
       <CommonTable
@@ -82,6 +98,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onDeleteSuccess }) => {
         hideAddButton={true}
         pagination={orders.pagination}
         onDeleteSuccess={onDeleteSuccess}
+        onDelete={handleDeleteOrders}
       />
     </div>
   );

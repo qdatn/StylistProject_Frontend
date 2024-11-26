@@ -1,9 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
-import { Tag } from 'antd';
+import { message, Tag } from 'antd';
 import { Discount, DiscountList } from '@src/types/Discount'; // Import type của Discount
 import { ColumnsType } from 'antd/es/table';
+import axiosClient from '@api/axiosClient';
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 interface DiscountTableProps {
   discounts: DiscountList; // Prop chứa danh sách mã giảm giá
@@ -76,7 +79,19 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ discounts, onDeleteSucces
     // Điều hướng đến trang thêm mới mã giảm giá
     navigate('new');
   };
-
+  const handleDeleteDiscounts = async (selectedKeys: React.Key[]) => {
+    try {
+      await Promise.all(
+        selectedKeys.map((id) =>
+          axiosClient.delete(`${baseUrl}/api/discount/${id}`)
+        )
+      );
+      message.success("Discounts deleted successfully");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to delete Discounts");
+    }
+  };
   return (
     <div>
       <CommonTable
@@ -92,6 +107,7 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ discounts, onDeleteSucces
         onAddNew={handleAddNewDiscount} // Hàm thêm mới mã giảm giá
         pagination={discounts.pagination}
         onDeleteSuccess={onDeleteSuccess}
+        onDelete={handleDeleteDiscounts}
       />
     </div>
   );

@@ -8,7 +8,7 @@ import { Product, ProductList } from "@src/types/Product";
 
 const { Search } = Input;
 const urlPath = import.meta.env.VITE_API_URL;
-const baseUrl = import.meta.env.VITE_API_URL;
+//const baseUrl = import.meta.env.VITE_API_URL;
 
 interface CommonTableProps<T> extends TableProps<T> {
   columns: ColumnsType<T>;
@@ -22,6 +22,7 @@ interface CommonTableProps<T> extends TableProps<T> {
   hideHideButton?: boolean; //nhưng form không cần nút "toggle status" thì cho nút này ẩn đi
   pagination?: PaginationType;
   onDeleteSuccess?: () => void;
+  onDelete?: (selectedKeys: React.Key[]) => Promise<void>; // Hàm xử lý xóa
 }
 
 function CommonTable<T extends { [key: string]: any }>(
@@ -57,32 +58,35 @@ function CommonTable<T extends { [key: string]: any }>(
     console.log("[pagi]", pagination);
   }, [pagination]);
 
-  const deleteProductInDB = async (productId: string) => {
+  // const deleteProductInDB = async (productId: string) => {
+  //   try {
+  //     const updateProduct = await axiosClient.delete<Product>(
+  //       `${baseUrl}/api/product/${productId}`
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert(error);
+  //   }
+  // };
+  const handleDelete = async () => {
     try {
-      const updateProduct = await axiosClient.delete<Product>(
-        `${baseUrl}/api/product/${productId}`
+      if (props.onDelete) {
+        // Gọi hàm xóa từ props
+        await props.onDelete(selectedRowKeys);
+      }
+  
+      // Cập nhật dữ liệu bảng sau khi xóa thành công
+      setTableData((prevData) =>
+        prevData.filter((item) => !selectedRowKeys.includes(item[rowKey]))
       );
+  
+      setSelectedRowKeys([]);
+      if (onDeleteSuccess) {
+        onDeleteSuccess();
+      }
     } catch (error) {
-      console.log(error);
-      alert(error);
+      message.error("Failed to delete selected items");
     }
-  };
-  const handleDelete = () => {
-    setTableData((prevData) =>
-      prevData.filter((item) => {
-        if (selectedRowKeys.includes(item[rowKey])) {
-          console.log("rowkey:", item[rowKey]);
-          deleteProductInDB(item[rowKey]);
-        }
-        if (onDeleteSuccess) {
-          onDeleteSuccess();
-        }
-        // !selectedRowKeys.includes(item[rowKey]);
-      })
-    );
-
-    setSelectedRowKeys([]);
-    message.success("Selected items deleted");
   };
 
   const handleSearch = (value: string) => {

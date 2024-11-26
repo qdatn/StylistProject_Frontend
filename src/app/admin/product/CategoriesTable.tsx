@@ -1,8 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
-import { Tag } from 'antd';
+import { message, Tag } from 'antd';
 import { Category, CategoryList, mockCategories } from '@src/types/Category'; // Import mock data của category
+import axiosClient from '@api/axiosClient';
+
+const baseUrl = import.meta.env.VITE_API_URL;
+
 interface CategoryTableProps {
   categories: CategoryList; // Prop chứa danh sách danh mục
   onDeleteSuccess: () => void;
@@ -40,6 +44,19 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
     // Điều hướng đến trang thêm mới danh mục
     navigate('new');
   };
+  const handleDeleteCategories = async (selectedKeys: React.Key[]) => {
+    try {
+      await Promise.all(
+        selectedKeys.map((id) =>
+          axiosClient.delete(`${baseUrl}/api/category/${id}`)
+        )
+      );
+      message.success("Categories deleted successfully");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to delete Categories");
+    }
+  };
   return (
     <div>
       <CommonTable
@@ -56,6 +73,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         hideHideButton={true}
         pagination={categories.pagination}
         onDeleteSuccess={onDeleteSuccess}
+        onDelete={handleDeleteCategories}
       />
     </div>
   );
