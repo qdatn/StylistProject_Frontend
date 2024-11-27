@@ -1,25 +1,40 @@
 // app/admin/product/EditProduct.tsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import mockProducts, { Product } from "@src/types/Product";
 import ProductStorageForm from "@components/ProductStorageForm";
+import axiosClient from "@api/axiosClient";
 
+const baseUrl = import.meta.env.VITE_API_URL;
 const EditProductStorage: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // Lấy ID sản phẩm từ URL
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
+  const location = useLocation();
+  const productFromState = location.state?.product || null;
 
-  useEffect(() => {
-    // Tìm sản phẩm theo ID trong mockProducts
-    const existingProduct = mockProducts.find((prod) => prod._id === id);
-    if (existingProduct) {
-      setProduct(existingProduct);
-    } else {
-      alert("Không tìm thấy sản phẩm.");
-      navigate("/admin/storage"); // Quay lại danh sách nếu không tìm thấy sản phẩm
+  const [product, setProduct] = useState<Product | null>(productFromState);
+
+  // useEffect(() => {
+  //   // Tìm sản phẩm theo ID trong mockProducts
+  //   const existingProduct = mockProducts.find((prod) => prod._id === id);
+  //   if (existingProduct) {
+  //     setProduct(existingProduct);
+  //   } else {
+  //     alert("Không tìm thấy sản phẩm.");
+  //     navigate("/admin/storage"); // Quay lại danh sách nếu không tìm thấy sản phẩm
+  //   }
+  // }, [id, navigate]);
+  const updateProductInDB = async (updatedProduct: Product) => {
+    try {
+      const updateProduct = await axiosClient.put<Product>(
+        `${baseUrl}/api/product/${id}`,
+        updatedProduct
+      );
+    } catch (error) {
+      console.log(error);
+      alert(error);
     }
-  }, [id, navigate]);
-
+  };
   const handleUpdateProduct = (updatedProduct: Partial<Product>) => {
     if (product) {
       // Đảm bảo rằng _id luôn có giá trị và không bị mất khi cập nhật
@@ -30,13 +45,14 @@ const EditProductStorage: React.FC = () => {
       };
 
       // Cập nhật danh mục trong mockCategories (nếu cần)
-      const index = mockProducts.findIndex((cat) => cat._id === product._id);
-      if (index !== -1) {
-        mockProducts[index] = { ...mockProducts[index], ...updatedProduct };
-      }
+      // const index = mockProducts.findIndex((cat) => cat._id === product._id);
+      // if (index !== -1) {
+      //   mockProducts[index] = { ...mockProducts[index], ...updatedProduct };
+      // }
 
       // Cập nhật lại danh mục trong state
       setProduct(updatedProductWithId);
+      updateProductInDB(updatedProductWithId);
 
       // Thông báo thành công
       console.log("Updated Product:", updatedProductWithId);
@@ -56,6 +72,7 @@ const EditProductStorage: React.FC = () => {
           initialProduct={product}
           onSave={handleUpdateProduct}
           onCancel={handelCancel}
+          type="edit"
         />
       ) : (
         <p>Đang tải dữ liệu sản phẩm...</p>

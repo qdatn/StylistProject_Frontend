@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { Order } from '@src/types/Order';
-import Ordertracking from '@components/Ordertracking';
 import OrdertrackingAdmin from './OrdertrackingAdmin';
 
 interface OrderFormProps {
     initialOrder?: Partial<Order>;
     onSave: (order: Partial<Order>) => void;
     onCancel: () => void;
+    type: string;
 }
 
-const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCancel }) => {
+const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCancel, type }) => {
     const [order, setOrder] = useState<Partial<Order>>(initialOrder);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -53,6 +53,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     <input
                         type="text"
                         name="_id"
+                        disabled
                         value={order._id || ''}
                         onChange={handleChange}
                         placeholder="Enter Order ID"
@@ -66,6 +67,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     <input
                         type="text"
                         name="user"
+                        disabled
                         value={order.user || ''}
                         onChange={handleChange}
                         placeholder="Enter User ID"
@@ -101,6 +103,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     <input
                         type="number"
                         name="total_price"
+                        disabled
                         value={order.total_price || 0}
                         onChange={handleChange}
                         min="0"
@@ -115,6 +118,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     <input
                         type="number"
                         name="discount"
+                        disabled
                         value={order.discount || 0}
                         onChange={handleChange}
                         min="0"
@@ -159,7 +163,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     <input
                         type="date"
                         name="create_date"
-                        value={order.create_date ? new Date(order.create_date).toISOString().split('T')[0] : ''}
+                        disabled
+                        value={order.createdDate ? new Date(order.createdDate).toISOString().split('T')[0] : ''}
                         onChange={handleChange}
                         className="w-full mt-1 p-2 border rounded-md"
                     />
@@ -167,14 +172,14 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
             </div>
 
             {/* Giao diện hiển thị Order Items */}
-            <div className="mt-8">
+            {/* <div className="mt-8">
                 <h3 className="text-lg font-semibold mb-4">Order Items</h3>
                 {order.order_items && order.order_items.length > 0 ? (
                     <OrdertrackingAdmin order={order as Order} />
                 ) : (
                     <p className="text-gray-600">No items in this order.</p>
                 )}
-            </div>
+            </div> */}
 
             {/* Nút hành động */}
             <div className="flex flex-row gap-2 justify-end mt-6">

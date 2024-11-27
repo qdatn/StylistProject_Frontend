@@ -37,6 +37,7 @@ const ProductListAdminPage: React.FC = () => {
       alert(error);
     }
   };
+  
 
   useEffect(() => {
     fetchProductItem(pagination.currentPage!, pagination.pageSize!);

@@ -1,12 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
-import { Tag } from 'antd';
-import { Order } from '@src/types/Order'; // Import type của Order
+import { message, Tag } from 'antd';
+import { Order, OrderList, OrderListAdmin, OrderTracking } from '@src/types/Order'; // Import type của Order
 import { ColumnsType } from 'antd/es/table';
+import axiosClient from '@api/axiosClient';
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 interface OrderTableProps {
-  orders: Order[]; // Prop chứa danh sách đơn hàng
+  orders: OrderListAdmin; // Prop chứa danh sách đơn hàng
+  onDeleteSuccess: () => void;
 }
 
 const orderColumns:  ColumnsType<Order>=[
@@ -50,27 +54,38 @@ const orderColumns:  ColumnsType<Order>=[
   },
 ];
 
-const OrderTable: React.FC<OrderTableProps> = ({ orders }) => {
+const OrderTable: React.FC<OrderTableProps> = ({ orders, onDeleteSuccess }) => {
   const navigate = useNavigate();
-
+  
   const handleRowClick = (record: Order) => {
     // Điều hướng đến trang chi tiết hoặc chỉnh sửa đơn hàng
-    navigate(`/admin/order/edit/${record._id}`);
+    navigate(`/admin/order/edit/${record._id}`,{
+      state: { order: record },
+    });
   };
 
   const handleAddNewOrder = () => {
     // Điều hướng đến trang thêm mới đơn hàng
     navigate('new');
   };
-
+  const handleDeleteOrders = async (selectedKeys: React.Key[]) => {
+    try {
+      await Promise.all(
+        selectedKeys.map((id) =>
+          axiosClient.delete(`${baseUrl}/api/order/${id}`)
+        )
+      );
+      message.success("Orders deleted successfully");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to delete Orders");
+    }
+  };
   return (
     <div>
-      <div>
-
-      </div>
       <CommonTable
         columns={orderColumns}
-        dataSource={orders}
+        dataSource={orders.data}
         rowKey="_id"
         rowSelection={{
           type: 'checkbox',
@@ -80,6 +95,10 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders }) => {
         })}
         onAddNew={handleAddNewOrder} // Hàm thêm mới đơn hàng
         hideHideButton={true}
+        hideAddButton={true}
+        pagination={orders.pagination}
+        onDeleteSuccess={onDeleteSuccess}
+        onDelete={handleDeleteOrders}
       />
     </div>
   );

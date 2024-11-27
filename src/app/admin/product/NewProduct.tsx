@@ -1,5 +1,5 @@
 // app/admin/product/ProductList.tsx
-import ProductForm from "@components/ProductForm";
+import ProductForm from "@components/product/ProductForm";
 import React, { useState } from "react";
 import mockProducts, { Product } from "@src/types/Product";
 import { useNavigate } from "react-router-dom";

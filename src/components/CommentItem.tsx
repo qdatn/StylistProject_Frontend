@@ -1,3 +1,4 @@
+import { OrderAttribute } from "@src/types/Attribute";
 import React from "react";
 import { FaStar } from "react-icons/fa";
 
@@ -10,7 +11,7 @@ interface CommentItemProps {
   username: string;
   rating: number;
   review: string;
-  attributes: Attribute[];
+  attributes: OrderAttribute[];
   created_date: string;
 }
 
@@ -21,6 +22,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   attributes,
   created_date,
 }) => {
+  console.log(attributes);
   return (
     <div className="border p-4 rounded-md shadow">
       <div className="flex flex-row gap-4">
@@ -31,13 +33,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
           ))}
         </div>
       </div>
-      {/* <div className="text-gray-500 text-[14px] mb-2">
-                {attributes.map(attr => (
-                    <span key={attr.key} className="mr-2">
-                        {attr.key}: {attr.value}
-                    </span>
-                ))}
-            </div> */}
+      <div className="text-gray-500 text-[14px] mb-2">
+        {attributes.map((attr) => (
+          <span key={attr.key} className="mr-2">
+            {attr.key}: {attr.value}
+          </span>
+        ))}
+      </div>
       <p className="text-gray-600 mb-2">{review}</p>
       <p className="text-xs text-gray-400">{created_date.toString()}</p>
     </div>

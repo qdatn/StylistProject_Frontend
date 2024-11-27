@@ -148,11 +148,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
           );
           return productAttr
             ? {
-                ...attr,
-                value: Array.from(
-                  new Set([...attr.value, ...productAttr.value])
-                ),
-              }
+              ...attr,
+              value: Array.from(
+                new Set([...attr.value, ...productAttr.value])
+              ),
+            }
             : attr;
         });
       });
@@ -277,8 +277,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     if (!product.brand) newErrors.brand = "Brand is required.";
     if (product.stock_quantity !== undefined && product.stock_quantity < 0)
       newErrors.stock_quantity = "Stock quantity cannot be negative.";
-    if (selectedCategories.length === 0)
-      newErrors.categories = "Please select at least one category.";
+    // if (selectedCategories.length === 0)
+    //   newErrors.categories = "Please select at least one category.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -301,8 +301,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         ...product,
         attributes: updatedAttributes,
         // categories: selectedCategoryObjects,
-        categories: categoryIds,
-        images: fileList.map((file) => file.url || file.response?.url || ""), // Lấy URL từ fileList
+        categories: categories,
+        images: fileList.map((file) => file.url || file.response?.url), // Lấy URL từ fileList
       };
       console.log("FINAL", finalProduct);
       onSave(finalProduct);
@@ -324,9 +324,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             placeholder="Enter product ID"
             required
             disabled
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.id ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.id ? "border-red-500" : ""
+              }`}
           />
           {errors.id && <p className="text-red-500 text-sm">{errors.id}</p>}
         </div>
@@ -338,9 +337,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             value={product.product_name || ""}
             onChange={handleChange}
             placeholder="Enter product name"
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.name ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.name ? "border-red-500" : ""
+              }`}
           />
           {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
@@ -355,9 +353,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             min="0"
             required
             placeholder="Enter original price"
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.originalPrice ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.originalPrice ? "border-red-500" : ""
+              }`}
           />
           {errors.originalPrice && (
             <p className="text-red-500 text-sm">{errors.originalPrice}</p>
@@ -375,9 +372,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             max={product.price}
             required
             placeholder="Enter discounted price"
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.discountedPrice ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.discountedPrice ? "border-red-500" : ""
+              }`}
           />
           {errors.discountedPrice && (
             <p className="text-red-500 text-sm">{errors.discountedPrice}</p>
@@ -393,9 +389,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={handleChange}
             placeholder="Enter brand"
             required
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.brand ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.brand ? "border-red-500" : ""
+              }`}
           />
           {errors.brand && (
             <p className="text-red-500 text-sm">{errors.brand}</p>
@@ -476,9 +471,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
               min="0"
               required
               placeholder="Enter stock quantity"
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.stock_quantity ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.stock_quantity ? "border-red-500" : ""
+                }`}
             />
             {errors.stock_quantity && (
               <p className="text-red-500 text-sm">{errors.stock_quantity}</p>
@@ -493,9 +487,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
               onChange={handleChange}
               min="0"
               placeholder="Enter stock quantity"
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.min_quantity ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.min_quantity ? "border-red-500" : ""
+                }`}
             />
             {errors.min_quantity && (
               <p className="text-red-500 text-sm">{errors.min_quantity}</p>
@@ -510,9 +503,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
               onChange={handleChange}
               min="0"
               placeholder="Enter stock quantity"
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.sold_quantity ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.sold_quantity ? "border-red-500" : ""
+                }`}
             />
             {errors.sold_quantity && (
               <p className="text-red-500 text-sm">{errors.stock_quantity}</p>
@@ -532,9 +524,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   : ""
               } // Giá trị là ngày hiện tại
               disabled // Không cho phép thay đổi
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.createdAt ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.createdAt ? "border-red-500" : ""
+                }`}
             />
             {errors.createdAt && (
               <p className="text-red-500 text-sm">{errors.createdAt}</p>

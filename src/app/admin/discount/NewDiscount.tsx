@@ -1,24 +1,67 @@
 // app/admin/Discount/NewDiscount.tsx
 import DiscountForm from "@components/DiscountForm"; // Import form cho Discount
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import mockDiscounts, { Discount } from "@src/types/Discount"; // Import dữ liệu mẫu và type
 import { useNavigate } from "react-router-dom";
-import mockProducts from "@src/types/Product";
-import { mockCategories } from "@src/types/Category";
+import mockProducts, { Product, ProductList } from "@src/types/Product";
+import { Category, CategoryList, mockCategories } from "@src/types/Category";
+import axiosClient from "@api/axiosClient";
 
+const baseUrl = import.meta.env.VITE_API_URL;
 const NewDiscount: React.FC = () => {
     const [discounts, setDiscounts] = useState<Discount[]>(mockDiscounts); // State lưu danh sách Discounts
     const navigate = useNavigate();
+    const [products, setProducts] = useState<Product[]>([]); // State lưu danh sách sản phẩm
+    const [categories, setCategories] = useState<Category[]>([]); // State lưu danh sách danh mục
+    // Gọi API để lấy danh sách sản phẩm
+    const fetchProducts = async () => {
+        try {
+            const response = await axiosClient.getOne<ProductList>(
+                `${baseUrl}/api/product`,
+            );
+            setProducts(response.data);
+        } catch (error) {
+            console.error("Failed:", error);
+        }
+    };
 
+    // Gọi API để lấy danh sách danh mục
+    const fetchCategories = async () => {
+        try {
+            const response = await axiosClient.getOne<CategoryList>(
+                `${baseUrl}/api/category`,
+            );
+            setCategories(response.data);
+        } catch (error) {
+            console.error("Failed:", error);
+        }
+    };
+
+
+    // Dùng useEffect để gọi API khi component được render
+    useEffect(() => {
+        fetchProducts();
+        fetchCategories();
+    }, []);
+    const addDiscountToDB = async (discount: Discount) => {
+        try {
+            const addDiscount = axiosClient.post<Discount>(
+                `${baseUrl}/api/discount`,
+                discount
+            );
+        } catch (error) {
+            alert(error);
+        }
+    };
     // Xử lý thêm Discount mới
     const handleAddDiscount = (newDiscount: Partial<Discount>) => {
         const discountToAdd: Discount = {
             ...newDiscount,
-            discount_id: newDiscount._id || `discount-${Date.now()}`, // Tạo ID nếu chưa có
-            create_date: new Date(), // Tự động thêm ngày tạo
+            //discount_id: newDiscount._id || `discount-${Date.now()}`, // Tạo ID nếu chưa có
         } as Discount;
 
         setDiscounts((prevDiscounts) => [...prevDiscounts, discountToAdd]);
+        addDiscountToDB(discountToAdd);
         alert("Discount added successfully!");
         navigate("/admin/discount"); // Chuyển hướng về danh sách đơn hàng
     };
@@ -36,8 +79,9 @@ const NewDiscount: React.FC = () => {
                 <DiscountForm
                     onSave={handleAddDiscount}
                     onCancel={handleCancel}
-                    mockProducts={mockProducts} // Truyền mockProducts
-                    mockCategories={mockCategories} // Truyền mockCategories
+                    products={products}
+                    categories={categories}
+                    type="add"
                 />
             </div>
         </div>

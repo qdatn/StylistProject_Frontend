@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Tag } from "antd";
+import { message, Tag } from "antd";
 import dayjs from "dayjs";
 import CommonTable from "@components/ui/table";
 import { ColumnsType } from "antd/es/table";
 import { Product, ProductList } from "@src/types/Product";
 import { PaginationType } from "@src/types/Pagination";
 import { Console } from "console";
+import axiosClient from "@api/axiosClient";
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 interface ProductTableProps {
   products: ProductList;
@@ -81,10 +84,19 @@ const ProductTable: React.FC<ProductTableProps> = ({
     navigate("new");
   };
 
-  // useEffect(() => {
-  //   console.log("PRODUCT", products);
-  // });
-
+  const handleDeleteProducts = async (selectedKeys: React.Key[]) => {
+    try {
+      await Promise.all(
+        selectedKeys.map((id) =>
+          axiosClient.delete(`${baseUrl}/api/product/${id}`)
+        )
+      );
+      message.success("Products deleted successfully");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to delete products");
+    }
+  };
   return (
     <div>
       <CommonTable
@@ -100,6 +112,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         onAddNew={handleAddNewProduct}
         pagination={products.pagination}
         onDeleteSuccess={onDeleteSuccess}
+        onDelete={handleDeleteProducts}
       />
     </div>
   );

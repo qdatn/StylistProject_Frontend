@@ -1,5 +1,6 @@
 // src/types/OrderItem.ts
 import { Product } from "@src/types/Product";
+import { OrderAttribute } from "./Attribute";
 
 export interface OrderItem {
   _id: string;
@@ -10,7 +11,7 @@ export interface OrderItem {
   note?: string;
   //purchased_price: number;
   //discounted_price: number;
-  attributes: { key: string; value: string }[];
+  attributes: OrderAttribute[];
   //image: string[];
 }
 // Đã sửa kiểu dữ liệu imageURL -> image

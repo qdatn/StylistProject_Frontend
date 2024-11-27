@@ -31,13 +31,15 @@ export default function CustomerHeader() {
       try {
         // Gọi API tìm kiếm
         const response = await axiosClient.getOne<ProductList>(
-          `${baseUrl}/api/product/search?name=${searchTerm}`
+          `${baseUrl}/api/product/search/query?name=${searchTerm}`
         );
         console.log("SEARCH", response);
         console.log("SEARCHQUERY", searchTerm);
 
         // Chuyển tới trang kết quả và truyền dữ liệu sản phẩm nếu cần
-        navigate("/product/search", { state: { searchquery: searchTerm } });
+        navigate(`/product/search/query?name=${searchTerm}`, {
+          state: { searchquery: searchTerm },
+        });
       } catch (error) {
         console.error("Error fetching search results:", error);
       }

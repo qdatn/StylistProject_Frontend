@@ -12,7 +12,7 @@ export interface Product {
   stock_quantity: number;
   min_quantity?: number;
   sold_quantity?: number;
-  categories: Category[] | string[];
+  categories: Category[];
   stock_update_date?: Date;
   status: boolean;
   images: string[];

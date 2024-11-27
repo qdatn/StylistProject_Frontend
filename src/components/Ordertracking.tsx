@@ -58,6 +58,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <OrderReviewForm
             order={order}
+            orderitems={orderitems}
             onClose={() => setIsReviewFormOpen(false)}
           />
         </div>

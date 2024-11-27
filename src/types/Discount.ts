@@ -1,3 +1,5 @@
+import { PaginationType } from "./Pagination";
+
 export interface Discount {
     _id: string; // Mã ID duy nhất của mã giảm giá
     code: string; // Mã code giảm giá
@@ -12,6 +14,10 @@ export interface Discount {
     used_count?: number; // Số lần đã sử dụng
     status: boolean; // Trạng thái của mã giảm giá (true: hoạt động, false: không hoạt động)
 }
+export interface DiscountList {
+    data: Discount[];
+    pagination: PaginationType;
+  }
 
 const mockDiscounts: Discount[] = [
     {

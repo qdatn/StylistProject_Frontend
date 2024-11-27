@@ -33,6 +33,8 @@ import DashboardPage from "@app/admin/statistics";
 import RequireAuth from "@components/auth/auth_require";
 import ProductListAdminPage from "@app/admin/product/ProductList";
 import ProductListPage from "@app/customer/product";
+import NotFound from "@components/NotFound";
+import ProductSearchPage from "@app/customer/product/product_search/ProductSearchPage";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -46,8 +48,12 @@ function App() {
           {/* Public layout - guest */}
           <Route element={<RequireAuth role="guest" />}>
             <Route path="/" element={<Home />} />
-            <Route path="/product/search" element={<ProductListPage />} />
+            <Route
+              path="/product/search/query"
+              element={<ProductSearchPage />}
+            />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
 
           {/* Protected layout - customer */}
@@ -58,6 +64,7 @@ function App() {
             <Route path="/resetpassword" element={<ResetPasswordForm />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
 
           {/* Protected layout - admin */}
@@ -98,6 +105,7 @@ function App() {
             />
             <Route path="/admin/order/new" element={<NewOrder />} />
             <Route path="/admin/discount/new" element={<NewDiscount />} />
+            <Route path="/admin/*" element={<NotFound />} />
           </Route>
 
           {/* Public layout - guest */}

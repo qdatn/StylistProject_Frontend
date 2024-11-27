@@ -1,24 +1,24 @@
 import { UserInfo } from "os";
-import { Attribute } from "./Attribute";
+import { Attribute, OrderAttribute } from "./Attribute";
 import { User } from "./auth/AuthType";
-import { Pagination } from "./Pagination";
+import { PaginationType } from "./Pagination";
 import mockProducts, { Product } from "./Product";
 import { UserAccount } from "./UserAccount";
 export interface Comment {
-  _id: string;
+  _id?: string;
   product: Product;
-  //   user: UserAccount;
-  user_info: UserAccount;
+  user?: UserAccount | string;
+  user_info?: UserAccount;
   rating: number;
   review: string;
-  attributes: Attribute[];
-  createdAt: Date;
-  updatedAt: Date;
+  attributes: OrderAttribute[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface CommentList {
   data: Comment[];
-  pagination: Pagination;
+  pagination: PaginationType;
 }
 // const mockComments: Comment[] = [
 //   {
