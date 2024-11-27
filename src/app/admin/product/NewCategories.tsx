@@ -8,7 +8,7 @@ import axiosClient from "@api/axiosClient";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const NewCategory: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
+ // const [categories, setCategories] = useState<Category[]>(mockCategories);
   const navigate = useNavigate();
   const addCategoryToDB = async (category: Category) => {
     try {
@@ -22,7 +22,7 @@ const NewCategory: React.FC = () => {
   };
   const handleAddCategory = (newCategory: Partial<Category>) => {
     const categoryToAdd: Category = { ...newCategory, id: newCategory._id } as Category;
-    setCategories((prevCategory) => [...prevCategory, categoryToAdd]);
+    //setCategories((prevCategory) => [...prevCategory, categoryToAdd]);
     addCategoryToDB(categoryToAdd);
     alert('Add successfully');
     navigate("/admin/product/categories"); // Chuyển hướng về danh sách sản phẩm

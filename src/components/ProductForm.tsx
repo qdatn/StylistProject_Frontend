@@ -301,7 +301,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         ...product,
         attributes: updatedAttributes,
         // categories: selectedCategoryObjects,
-        categories: categoryIds,
+        categories: categories,
         images: fileList.map((file) => file.url || file.response?.url), // Lấy URL từ fileList
       };
       console.log("FINAL", finalProduct);
