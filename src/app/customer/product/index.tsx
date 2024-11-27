@@ -34,7 +34,7 @@ export default function ProductListPage() {
     try {
       const response = searchquery
         ? await axiosClient.getOne<ProductList>(
-            `${urlPath}/api/product/search?name=${searchquery}`,
+            `${urlPath}/api/product/search/query?name=${searchquery}`,
             {
               params: { page, limit: pageSize },
             }
