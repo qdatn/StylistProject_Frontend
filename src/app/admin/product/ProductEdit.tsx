@@ -1,7 +1,7 @@
 // app/admin/product/EditProduct.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import ProductForm from "@components/ProductForm";
+import ProductForm from "@components/product/ProductForm";
 import mockProducts, { Product } from "@src/types/Product";
 import axiosClient from "@api/axiosClient";
 
