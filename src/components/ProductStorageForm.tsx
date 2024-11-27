@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Product } from '@src/types/Product';
-import { Category, mockCategories } from '@src/types/Category';
-import { IoAddSharp } from "react-icons/io5";
-import { IoClose } from "react-icons/io5";
 import { Upload, Button, Input, message, Modal } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
 
 interface ProductStorageFormProps {
     initialProduct?: Partial<Product>;
     onSave: (product: Partial<Product>) => void;
     onCancel: () => void;
+    type: string;
 }
 
-const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct = {}, onSave, onCancel }) => {
+const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct = {}, onSave, onCancel, type }) => {
     const [product, setProduct] = useState<Partial<Product>>(initialProduct);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [fileList, setFileList] = useState<any[]>([]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -28,14 +24,14 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
         const newErrors: Record<string, string> = {};
         if (!product._id) newErrors.id = 'Product ID is required.';
         if (!product.product_name) newErrors.name = 'Product name is required.';
-        if (!product.price || product.price <= 0)
-            newErrors.originalPrice = 'Original price must be greater than 0.';
-        if (product.discountedPrice === undefined || product.discountedPrice < 0)
-            newErrors.discountedPrice = 'Discounted price must not be negative.';
-        if (!product.brand) newErrors.brand = 'Brand is required.';
+        // if (!product.price || product.price <= 0)
+        //     newErrors.originalPrice = 'Original price must be greater than 0.';
+        // if (product.discountedPrice === undefined || product.discountedPrice < 0)
+        //     newErrors.discountedPrice = 'Discounted price must not be negative.';
+        // if (!product.brand) newErrors.brand = 'Brand is required.';
         if (product.stock_quantity !== undefined && product.stock_quantity < 0)
             newErrors.stock_quantity = 'Stock quantity cannot be negative.';
-
+        setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
     const handleSave = () => {
@@ -44,6 +40,7 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
             const finalProduct: Partial<Product> = {
                 ...product,
             };
+            console.log("FINAL", finalProduct);
             onSave(finalProduct);
         }
     };
@@ -55,7 +52,7 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
                     <label className="block font-medium">Product ID</label>
                     <input
                         type="text"
-                        name="id"
+                        name="_id"
                         value={product._id || ''}
                         onChange={handleChange}
                         placeholder="Enter product ID"
@@ -69,7 +66,7 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
                     <label className="block font-medium">Product Name</label>
                     <input
                         type="text"
-                        name="name"
+                        name="product_name"
                         value={product.product_name || ''}
                         onChange={handleChange}
                         placeholder="Enter product name"

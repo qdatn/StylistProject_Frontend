@@ -1,18 +1,19 @@
 import React from 'react';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
-import { Tag } from 'antd';
-import { Product } from '@src/types/Product';
+import { message, Tag } from 'antd';
+import { Product, ProductList } from '@src/types/Product';
 import { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
+import axiosClient from '@api/axiosClient';
+
+const baseUrl = import.meta.env.VITE_API_URL;
+
 interface StorageTableProps {
-    products: Product[];
+    products: ProductList;
+    onDeleteSuccess: () => void;
 }
 const productColumns: ColumnsType<Product> = [
-    {
-        title: 'ID',
-        dataIndex: '_id',
-    },
     {
         title: 'Image',
         dataIndex: 'images',
@@ -55,20 +56,35 @@ const productColumns: ColumnsType<Product> = [
         onFilter: (value, record) => record.status === value,
     },
 ];
-
+const handleDeleteProducts = async (selectedKeys: React.Key[]) => {
+    try {
+      await Promise.all(
+        selectedKeys.map((id) =>
+          axiosClient.delete(`${baseUrl}/api/product/${id}`)
+        )
+      );
+      message.success("Products deleted successfully");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to delete products");
+    }
+  };
 const StorageTable: React.FC<StorageTableProps> = ({
     products,
+    onDeleteSuccess
 }) => {
     const navigate = useNavigate();
 
     const handleRowClick = (record: Product) => {
-        navigate(`/admin/storage/edit/${record._id}`);
+        navigate(`/admin/storage/edit/${record._id}`, {
+            state: { product: record },
+        });
     };
     return (
         <div>
             <CommonTable
                 columns={productColumns}
-                dataSource={products}
+                dataSource={products.data}
                 rowKey="_id"
                 rowSelection={{
                     type: 'checkbox',
@@ -77,6 +93,9 @@ const StorageTable: React.FC<StorageTableProps> = ({
                     onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
                 })}
                 hideAddButton={true}
+                pagination={products.pagination}
+                onDeleteSuccess={onDeleteSuccess}
+                onDelete={handleDeleteProducts}
             />
         </div>
     );

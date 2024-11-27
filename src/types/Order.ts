@@ -25,6 +25,10 @@ export interface OrderList {
   data: OrderTracking[];
   pagination: PaginationType;
 }
+export interface OrderListAdmin {
+  data: Order[];
+  pagination: PaginationType;
+}
 
 const calculateTotalPrice = (
   orderItems: OrderItem[],
@@ -35,6 +39,7 @@ const calculateTotalPrice = (
   }, 0);
   return discount ? subtotal * ((100 - discount) / 100) : subtotal;
 };
+
 const mockOrderItem: OrderItem[] = [
   // {
   //   product: mockProducts[0],
