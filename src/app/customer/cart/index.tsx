@@ -25,7 +25,7 @@ const CartPage = () => {
   const userId = user.user?.user._id;
   const cart = useSelector(
     (state: RootState) => state.persist.cart[userId!]?.items || []
-  );;
+  );
   const urlPath = import.meta.env.VITE_API_URL;
 
   const dispatch = useDispatch();
@@ -104,6 +104,10 @@ const CartPage = () => {
       })
     );
   };
+
+  useEffect(() => {
+    console.log("quantities", quantities);
+  }, [quantities]);
 
   const deleteProductInCart = async (productId: string) => {
     try {
@@ -205,7 +209,7 @@ const CartPage = () => {
         // _id: "",
         order: "",
         product: item._id,
-        quantity: quantities[item._id] || 1,
+        quantity: item.quantity /*quantities[item._id] || 1*/,
         note: "",
         attributes: item.cart_attributes,
       }));
@@ -214,6 +218,9 @@ const CartPage = () => {
       console.log(order);
       console.log({ order, order_items });
       // if (!validateForm()) return;
+      order_items.map((item) => {
+        removeItem(item.product);
+      });
     } else if (!order_items.length) {
       alert("Please choose product to place order");
     } else {
