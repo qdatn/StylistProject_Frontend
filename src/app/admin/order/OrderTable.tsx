@@ -5,15 +5,18 @@ import { message, Tag } from 'antd';
 import { Order, OrderList, OrderListAdmin, OrderTracking } from '@src/types/Order'; // Import type của Order
 import { ColumnsType } from 'antd/es/table';
 import axiosClient from '@api/axiosClient';
+import { PaginationType } from '@src/types/Pagination';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 interface OrderTableProps {
   orders: OrderListAdmin; // Prop chứa danh sách đơn hàng
   onDeleteSuccess: () => void;
+  onPageChange: (page: number, pageSize: number) => void;
+  pagination: PaginationType;
 }
 
-const orderColumns:  ColumnsType<Order>=[
+const orderColumns: ColumnsType<Order> = [
   {
     title: 'ID',
     dataIndex: '_id',
@@ -31,12 +34,12 @@ const orderColumns:  ColumnsType<Order>=[
     title: 'Status',
     dataIndex: 'status',
     render: (status: string) => {
-      let color = 
+      let color =
         status === 'pending' ? 'orange' :
-        status === 'shipped' ? 'blue' :
-        status === 'delivered' ? 'green' :
-        status === 'canceled' ? 'red' : 'gray';
-      
+          status === 'shipped' ? 'blue' :
+            status === 'delivered' ? 'green' :
+              status === 'canceled' ? 'red' : 'gray';
+
       return <Tag color={color}>{status.toUpperCase()}</Tag>;
     },
     filters: [
@@ -45,7 +48,7 @@ const orderColumns:  ColumnsType<Order>=[
       { text: 'Delivered', value: 'delivered' },
       { text: 'Canceled', value: 'canceled' },
     ],
-    onFilter: (value,record) => record.status === value,
+    onFilter: (value, record) => record.status === value,
   },
   {
     title: 'Created Date',
@@ -54,12 +57,17 @@ const orderColumns:  ColumnsType<Order>=[
   },
 ];
 
-const OrderTable: React.FC<OrderTableProps> = ({ orders, onDeleteSuccess }) => {
+const OrderTable: React.FC<OrderTableProps> = ({
+  orders,
+  onDeleteSuccess,
+  onPageChange,
+  pagination
+}) => {
   const navigate = useNavigate();
-  
+
   const handleRowClick = (record: Order) => {
     // Điều hướng đến trang chi tiết hoặc chỉnh sửa đơn hàng
-    navigate(`/admin/order/edit/${record._id}`,{
+    navigate(`/admin/order/edit/${record._id}`, {
       state: { order: record },
     });
   };
@@ -99,6 +107,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onDeleteSuccess }) => {
         pagination={orders.pagination}
         onDeleteSuccess={onDeleteSuccess}
         onDelete={handleDeleteOrders}
+        onPageChange={onPageChange}
       />
     </div>
   );

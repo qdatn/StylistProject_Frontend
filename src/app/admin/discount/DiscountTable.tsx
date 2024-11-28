@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
 import { message, Tag } from 'antd';
 import { Discount, DiscountList } from '@src/types/Discount'; // Import type của Discount
 import { ColumnsType } from 'antd/es/table';
 import axiosClient from '@api/axiosClient';
+import { PaginationType } from '@src/types/Pagination';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 interface DiscountTableProps {
   discounts: DiscountList; // Prop chứa danh sách mã giảm giá
   onDeleteSuccess: () => void;
+  onPageChange: (page: number, pageSize: number) => void;
+  pagination:PaginationType;
 }
 
 const discountColumns: ColumnsType<Discount> = [
@@ -26,12 +29,12 @@ const discountColumns: ColumnsType<Discount> = [
     title: 'Type',
     dataIndex: 'type',
     render: (type: string) => (
-      <Tag color={type === 'product' ? 'blue' :'green' }>{type.toUpperCase()}</Tag>
+      <Tag color={type === 'product' ? 'blue' : 'green'}>{type.toUpperCase()}</Tag>
     ),
     filters: [
       { text: 'Product', value: 'product' },
       { text: 'Category', value: 'category' },
-      {text:'All', value: 'all'}
+      { text: 'All', value: 'all' }
     ],
     onFilter: (value, record) => record.type === value,
   },
@@ -65,12 +68,12 @@ const discountColumns: ColumnsType<Discount> = [
   },
 ];
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ discounts, onDeleteSuccess }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({ discounts, onDeleteSuccess, onPageChange, pagination }) => {
   const navigate = useNavigate();
 
   const handleRowClick = (record: Discount) => {
     // Điều hướng đến trang chi tiết hoặc chỉnh sửa mã giảm giá
-    navigate(`/admin/discount/edit/${record._id}`,{
+    navigate(`/admin/discount/edit/${record._id}`, {
       state: { discount: record },
     });
   };
@@ -105,9 +108,10 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ discounts, onDeleteSucces
           onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
         })}
         onAddNew={handleAddNewDiscount} // Hàm thêm mới mã giảm giá
-        pagination={discounts.pagination}
         onDeleteSuccess={onDeleteSuccess}
         onDelete={handleDeleteDiscounts}
+        pagination={discounts.pagination}
+        onPageChange={onPageChange}
       />
     </div>
   );

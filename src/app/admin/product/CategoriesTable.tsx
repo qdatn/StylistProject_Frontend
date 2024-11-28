@@ -4,12 +4,15 @@ import CommonTable from '@components/ui/table'; // Giả sử bạn đã có com
 import { message, Tag } from 'antd';
 import { Category, CategoryList, mockCategories } from '@src/types/Category'; // Import mock data của category
 import axiosClient from '@api/axiosClient';
+import { PaginationType } from '@src/types/Pagination';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 interface CategoryTableProps {
   categories: CategoryList; // Prop chứa danh sách danh mục
   onDeleteSuccess: () => void;
+  onPageChange: (page: number, pageSize: number) => void;
+  pagination:PaginationType;
 }
 const categoryColumns = [
   {
@@ -30,6 +33,8 @@ const categoryColumns = [
 const CategoryTable: React.FC<CategoryTableProps> = ({
   categories,
   onDeleteSuccess,
+  onPageChange,
+  pagination
 }) => {
   const navigate = useNavigate();
 
@@ -71,9 +76,10 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         })}
         onAddNew={handleAddNewCategory} // Hàm thêm mới danh mục
         hideHideButton={true}
-        pagination={categories.pagination}
         onDeleteSuccess={onDeleteSuccess}
         onDelete={handleDeleteCategories}
+        pagination={pagination}
+        onPageChange={onPageChange}
       />
     </div>
   );

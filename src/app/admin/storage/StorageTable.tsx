@@ -6,12 +6,15 @@ import { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '@api/axiosClient';
+import { PaginationType } from '@src/types/Pagination';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 interface StorageTableProps {
     products: ProductList;
     onDeleteSuccess: () => void;
+    onPageChange: (page: number, pageSize: number) => void;
+    pagination: PaginationType;
 }
 const productColumns: ColumnsType<Product> = [
     {
@@ -58,20 +61,22 @@ const productColumns: ColumnsType<Product> = [
 ];
 const handleDeleteProducts = async (selectedKeys: React.Key[]) => {
     try {
-      await Promise.all(
-        selectedKeys.map((id) =>
-          axiosClient.delete(`${baseUrl}/api/product/${id}`)
-        )
-      );
-      message.success("Products deleted successfully");
+        await Promise.all(
+            selectedKeys.map((id) =>
+                axiosClient.delete(`${baseUrl}/api/product/${id}`)
+            )
+        );
+        message.success("Products deleted successfully");
     } catch (error) {
-      console.error(error);
-      message.error("Failed to delete products");
+        console.error(error);
+        message.error("Failed to delete products");
     }
-  };
+};
 const StorageTable: React.FC<StorageTableProps> = ({
     products,
-    onDeleteSuccess
+    onDeleteSuccess,
+    onPageChange,
+    pagination
 }) => {
     const navigate = useNavigate();
 
@@ -96,6 +101,7 @@ const StorageTable: React.FC<StorageTableProps> = ({
                 pagination={products.pagination}
                 onDeleteSuccess={onDeleteSuccess}
                 onDelete={handleDeleteProducts}
+                onPageChange={onPageChange}
             />
         </div>
     );

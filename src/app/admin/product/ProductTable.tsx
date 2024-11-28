@@ -14,6 +14,8 @@ const baseUrl = import.meta.env.VITE_API_URL;
 interface ProductTableProps {
   products: ProductList;
   onDeleteSuccess: () => void;
+  onPageChange: (page: number, pageSize: number) => void;
+  pagination:PaginationType;
 }
 
 const productColumns: ColumnsType<Product> = [
@@ -68,6 +70,8 @@ const productColumns: ColumnsType<Product> = [
 const ProductTable: React.FC<ProductTableProps> = ({
   products,
   onDeleteSuccess,
+  onPageChange,
+  pagination
 }) => {
   const navigate = useNavigate();
 
@@ -111,6 +115,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         })}
         onAddNew={handleAddNewProduct}
         pagination={products.pagination}
+        onPageChange={onPageChange}
         onDeleteSuccess={onDeleteSuccess}
         onDelete={handleDeleteProducts}
       />

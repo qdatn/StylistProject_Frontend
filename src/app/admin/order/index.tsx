@@ -37,19 +37,38 @@ const OrderManagement: React.FC = () => {
     }
   };
 
+  const pageSize = 8
+
   useEffect(() => {
     fetchOrderItem(pagination.currentPage!, pagination.pageSize!);
   }, []);
+
   const refreshData = () => {
     // Fetch the updated data and set it to the state that controls `dataSource`
-    fetchOrderItem(pagination.currentPage!, pagination.pageSize!); // Your existing function to fetch updated data
+    fetchOrderItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page <= pagination?.totalPages!) {
+      setPagination({
+        ...pagination,
+        currentPage: page,
+      });
+    }
+    //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
+    fetchOrderItem(page, pageSize);
   };
 
   return (
     <div>
       <div className="font-semibold text-xl p-6">Order Page</div>
       <div>
-        <OrderTable orders={orders} onDeleteSuccess={refreshData} />
+        <OrderTable
+          orders={orders}
+          onDeleteSuccess={refreshData}
+          pagination={pagination}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

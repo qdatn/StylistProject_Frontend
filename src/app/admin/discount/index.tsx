@@ -39,13 +39,25 @@ const DiscountManagement: React.FC = () => {
     fetchDiscountItem(pagination.currentPage!, pagination.pageSize!);
   }, []);
 
-  // useEffect(() => {
-  //   console.log("discount", discounts);
-  //   console.log("pagination", pagination);
-  // }, [discounts]);
+  useEffect(() => {
+    console.log("discount", discounts);
+    console.log("pagination", pagination);
+  }, [discounts]);
+
+  const pageSize =8
   const refreshData = () => {
     // Fetch the updated data and set it to the state that controls `dataSource`
-    fetchDiscountItem(pagination.currentPage!, pagination.pageSize!); // Your existing function to fetch updated data
+    fetchDiscountItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
+  };
+  const handlePageChange = (page: number) => {
+    if (page <= pagination?.totalPages!) {
+      setPagination({
+        ...pagination,
+        currentPage: page,
+      });
+    }
+    //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
+    fetchDiscountItem(page, pageSize);
   };
 
   return (
@@ -54,7 +66,9 @@ const DiscountManagement: React.FC = () => {
       <div>
         <DiscountTable
           discounts={discounts}
-          onDeleteSuccess={refreshData} 
+          onDeleteSuccess={refreshData}
+          pagination={pagination}
+          onPageChange={handlePageChange}
         />
       </div>
     </div>
