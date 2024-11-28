@@ -9,9 +9,21 @@ import axiosClient from "@api/axiosClient";
 import { PaginationType } from "@src/types/Pagination";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Spin } from "antd";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
-export default function ProductListPage() {
+interface ProductListPageProps {
+  name?: string;
+  category?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
+const ProductListPage: React.FC<ProductListPageProps> = ({
+  name,
+  category,
+  sortBy,
+  sortOrder,
+}) => {
   const [products, setProducts] = useState<ProductList>({
     data: [],
     pagination: {},
@@ -28,16 +40,31 @@ export default function ProductListPage() {
   const urlPath = import.meta.env.VITE_API_URL;
 
   const location = useLocation();
-  const searchquery = location.state?.searchquery || "";
-  console.log("SERRRR", searchquery);
+  // const { name, category, sortBy, sortOrder } = useParams();
+  // const name = location.state.name || "";
+  // const { name, category, sortBy, sortOrder } = location.state || {};
+  const [query, setQuery] = useState<any>({
+    name,
+    category,
+    sortBy,
+    sortOrder,
+  });
+  console.log("SERRRR", name, category, sortBy, sortOrder);
   const fetchProductItem = async (page: number, pageSize: number) => {
     try {
-      const response = searchquery
+      const response = name
         ? await axiosClient.getOne<ProductList>(
-            `${urlPath}/api/product/search/query?name=${searchquery}`,
-            {
-              params: { page, limit: pageSize },
-            }
+            `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
+            // {
+            //   params: {
+            //     name,
+            //     category: category || "All",
+            //     sortBy: sortBy || "product_name",
+            //     sortOrder: sortOrder || "asc",
+            //     page,
+            //     limit: pageSize,
+            //   },
+            // }
           )
         : await axiosClient.getOne<ProductList>(
             `${urlPath}/api/product/`,
@@ -73,7 +100,7 @@ export default function ProductListPage() {
   useEffect(() => {
     fetchProductItem(pagination?.currentPage ?? 1, pagination.pageSize!);
     // fetchData();
-  }, [searchquery]);
+  }, [name, category, sortBy, sortOrder]);
 
   useEffect(() => {
     console.log("PRODUCT", products);
@@ -112,4 +139,6 @@ export default function ProductListPage() {
       {/* <button onClick={handleClick}>Click herre</button> */}
     </>
   );
-}
+};
+
+export default ProductListPage;

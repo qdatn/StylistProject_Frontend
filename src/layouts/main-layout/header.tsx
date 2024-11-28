@@ -27,6 +27,9 @@ export default function CustomerHeader() {
 
   // Search click
   const handleSearch = async (e: any) => {
+    // if (!searchTerm) {
+    //   navigate(`/product/search/query`);
+    // } else 
     if (e.key === "Enter" && searchTerm.trim()) {
       try {
         // Gọi API tìm kiếm
@@ -38,7 +41,7 @@ export default function CustomerHeader() {
 
         // Chuyển tới trang kết quả và truyền dữ liệu sản phẩm nếu cần
         navigate(`/product/search/query?name=${searchTerm}`, {
-          state: { searchquery: searchTerm },
+          // state: { name: searchTerm },
         });
       } catch (error) {
         console.error("Error fetching search results:", error);
