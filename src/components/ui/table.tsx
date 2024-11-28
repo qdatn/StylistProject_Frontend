@@ -9,7 +9,7 @@ import { Product, ProductList } from "@src/types/Product";
 const { Search } = Input;
 const urlPath = import.meta.env.VITE_API_URL;
 //const baseUrl = import.meta.env.VITE_API_URL;
-
+const pageSize =8
 interface CommonTableProps<T> extends TableProps<T> {
   columns: ColumnsType<T>;
   dataSource: T[];
@@ -23,6 +23,7 @@ interface CommonTableProps<T> extends TableProps<T> {
   pagination?: PaginationType;
   onDeleteSuccess?: () => void;
   onDelete?: (selectedKeys: React.Key[]) => Promise<void>; // Hàm xử lý xóa
+  onPageChange: (page: number, pageSize: number) => void;
 }
 
 function CommonTable<T extends { [key: string]: any }>(
@@ -37,37 +38,21 @@ function CommonTable<T extends { [key: string]: any }>(
     hideAddButton = false,
     hideHideButton = false,
     onDeleteSuccess,
+    onPageChange,
+    pagination,
     ...restProps
   } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [tableData, setTableData] = useState<T[]>(dataSource);
   const [searchText, setSearchText] = useState("");
-  const [pagination, setPagination] = useState(props.pagination);
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
   useEffect(() => {
-    setPagination(props.pagination);
     setTableData(dataSource);
   }, [props.dataSource, props.pagination]);
 
-  useEffect(() => {
-    console.log("dtsrc", dataSource);
-    console.log("tabdata", tableData);
-    console.log("[pagi]", pagination);
-  }, [pagination]);
-
-  // const deleteProductInDB = async (productId: string) => {
-  //   try {
-  //     const updateProduct = await axiosClient.delete<Product>(
-  //       `${baseUrl}/api/product/${productId}`
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //     alert(error);
-  //   }
-  // };
   const handleDelete = async () => {
     try {
       if (props.onDelete) {
@@ -114,42 +99,42 @@ function CommonTable<T extends { [key: string]: any }>(
 
   const mergedRowSelection = rowSelection
     ? {
-        selectedRowKeys,
-        onChange: onSelectChange,
-        ...rowSelection,
-      }
+      selectedRowKeys,
+      onChange: onSelectChange,
+      ...rowSelection,
+    }
     : undefined;
 
-  const fetchProductItem = async (page: number, pageSize: number) => {
-    try {
-      const response = await axiosClient.getOne<ProductList>(
-        `${urlPath}/api/product/`,
-        //pagination params
-        { page: page, limit: pageSize }
-      );
+  // const fetchProductItem = async (page: number, pageSize: number) => {
+  //   try {
+  //     const response = await axiosClient.getOne<ProductList>(
+  //       `${urlPath}/api/product/`,
+  //       //pagination params
+  //       { page: page, limit: pageSize }
+  //     );
 
-      // Lỗi data type nếu bỏ as
-      setTableData(response.data as unknown as T[]);
+  //     // Lỗi data type nếu bỏ as
+  //     setTableData(response.data as unknown as T[]);
 
-      setPagination(response.pagination);
-      // setHasMore(page < response.pagination.totalPages!);
-    } catch (error) {
-      alert(error);
-    }
-  };
+  //     setPagination(response.pagination);
+  //     // setHasMore(page < response.pagination.totalPages!);
+  //   } catch (error) {
+  //     alert(error);
+  //   }
+  // };
 
-  const handlePageChange = (page: number) => {
-    // Update the pagination state
-    if (page <= pagination?.totalPages!) {
-      setPagination({
-        ...pagination,
-        currentPage: page,
-      });
-    }
+  // const handlePageChange = (page: number) => {
+  //   // Update the pagination state
+  //   if (page <= pagination?.totalPages!) {
+  //     setPagination({
+  //       ...pagination,
+  //       currentPage: page,
+  //     });
+  //   }
 
-    // Simulate data fetching for the new page
-    fetchProductItem(page, props.pagination?.pageSize!);
-  };
+  //   // Simulate data fetching for the new page
+  //   fetchProductItem(page, props.pagination?.pageSize!);
+  // };
 
   return (
     <>
@@ -194,9 +179,9 @@ function CommonTable<T extends { [key: string]: any }>(
         align="end"
         defaultCurrent={1}
         current={pagination?.currentPage}
-        pageSize={props.pagination?.pageSize}
+        pageSize={pageSize}
         total={pagination?.totalItems}
-        onChange={handlePageChange}
+        onChange={onPageChange}
         showSizeChanger={false}
         showTotal={() =>
           pagination?.totalItems

@@ -36,20 +36,34 @@ const StoragePage: React.FC = () => {
       alert(error);
     }
   };
-
+  const pageSize =8 
   useEffect(() => {
     fetchProductItem(pagination.currentPage!, pagination.pageSize!);
   }, []);
   const refreshData = () => {
     // Fetch the updated data and set it to the state that controls `dataSource`
-    fetchProductItem(pagination.currentPage!, pagination.pageSize!); // Your existing function to fetch updated data
+    fetchProductItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
   };
-
+  const handlePageChange = (page: number) => {
+    if (page <= pagination?.totalPages!) {
+      setPagination({
+        ...pagination,
+        currentPage: page,
+      });
+    }
+    //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
+    fetchProductItem(page, pageSize);
+  };
   return (
     <div>
       <div className="font-semibold text-xl p-6"></div>
       <div>
-        <StorageTable products={products} onDeleteSuccess={refreshData} />
+        <StorageTable 
+        products={products} 
+        onDeleteSuccess={refreshData}
+        pagination={pagination}
+        onPageChange={handlePageChange} 
+        />
       </div>
     </div>
   );
