@@ -8,6 +8,7 @@ import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
 import { Input } from "antd";
 import {
+  CartProduct,
   deleteItemFromCart,
   updateProductQuantity,
 } from "@redux/reducers/cartReducer";
@@ -21,9 +22,11 @@ const baseUrl = import.meta.env.VITE_API_URL;
 
 const CartPage = () => {
   const user = useSelector((state: RootState) => state.persist.auth);
-  const cart = useSelector((state: RootState) => state.persist.cart.items);
-  const urlPath = import.meta.env.VITE_API_URL;
   const userId = user.user?.user._id;
+  const cart = useSelector(
+    (state: RootState) => state.persist.cart[userId!]?.items || []
+  );;
+  const urlPath = import.meta.env.VITE_API_URL;
 
   const dispatch = useDispatch();
 
@@ -45,7 +48,7 @@ const CartPage = () => {
     district: "",
     paymentMethod: "",
   });
-  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [cartItems, setCartItems] = useState<CartProduct[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [discountCode, setDiscountCode] = useState<string>("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -94,7 +97,11 @@ const CartPage = () => {
 
     //Cập nhật lại sl vào redux
     dispatch(
-      updateProductQuantity({ productId: itemId, quantity: newQuantity })
+      updateProductQuantity({
+        userId: userId!,
+        productId: itemId,
+        quantity: newQuantity,
+      })
     );
   };
 
@@ -113,7 +120,7 @@ const CartPage = () => {
     try {
       console.log(itemId);
       deleteProductInCart(itemId);
-      dispatch(deleteItemFromCart({ productId: itemId }));
+      dispatch(deleteItemFromCart({ userId: userId!, productId: itemId }));
       setCartItems((prevItems) =>
         prevItems.filter((item) => item._id !== itemId)
       );
@@ -173,6 +180,7 @@ const CartPage = () => {
   };
 
   const handleSubmit = async (values: any) => {
+    await setCartItems(cart);
     const addressData: Address = {
       name: values.name,
       user: userId as string,
@@ -199,13 +207,14 @@ const CartPage = () => {
         product: item._id,
         quantity: quantities[item._id] || 1,
         note: "",
-        attributes: [],
+        attributes: item.cart_attributes,
       }));
-    createOrderToDB(order, order_items);
-    console.log(order);
-    console.log({ order, order_items });
-    // if (!validateForm()) return;
-    if (!order_items.length) {
+    if (order_items.length) {
+      createOrderToDB(order, order_items);
+      console.log(order);
+      console.log({ order, order_items });
+      // if (!validateForm()) return;
+    } else if (!order_items.length) {
       alert("Please choose product to place order");
     } else {
       console.log("Order submitted:", order);

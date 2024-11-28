@@ -35,7 +35,11 @@ const CartItem: React.FC<CartItemProps> = ({
   const [selectedAttributes, setSelectedAttributes] = useState<
     OrderAttribute[]
   >(product.cart_attributes);
-  const cart = useSelector((state: RootState) => state.persist.cart.items);
+  const userId: string =
+    useSelector((state: RootState) => state.persist.auth.user?.user._id) || "";
+  const cart = useSelector(
+    (state: RootState) => state.persist.cart[userId!]?.items || []
+  );
   const [isSelected, setIsSelected] = useState(false);
   const dispatch = useDispatch();
 
@@ -68,6 +72,7 @@ const CartItem: React.FC<CartItemProps> = ({
     if (selectedAttributes) {
       dispatch(
         updateCartAttributes({
+          userId: userId,
           productId: product._id,
           cart_attributes: selectedAttributes!,
         })
@@ -78,7 +83,7 @@ const CartItem: React.FC<CartItemProps> = ({
   useEffect(() => {
     console.log("CART ATTR:", selectedAttributes);
     console.log("cart redux", cart);
-  }, [selectedAttributes,cart]);
+  }, [selectedAttributes, cart]);
 
   const toggleSelect = () => {
     const newSelected = !isSelected;

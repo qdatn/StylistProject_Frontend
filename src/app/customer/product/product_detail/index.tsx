@@ -28,7 +28,10 @@ const ProductDetail: React.FC = () => {
     useState<OrderAttribute[]>();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.persist.auth);
-  const cart = useSelector((state: RootState) => state.persist.cart.items);
+  const userId = user.user?.user._id;
+  const cart = useSelector(
+    (state: RootState) => state.persist.cart[userId!]?.items || []
+  );
   const [validationErrors, setValidationErrors] = useState<any>({});
 
   console.log(id);
@@ -112,7 +115,12 @@ const ProductDetail: React.FC = () => {
         await setProduct(getProduct);
 
         dispatch(
-          addToCart({ product, quantity, cart_attributes: selectedAttributes })
+          addToCart({
+            userId: userId!,
+            product,
+            quantity,
+            cart_attributes: selectedAttributes,
+          })
         );
         console.log("PRODDDUCTT + quantity", product, quantity);
         console.log("CART REDUX:", cart);

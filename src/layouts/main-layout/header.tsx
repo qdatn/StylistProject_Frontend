@@ -16,7 +16,8 @@ const baseUrl = import.meta.env.VITE_API_URL;
 export default function CustomerHeader() {
   const user = useSelector((state: RootState) => state.persist.auth);
   const isLogin = useSelector((state: RootState) => state.persist.auth.isLogin);
-  const cartCount = useSelector(selectCartCount);
+  const userId = user.user?.user._id;
+  const cartCount = useSelector(selectCartCount(userId!));
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ export default function CustomerHeader() {
   const handleSearch = async (e: any) => {
     // if (!searchTerm) {
     //   navigate(`/product/search/query`);
-    // } else 
+    // } else
     if (e.key === "Enter" && searchTerm.trim()) {
       try {
         // Gọi API tìm kiếm
@@ -234,7 +235,7 @@ export default function CustomerHeader() {
                 <div className="flex px-4 py-2 text-red-400 hover:underline hover:text-gray-900 transition">
                   {cartCount}
                 </div>  */}
-                <Badge count={cartCount} offset={[10, 0]}>
+                <Badge count={cartCount!} offset={[10, 0]}>
                   <IoBagHandleOutline className="text-2xl" />
                 </Badge>
               </Link>
