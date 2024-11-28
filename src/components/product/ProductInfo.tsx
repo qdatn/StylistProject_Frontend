@@ -5,7 +5,7 @@ import { UploadOutlined } from "@ant-design/icons";
 
 interface BasicProductInfoProps {
     product: Partial<Product>;
-    setProduct: React.Dispatch<React.SetStateAction<Product>>;
+    setProduct: React.Dispatch<React.SetStateAction<Partial<Product>>>;
     type: string;
     errors: Record<string, string | null>; // Thêm lỗi từ ProductForm
 }
@@ -23,20 +23,32 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
     };
     const [fileList, setFileList] = useState<any[]>([]);
     const [newImageUrl, setNewImageUrl] = useState<string>("");
-    const [isUrlModalOpen, setIsUrlModalOpen] = useState(false)
-    const handleUploadChange = (info: any) => {
-        // const newFileList = [...info.fileList];
-        const newFileList = info.fileList.map((file: any) => {
-            // Nếu file có sẵn URL thì dùng nó, nếu không thì tạo URL tạm từ file
-            // if (!file.url) {
-            //   // file.url = URL.createObjectURL(file.originFileObj);
+    const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
 
-            //   file.url = file.originFileObj;
-            // }
-            return file;
-        });
-        console.log(newFileList);
+    // Sử dụng useEffect để cập nhật fileList từ dữ liệu sản phẩm khi load
+    useEffect(() => {
+        if (product.images && product.images.length > 0) {
+            const initialFileList = product.images.map((url, index) => ({
+                uid: index.toString(),
+                name: `image-${index + 1}`,
+                status: "done",
+                url: url,  // Đảm bảo rằng bạn lưu trữ đường dẫn ảnh hợp lệ
+            }));
+            setFileList(initialFileList);
+        }
+    }, [product.images]);
+
+    const handleUploadChange = (info: any) => {
+        const newFileList = info.fileList.map((file: any) => file);
         setFileList(newFileList);
+        
+        // Cập nhật ảnh vào dữ liệu sản phẩm
+        const newImageUrls = newFileList.map((file: any) => file.url).filter(Boolean);  // Lọc các URL không hợp lệ
+        setProduct((prev) => ({
+            ...prev,
+            images: newImageUrls,  // Lưu danh sách ảnh vào product
+        }));
+    
         // Kiểm tra trạng thái upload
         if (info.file.status === "done") {
             message.success(`${info.file.name} uploaded successfully.`);
@@ -44,19 +56,14 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
             message.error(`${info.file.name} upload failed.`);
         }
     };
-
-    useEffect(() => {
-        console.log(fileList);
-    }, [fileList]);
-
-    // Thêm ảnh từ URL
+    
     const handleAddImageFromUrl = () => {
         if (!newImageUrl.trim()) {
             message.error("Image URL cannot be empty.");
             return;
         }
-
-        // Thêm ảnh vào danh sách
+    
+        // Thêm ảnh URL vào danh sách ảnh
         setFileList((prev) => [
             ...prev,
             {
@@ -66,13 +73,17 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
                 status: "done",
             },
         ]);
-
+    
+        // Cập nhật ảnh vào sản phẩm
+        setProduct((prev) => ({
+            ...prev,
+            images: [...(prev.images || []), newImageUrl],
+        }));
+    
         setNewImageUrl("");
         setIsUrlModalOpen(false);
         message.success("Image URL added successfully.");
     };
-
-    // Xóa ảnh
     const handleRemoveImage = (file: any) => {
         setFileList((prev) => prev.filter((item) => item.uid !== file.uid));
         message.info("Image removed.");
@@ -86,7 +97,7 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
     return (
         <div>
             <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
-                {/* <div>
+                <div>
                     <label className="block font-medium">Product ID</label>
                     <input
                         type="text"
@@ -100,7 +111,7 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
                             }`}
                     />
                     {errors.id && <p className="text-red-500 text-sm">{errors.id}</p>}
-                </div> */}
+                </div>
                 <div>
                     <label className="block font-medium">Product Name</label>
                     <input
@@ -282,7 +293,7 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
                             <p className="text-red-500 text-sm">{errors.stock_quantity}</p>
                         )}
                     </div>
-                    
+
                     <div>
                         <label className="block font-medium">Create Date</label>
                         <input
