@@ -3,7 +3,7 @@ import { Product } from "@src/types/Product";
 import { Category, mockCategories } from "@src/types/Category";
 import { IoAddSharp, IoRemove } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-import { Upload, Button, Input, message, Modal, Checkbox } from "antd";
+import { Upload, Button, Input, message, Modal, Checkbox, notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Attribute, mockAttributes } from "@src/types/Attribute";
 
@@ -45,7 +45,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const handleAddKey = () => {
     if (!newKey.trim()) return;
     if (attributes.some((attr) => attr.key === newKey)) {
-      alert("This attribute already exists.");
+      notification.warning({
+        message: "This attribute already exists.",
+        description: "You have successfully logged in.",
+        placement: "topRight",
+        duration: 2,
+      });
       return;
     }
     setAttributes((prev) => [...prev, { key: newKey, value: [] }]);

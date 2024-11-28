@@ -6,6 +6,7 @@ import mockDiscounts, { Discount } from "@src/types/Discount"; // Dữ liệu gi
 import mockProducts, { Product, ProductList } from "@src/types/Product";
 import { Category, CategoryList, mockCategories } from "@src/types/Category";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -72,7 +73,13 @@ const EditDiscount: React.FC = () => {
 
       // Thông báo thành công
       console.log("Updated Discount:", updatedDiscountWithId);
-      alert("Discount updated successfully!");
+      notification.success({
+        message: "Discount updated successfully!",
+        description: "You have successfully logged in.",
+        placement: "topRight",
+        duration: 2,
+      });
+
       navigate("/admin/discount"); // Chuyển hướng về danh sách discounts
     }
   };

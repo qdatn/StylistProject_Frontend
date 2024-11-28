@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import OrderForm from "@components/OrderForm"; // Import form để chỉnh sửa thông tin đơn hàng
 import mockOrders, { Order } from "@src/types/Order"; // Giả lập dữ liệu đơn hàng
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 const EditOrder: React.FC = () => {
@@ -55,7 +56,12 @@ const EditOrder: React.FC = () => {
 
       // Thông báo thành công
       console.log("Updated Order:", updatedOrderWithId);
-      alert("Order updated successfully!");
+      notification.success({
+        message: "Order updated successfully!",
+        description: "You have successfully logged in.",
+        placement: "topRight",
+        duration: 2,
+      });
       navigate("/admin/order"); // Chuyển hướng về danh sách đơn hàng
     }
   };

@@ -6,7 +6,7 @@ import axiosClient from "@api/axiosClient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
-import { Input } from "antd";
+import { Input, notification } from "antd";
 import {
   CartProduct,
   deleteItemFromCart,
@@ -163,7 +163,12 @@ const CartPage = () => {
         order_items,
       });
 
-      alert("Create order success");
+      notification.success({
+        message: "Create order success",
+        description: "You have successfully logged in.",
+        placement: "topRight",
+        duration: 2,
+      });
       console.log(createOrder);
     } catch (error) {
       alert(error);

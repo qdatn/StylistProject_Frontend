@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import CategoryForm from "@components/CategoryForm";
 import { Category, mockCategories } from "@src/types/Category";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 const EditCategory: React.FC = () => {
@@ -55,7 +56,12 @@ const EditCategory: React.FC = () => {
       updateCategoryInDB(updatedCategoryWithId);
       // Thông báo thành công
       console.log("Updated Category:", updatedCategoryWithId);
-      alert("Category updated successfully!");
+      notification.success({
+        message: "Category updated successfully!",
+        description: "You have successfully logged in.",
+        placement: "topRight",
+        duration: 2,
+      });
 
       // Chuyển hướng về trang danh sách danh mục
       navigate("/admin/product/categories");
