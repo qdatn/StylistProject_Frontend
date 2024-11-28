@@ -9,9 +9,12 @@ import {
 } from "react-icons/ai";
 import { Input } from "antd";
 import { Link } from "react-router-dom";
+import { CartProduct } from "@redux/reducers/cartReducer";
+import { OrderAttribute } from "@src/types/Attribute";
 
 export interface CartItemProps {
-  product: Product; // Dữ liệu sản phẩm từ Cart
+  // product: Product; // Dữ liệu sản phẩm từ Cart
+  product: CartProduct; // Dữ liệu sản phẩm từ Cart
   onUpdateQuantity?: (newQuantity: number) => void; // Hàm để cập nhật số lượng, truyền trực tiếp số lượng mới
   onRemove?: () => void; // Hàm để xóa sản phẩm
   onSelect: (selected: boolean) => void; // Hàm để chọn sản phẩm
@@ -27,13 +30,30 @@ const CartItem: React.FC<CartItemProps> = ({
   onSelect,
   quantity,
 }) => {
-  const [selectedAttributes, setSelectedAttributes] = useState<{
-    [key: string]: string;
-  }>({});
+  const [selectedAttributes, setSelectedAttributes] =
+    useState<OrderAttribute[]>();
   const [isSelected, setIsSelected] = useState(false);
 
   const handleAttributeChange = (key: string, value: string) => {
-    setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+    // setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+    setSelectedAttributes((prev) => {
+      const updatedAttributes = prev ? [...prev] : [];
+
+      // Tìm thuộc tính trong danh sách hiện tại
+      const existingAttributeIndex = updatedAttributes.findIndex(
+        (attr) => attr.key === key
+      );
+
+      if (existingAttributeIndex > -1) {
+        // Nếu thuộc tính đã tồn tại, cập nhật giá trị
+        updatedAttributes[existingAttributeIndex].value = value;
+      } else {
+        // Nếu thuộc tính chưa tồn tại, thêm mới
+        updatedAttributes.push({ key, value });
+      }
+
+      return updatedAttributes;
+    });
   };
 
   const toggleSelect = () => {
@@ -73,7 +93,10 @@ const CartItem: React.FC<CartItemProps> = ({
               <label className="mr-2 text-[15px]">{attr.key}:</label>
               <div className="relative">
                 <select
-                  value={selectedAttributes[attr.key] || attr.value[0]}
+                  value={
+                    selectedAttributes?.find((item) => item.key === attr.key)
+                      ?.value || product.cart_attributes.find((item) => item.key === attr.key)?.value
+                  }
                   onChange={(e) =>
                     handleAttributeChange(attr.key, e.target.value)
                   }

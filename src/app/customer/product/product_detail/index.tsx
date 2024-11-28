@@ -11,11 +11,12 @@ import { FaStar } from "react-icons/fa";
 import mockProducts from "@src/types/Product";
 import { Product } from "@src/types/Product";
 import { useNavigate, useParams } from "react-router-dom";
-import { Carousel, Slider } from "antd";
+import { Carousel, Select, Slider } from "antd";
 import axiosClient from "@api/axiosClient";
 import formatDateTime from "@utils/formatDateTime";
 import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
+import { OrderAttribute } from "@src/types/Attribute";
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
@@ -23,12 +24,12 @@ const ProductDetail: React.FC = () => {
   const [comments, setComments] = useState<CommentList | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [detailsVisible, setDetailsVisible] = useState(false);
-  const [selectedAttributes, setSelectedAttributes] = useState<{
-    [key: string]: string;
-  }>({});
+  const [selectedAttributes, setSelectedAttributes] =
+    useState<OrderAttribute[]>();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.persist.auth);
   const cart = useSelector((state: RootState) => state.persist.cart.items);
+  const [validationErrors, setValidationErrors] = useState<any>({});
 
   console.log(id);
   const urlPath = import.meta.env.VITE_API_URL;
@@ -79,6 +80,19 @@ const ProductDetail: React.FC = () => {
 
   // Cập nhật handleAddToCart để hiển thị thông báo
   const handleAddToCart = async () => {
+    const errors: Record<string, string> = {};
+    product?.attributes.map((attr) => {
+      if (!selectedAttributes?.find((item) => item.key === attr.key)?.value) {
+        errors[attr.key] = `Please select ${attr.key}`;
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    setValidationErrors({});
     if (product) {
       // Kiểm tra product có phải là null không
       // Gọi action addToCart để thêm sản phẩm vào giỏ hàng
@@ -97,7 +111,9 @@ const ProductDetail: React.FC = () => {
         );
         await setProduct(getProduct);
 
-        dispatch(addToCart({ product, quantity }));
+        dispatch(
+          addToCart({ product, quantity, cart_attributes: selectedAttributes })
+        );
         console.log("PRODDDUCTT + quantity", product, quantity);
         console.log("CART REDUX:", cart);
       } catch (error) {
@@ -109,17 +125,32 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleAttributeChange = (key: string, value: string) => {
-    setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+    //   setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+    // };
+    // if (comments) {
+    setSelectedAttributes((prev) => {
+      const updatedAttributes = prev ? [...prev] : [];
+
+      // Tìm thuộc tính trong danh sách hiện tại
+      const existingAttributeIndex = updatedAttributes.findIndex(
+        (attr) => attr.key === key
+      );
+
+      if (existingAttributeIndex > -1) {
+        // Nếu thuộc tính đã tồn tại, cập nhật giá trị
+        updatedAttributes[existingAttributeIndex].value = value;
+      } else {
+        // Nếu thuộc tính chưa tồn tại, thêm mới
+        updatedAttributes.push({ key, value });
+      }
+
+      return updatedAttributes;
+    });
   };
-  if (comments) {
-    // const filteredComments = comments.data.filter(
-    //   (comment) => comment.product._id
-    // );
-    // console.log("FILTER",filteredComments);
-    //   const totalRating =
-    //     filteredComments.reduce((sum: number, comment: number) => sum + comment.rating, 0) /
-    //     (filteredComments?.length || 1);
-  }
+
+  useEffect(() => {
+    console.log("SELECTED ATTR", selectedAttributes);
+  }, [selectedAttributes]);
 
   if (!product) return <p>Loading...</p>;
   if (!product || !product.images || product.images.length === 0) {
@@ -185,22 +216,47 @@ const ProductDetail: React.FC = () => {
                   <label className="text-[16px] font-medium text-gray-700 block mb-1">
                     {attr.key}:
                   </label>
-                  <select
-                    value={selectedAttributes[attr.key] || ""}
-                    onChange={(e) =>
-                      handleAttributeChange(attr.key, e.target.value)
+                  {/* <div key={attr.key} className="mb-4">
+                    <label className="text-[16px] font-medium text-gray-700 block mb-1">
+                      {attr.key}:
+                    </label>
+                    <Select
+                      value={selectedAttributes[attr.key] || undefined}
+                      onChange={(value) =>
+                        handleAttributeChange(attr.key, value)
+                      }
+                      placeholder={`Select ${attr.key}`}
+                      className="w-40"
+                    >
+                      {attr.value.map((optionValue) => (
+                        <Option key={optionValue} value={optionValue}>
+                          {optionValue}
+                        </Option>
+                      ))}
+                    </Select>
+                  </div> */}
+                  <Select
+                    value={
+                      selectedAttributes?.find((item) => item.key === attr.key)
+                        ?.value || undefined
                     }
-                    className="w-40 border p-2 rounded-sm text-gray-700"
+                    onChange={(value) => handleAttributeChange(attr.key, value)}
+                    placeholder={`Select ${attr.key}`}
+                    className="w-40"
+                    status={validationErrors[attr.key] ? "error" : ""}
                   >
-                    <option value="" disabled>
-                      Select {attr.key}
-                    </option>
                     {attr.value.map((optionValue) => (
-                      <option key={optionValue} value={optionValue}>
+                      <Select.Option key={optionValue} value={optionValue}>
                         {optionValue}
-                      </option>
+                      </Select.Option>
                     ))}
-                  </select>
+                  </Select>
+                  {/* Hiển thị lỗi nếu có */}
+                  {validationErrors[attr.key] && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {validationErrors[attr.key]}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

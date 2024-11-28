@@ -1,9 +1,11 @@
 import { RootState } from "@redux/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "@src/types/Product";
+import { OrderAttribute } from "@src/types/Attribute";
 
-interface CartProduct extends Product {
+export interface CartProduct extends Product {
   quantity: number;
+  cart_attributes: OrderAttribute[];
 }
 
 interface CartState {
@@ -20,9 +22,13 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (
       state,
-      action: PayloadAction<{ product: Product; quantity: number }>
+      action: PayloadAction<{
+        product: Product;
+        quantity: number;
+        cart_attributes?: OrderAttribute[];
+      }>
     ) => {
-      const { product, quantity } = action.payload;
+      const { product, quantity, cart_attributes } = action.payload;
       const existingProduct = state.items.find(
         (item) => item._id === product._id
       );
@@ -32,7 +38,11 @@ const cartSlice = createSlice({
         existingProduct.quantity += quantity;
       } else {
         // Nếu sản phẩm chưa tồn tại, thêm vào giỏ hàng với số lượng
-        state.items.push({ ...product, quantity });
+        state.items.push({
+          ...product,
+          quantity,
+          cart_attributes: cart_attributes || [],
+        });
       }
     },
     deleteItemFromCart: (

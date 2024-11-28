@@ -48,7 +48,7 @@ const CartPage = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [discountCode, setDiscountCode] = useState<string>("");
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
     // try {
