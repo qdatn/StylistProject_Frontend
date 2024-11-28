@@ -1,4 +1,3 @@
-// app/admin/category/Categories.tsx
 import React, { useEffect, useState } from "react";
 import CategoryTable from "./CategoriesTable";
 import { Category, CategoryList, mockCategories } from "@src/types/Category";
@@ -36,22 +35,38 @@ const Categories: React.FC = () => {
         }
     };
 
+    const pageSize =8
     useEffect(() => {
         fetchCategoryItem(pagination.currentPage!, pagination.pageSize!);
     }, []);
 
-    // useEffect(() => {
-    //   console.log("Category", categories);
-    //   console.log("pagination", pagination);
-    // }, [categories]);
+    useEffect(() => {
+      console.log("Category", categories);
+      console.log("pagination", pagination);
+    }, [categories]);
     const refreshData = () => {
         // Fetch the updated data and set it to the state that controls `dataSource`
-        fetchCategoryItem(pagination.currentPage!, pagination.pageSize!); // Your existing function to fetch updated data
+        fetchCategoryItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
     };
+    const handlePageChange = (page: number) => {
+        if (page <= pagination?.totalPages!) {
+                setPagination({
+                  ...pagination,
+                  currentPage: page,
+                });
+        //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
+        fetchCategoryItem(page, pageSize);
+    };
+}
     return (
         <div>
             <div className="font-semibold text-xl p-6">Categories Page</div>
-            <div> <CategoryTable categories={categories} onDeleteSuccess={refreshData} />
+            <div> <CategoryTable
+                categories={categories}
+                onDeleteSuccess={refreshData}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+            />
             </div>
         </div>
     );

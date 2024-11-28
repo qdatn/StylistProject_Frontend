@@ -6,8 +6,9 @@ import axiosClient from "@api/axiosClient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
-import { Input } from "antd";
+import { Input, notification } from "antd";
 import {
+  CartProduct,
   deleteItemFromCart,
   updateProductQuantity,
 } from "@redux/reducers/cartReducer";
@@ -21,9 +22,11 @@ const baseUrl = import.meta.env.VITE_API_URL;
 
 const CartPage = () => {
   const user = useSelector((state: RootState) => state.persist.auth);
-  const cart = useSelector((state: RootState) => state.persist.cart.items);
-  const urlPath = import.meta.env.VITE_API_URL;
   const userId = user.user?.user._id;
+  const cart = useSelector(
+    (state: RootState) => state.persist.cart[userId!]?.items || []
+  );
+  const urlPath = import.meta.env.VITE_API_URL;
 
   const dispatch = useDispatch();
 
@@ -45,10 +48,10 @@ const CartPage = () => {
     district: "",
     paymentMethod: "",
   });
-  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [cartItems, setCartItems] = useState<CartProduct[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [discountCode, setDiscountCode] = useState<string>("");
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
     // try {
@@ -94,9 +97,17 @@ const CartPage = () => {
 
     //Cập nhật lại sl vào redux
     dispatch(
-      updateProductQuantity({ productId: itemId, quantity: newQuantity })
+      updateProductQuantity({
+        userId: userId!,
+        productId: itemId,
+        quantity: newQuantity,
+      })
     );
   };
+
+  useEffect(() => {
+    console.log("quantities", quantities);
+  }, [quantities]);
 
   const deleteProductInCart = async (productId: string) => {
     try {
@@ -113,7 +124,7 @@ const CartPage = () => {
     try {
       console.log(itemId);
       deleteProductInCart(itemId);
-      dispatch(deleteItemFromCart({ productId: itemId }));
+      dispatch(deleteItemFromCart({ userId: userId!, productId: itemId }));
       setCartItems((prevItems) =>
         prevItems.filter((item) => item._id !== itemId)
       );
@@ -152,7 +163,12 @@ const CartPage = () => {
         order_items,
       });
 
-      alert("Create order success");
+      notification.success({
+        message: "Create order success",
+        description: "",
+        placement: "topRight",
+        duration: 2,
+      });
       console.log(createOrder);
     } catch (error) {
       alert(error);
@@ -173,6 +189,7 @@ const CartPage = () => {
   };
 
   const handleSubmit = async (values: any) => {
+    await setCartItems(cart);
     const addressData: Address = {
       name: values.name,
       user: userId as string,
@@ -197,16 +214,25 @@ const CartPage = () => {
         // _id: "",
         order: "",
         product: item._id,
-        quantity: quantities[item._id] || 1,
+        quantity: item.quantity /*quantities[item._id] || 1*/,
         note: "",
-        attributes: [],
+        attributes: item.cart_attributes,
       }));
-    createOrderToDB(order, order_items);
-    console.log(order);
-    console.log({ order, order_items });
-    // if (!validateForm()) return;
-    if (!order_items.length) {
-      alert("Please choose product to place order");
+    if (order_items.length) {
+      createOrderToDB(order, order_items);
+      console.log(order);
+      console.log({ order, order_items });
+      // if (!validateForm()) return;
+      order_items.map((item) => {
+        removeItem(item.product);
+      });
+    } else if (!order_items.length) {
+      notification.warning({
+        message: "Please choose product to place order",
+        description: "",
+        placement: "topRight",
+        duration: 2,
+      });
     } else {
       console.log("Order submitted:", order);
     }
@@ -254,7 +280,7 @@ const CartPage = () => {
     address: "",
     // city: "",
     // district: "",
-    paymentMethod: "",
+    paymentMethod: "COD",
   };
 
   const validateForm = () => {

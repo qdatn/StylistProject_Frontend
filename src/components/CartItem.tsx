@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Product } from "@src/types/Product";
 import {
   AiOutlineCheck,
@@ -9,9 +9,14 @@ import {
 } from "react-icons/ai";
 import { Input } from "antd";
 import { Link } from "react-router-dom";
+import { CartProduct, updateCartAttributes } from "@redux/reducers/cartReducer";
+import { OrderAttribute } from "@src/types/Attribute";
+import { RootState } from "@redux/store";
+import { useDispatch, useSelector } from "react-redux";
 
 export interface CartItemProps {
-  product: Product; // Dữ liệu sản phẩm từ Cart
+  // product: Product; // Dữ liệu sản phẩm từ Cart
+  product: CartProduct; // Dữ liệu sản phẩm từ Cart
   onUpdateQuantity?: (newQuantity: number) => void; // Hàm để cập nhật số lượng, truyền trực tiếp số lượng mới
   onRemove?: () => void; // Hàm để xóa sản phẩm
   onSelect: (selected: boolean) => void; // Hàm để chọn sản phẩm
@@ -27,14 +32,58 @@ const CartItem: React.FC<CartItemProps> = ({
   onSelect,
   quantity,
 }) => {
-  const [selectedAttributes, setSelectedAttributes] = useState<{
-    [key: string]: string;
-  }>({});
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    OrderAttribute[]
+  >(product.cart_attributes);
+  const userId: string =
+    useSelector((state: RootState) => state.persist.auth.user?.user._id) || "";
+  const cart = useSelector(
+    (state: RootState) => state.persist.cart[userId!]?.items || []
+  );
   const [isSelected, setIsSelected] = useState(false);
+  const dispatch = useDispatch();
 
   const handleAttributeChange = (key: string, value: string) => {
-    setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+    // setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+    setSelectedAttributes((prev) => {
+      const updatedAttributes = prev ? [...prev] : [];
+
+      // Tìm thuộc tính trong danh sách hiện tại
+      const existingAttributeIndex = updatedAttributes.findIndex(
+        (attr) => attr.key === key
+      );
+
+      if (existingAttributeIndex > -1) {
+        // Nếu thuộc tính đã tồn tại, cập nhật giá trị
+        // updatedAttributes[existingAttributeIndex].value = value;
+        updatedAttributes[existingAttributeIndex] = {
+          ...updatedAttributes[existingAttributeIndex],
+          value: value, // Cập nhật giá trị trong bản sao
+        };
+      } else {
+        // Nếu thuộc tính chưa tồn tại, thêm mới
+        updatedAttributes.push({ key, value });
+      }
+      return updatedAttributes;
+    });
   };
+
+  useEffect(() => {
+    if (selectedAttributes) {
+      dispatch(
+        updateCartAttributes({
+          userId: userId,
+          productId: product._id,
+          cart_attributes: selectedAttributes!,
+        })
+      );
+    }
+  }, [selectedAttributes]);
+
+  useEffect(() => {
+    console.log("CART ATTR:", selectedAttributes);
+    console.log("cart redux", cart);
+  }, [selectedAttributes, cart]);
 
   const toggleSelect = () => {
     const newSelected = !isSelected;
@@ -73,7 +122,14 @@ const CartItem: React.FC<CartItemProps> = ({
               <label className="mr-2 text-[15px]">{attr.key}:</label>
               <div className="relative">
                 <select
-                  value={selectedAttributes[attr.key] || attr.value[0]}
+                  value={
+                    selectedAttributes?.find((item) => item.key === attr.key)
+                      ?.value ||
+                    (product.cart_attributes &&
+                      product.cart_attributes.find(
+                        (item) => item.key === attr.key
+                      )?.value)
+                  }
                   onChange={(e) =>
                     handleAttributeChange(attr.key, e.target.value)
                   }

@@ -20,7 +20,7 @@ const ProductListAdminPage: React.FC = () => {
     totalItems: 0,
     totalPages: 0,
   });
-
+const pageSize =8 
   const fetchProductItem = async (page: number, pageSize: number) => {
     try {
       const response = await axiosClient.getOne<ProductList>(
@@ -38,25 +38,39 @@ const ProductListAdminPage: React.FC = () => {
     }
   };
   
-
+  const handlePageChange = (page: number) => {
+    if (page <= pagination?.totalPages!) {
+      setPagination({
+        ...pagination,
+        currentPage: page,
+      });
+    }
+    //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
+    fetchProductItem(page, pageSize);
+  };
   useEffect(() => {
     fetchProductItem(pagination.currentPage!, pagination.pageSize!);
   }, []);
 
-  // useEffect(() => {
-  //   console.log("PRODUCT", products);
-  //   console.log("pagination", pagination);
-  // }, [products]);
+  useEffect(() => {
+    console.log("PRODUCT", products);
+    console.log("pagination", pagination);
+  }, [products]);
   const refreshData = () => {
     // Fetch the updated data and set it to the state that controls `dataSource`
-    fetchProductItem(pagination.currentPage!, pagination.pageSize!); // Your existing function to fetch updated data
+    fetchProductItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
   };
 
   return (
     <div>
       <div className="font-semibold text-xl p-6">Product List</div>
       <div>
-        <ProductTable products={products} onDeleteSuccess={refreshData} />
+        <ProductTable 
+        products={products} 
+        onDeleteSuccess={refreshData} 
+        pagination={pagination}
+        onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

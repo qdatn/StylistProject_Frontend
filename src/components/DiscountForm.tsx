@@ -283,9 +283,9 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 flex gap-2 justify-end">
         <Button onClick={onCancel}>Cancel</Button>
-        <Button type="primary" onClick={handleSave}>
+        <Button onClick={handleSave}>
           Save
         </Button>
       </div>
