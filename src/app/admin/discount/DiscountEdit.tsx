@@ -75,7 +75,7 @@ const EditDiscount: React.FC = () => {
       console.log("Updated Discount:", updatedDiscountWithId);
       notification.success({
         message: "Discount updated successfully!",
-        description: "You have successfully logged in.",
+        description: "",
         placement: "topRight",
         duration: 2,
       });

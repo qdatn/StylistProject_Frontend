@@ -47,7 +47,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     if (attributes.some((attr) => attr.key === newKey)) {
       notification.warning({
         message: "This attribute already exists.",
-        description: "You have successfully logged in.",
+        description: "",
         placement: "topRight",
         duration: 2,
       });

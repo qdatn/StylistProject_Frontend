@@ -58,7 +58,7 @@ const EditCategory: React.FC = () => {
       console.log("Updated Category:", updatedCategoryWithId);
       notification.success({
         message: "Category updated successfully!",
-        description: "You have successfully logged in.",
+        description: "",
         placement: "topRight",
         duration: 2,
       });

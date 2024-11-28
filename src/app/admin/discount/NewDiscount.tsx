@@ -65,7 +65,7 @@ const NewDiscount: React.FC = () => {
         addDiscountToDB(discountToAdd);
         notification.success({
             message: "Discount added successfully!",
-            description: "You have successfully logged in.",
+            description: "",
             placement: "topRight",
             duration: 2,
           });

@@ -11,7 +11,7 @@ import { FaStar } from "react-icons/fa";
 import mockProducts from "@src/types/Product";
 import { Product } from "@src/types/Product";
 import { useNavigate, useParams } from "react-router-dom";
-import { Carousel, Select, Slider } from "antd";
+import { Carousel, notification, Select, Slider } from "antd";
 import axiosClient from "@api/axiosClient";
 import formatDateTime from "@utils/formatDateTime";
 import { RootState } from "@redux/store";
@@ -124,6 +124,13 @@ const ProductDetail: React.FC = () => {
         );
         console.log("PRODDDUCTT + quantity", product, quantity);
         console.log("CART REDUX:", cart);
+
+        notification.success({
+          message: "Product have been added to cart!",
+          description: "",
+          placement: "topRight",
+          duration: 2,
+        });
       } catch (error) {
         alert(error);
       }

@@ -165,7 +165,7 @@ const CartPage = () => {
 
       notification.success({
         message: "Create order success",
-        description: "You have successfully logged in.",
+        description: "",
         placement: "topRight",
         duration: 2,
       });
@@ -227,7 +227,12 @@ const CartPage = () => {
         removeItem(item.product);
       });
     } else if (!order_items.length) {
-      alert("Please choose product to place order");
+      notification.warning({
+        message: "Please choose product to place order",
+        description: "",
+        placement: "topRight",
+        duration: 2,
+      });
     } else {
       console.log("Order submitted:", order);
     }
@@ -275,7 +280,7 @@ const CartPage = () => {
     address: "",
     // city: "",
     // district: "",
-    paymentMethod: "",
+    paymentMethod: "COD",
   };
 
   const validateForm = () => {
