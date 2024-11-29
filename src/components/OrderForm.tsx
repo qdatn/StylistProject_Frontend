@@ -157,11 +157,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         value={order.method || ''}
                         onChange={(e) => handleChange({ target: { name: e.target.name, value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
                         className={`w-full mt-1 p-2 border rounded-md ${errors.method ? 'border-red-500' : ''}`}
+                        disabled
                     >
-                        <option value="" disabled>Select Payment Method</option>
-                        <option value="credit_card">Credit Card</option>
-                        <option value="paypal">PayPal</option>
-                        <option value="cash_on_delivery">Cash on Delivery</option>
+                        <option value="" disabled>Select Payment Method</option>    
+                        <option value="Credit_card">Credit Card</option>
+                        <option value="Paypal">PayPal</option>
+                        <option value="COD">COD</option>
                     </select>
                     {errors.method && <p className="text-red-500 text-sm">{errors.method}</p>}
                 </div>

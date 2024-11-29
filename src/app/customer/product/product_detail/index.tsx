@@ -309,7 +309,12 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
         </div>
-
+        {/* <div className="mt-10 flex justify-center py-24"> */}
+          <div className="flex flex-col justify-center mb-10 py-24 px-20">
+            <h1 className="text-xl font-bold py-10">Description</h1>
+            <p className="text-justify">{product.description}</p>
+          </div>
+        {/* </div> */}
         {/* Comments Section */}
         <div className="mt-10 flex justify-center">
           <div className="w-full max-w-6xl">
