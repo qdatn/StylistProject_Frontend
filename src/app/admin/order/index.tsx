@@ -1,5 +1,5 @@
 // app/admin/product/OrderCategories.tsx
-import mockOrders, { Order, OrderList } from "@src/types/Order";
+import mockOrders, { Order, OrderList, OrderListAdmin } from "@src/types/Order";
 import React, { useEffect, useState } from "react";
 import OrderTable from "./OrderTable";
 import { PaginationType } from "@src/types/Pagination";
@@ -9,7 +9,7 @@ const OrderManagement: React.FC = () => {
   //const [Orders, setOrders] = useState<Order[]>(mockOrders);
 
   // Lấy lại danh sách từ `mockOrders` mỗi khi component được render
-  const [orders, setOrders] = useState<OrderList>({
+  const [orders, setOrders] = useState<OrderListAdmin>({
     data: [],
     pagination: {},
   });
@@ -22,7 +22,7 @@ const OrderManagement: React.FC = () => {
 
   const fetchOrderItem = async (page: number, pageSize: number) => {
     try {
-      const response = await axiosClient.getOne<OrderList>(
+      const response = await axiosClient.getOne<OrderListAdmin>(
         `${urlPath}/api/order/`,
         //pagination params
         { page: page, limit: pageSize }

@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+// components/OrderForm.tsx
+import React, { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import { Order } from '@src/types/Order';
+import { OrderItem, OrderItemList } from '@src/types/OrderItem';
+import { Address } from "@src/types/Address";
 import OrdertrackingAdmin from './OrdertrackingAdmin';
+import axiosClient from '@api/axiosClient';
+import Ordertracking from './OrdertrackingAdmin';
+
+const baseUrl = import.meta.env.VITE_API_URL;
 
 interface OrderFormProps {
-    initialOrder?: Partial<Order>;
+    initialOrder?: Partial<Order>;  // Nhận dữ liệu OrderItem
     onSave: (order: Partial<Order>) => void;
     onCancel: () => void;
     type: string;
@@ -13,7 +20,26 @@ interface OrderFormProps {
 const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCancel, type }) => {
     const [order, setOrder] = useState<Partial<Order>>(initialOrder);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [addressDetail, setAddressDetail] = useState<Address | null>(null);
 
+    useEffect(() => {
+        console.log("Order Address ID:", order.address); // Kiểm tra ID trước khi gọi API
+        if (order.address) { // Kiểm tra ID tồn tại
+            fetchAddressDetail();
+        }
+    }, [order.address]);
+
+    const fetchAddressDetail = async (): Promise<void> => {
+        try {
+            const response = await axiosClient.getOne<Address>(`${baseUrl}/api/address/${order.address}`);
+            const addressData = response
+            console.log("Fetched Address:", addressData);
+            setAddressDetail(addressData);
+        } catch (error) {
+            console.error("Error fetching address details:", error);
+        }
+    };
+   
     // Xử lý thay đổi dữ liệu trong form
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -30,7 +56,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
         if (!order.status) newErrors.status = 'Order status is required.';
         if (!order.user) newErrors.user = 'User is required.';
         if (!order.status) newErrors.status = 'Order status is required.';
-        if (!order.method) newErrors.method = 'method is required.';
+        if (!order.method) newErrors.method = 'Method is required.';
         if (!order.total_price) newErrors.total_price = 'Total price is required.';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -46,7 +72,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
 
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
-            {/* Form thông tin cơ bản */}
             <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
                 <div>
                     <label className="block font-medium">Order ID</label>
@@ -68,9 +93,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         type="text"
                         name="user"
                         disabled
-                        value={order.user || ''}
+                        value={order.user?.email}
                         onChange={handleChange}
-                        placeholder="Enter User ID"
+                        placeholder="User ID"
                         required
                         className={`w-full mt-1 p-2 border rounded-md ${errors.user ? 'border-red-500' : ''}`}
                     />
@@ -85,19 +110,17 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         required
                         className={`w-full mt-1 p-2 border rounded-md ${errors.status ? 'border-red-500' : ''}`}
                     >
-                        <option value="" disabled>
-                            Select Status
-                        </option>
+                        <option value="" disabled>Select Status</option>
                         <option value="pending">Pending</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                         <option value="canceled">Canceled</option>
                     </select>
                     {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
-
                 </div>
             </div>
-            <div className='grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5'>
+
+            <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
                 <div>
                     <label className="block font-medium">Total Price</label>
                     <input
@@ -135,59 +158,34 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         onChange={(e) => handleChange({ target: { name: e.target.name, value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
                         className={`w-full mt-1 p-2 border rounded-md ${errors.method ? 'border-red-500' : ''}`}
                     >
-                        <option value="" disabled>
-                            Select Payment Method
-                        </option>
+                        <option value="" disabled>Select Payment Method</option>
                         <option value="credit_card">Credit Card</option>
                         <option value="paypal">PayPal</option>
                         <option value="cash_on_delivery">Cash on Delivery</option>
-                        {/* <option value="bank_transfer">Bank Transfer</option> */}
                     </select>
                     {errors.method && <p className="text-red-500 text-sm">{errors.method}</p>}
                 </div>
             </div>
-            <div className='grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5'>
 
-                <div>
-                    <label className="block font-medium">Receive Date</label>
-                    <input
-                        type="date"
-                        name="receive_date"
-                        value={order.receive_date ? new Date(order.receive_date).toISOString().split('T')[0] : ''}
-                        onChange={handleChange}
-                        className="w-full mt-1 p-2 border rounded-md"
-                    />
-                </div>
-                <div>
-                    <label className="block font-medium">Create Date</label>
-                    <input
-                        type="date"
-                        name="create_date"
-                        disabled
-                        value={order.createdDate ? new Date(order.createdDate).toISOString().split('T')[0] : ''}
-                        onChange={handleChange}
-                        className="w-full mt-1 p-2 border rounded-md"
-                    />
+            <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
+                <div className=''>
+                    <label className="block font-medium">Address: </label>
+                    <div className='border rounded-sm mt-2 p-2 flex flex-col gap-2'>
+                        <label >Name: {addressDetail?.name}</label>
+                        <label >Phone: {addressDetail?.phone_num}</label>
+                        <label >Address: {addressDetail?.address}</label>
+                    </div>
                 </div>
             </div>
-
-            {/* Giao diện hiển thị Order Items */}
-            {/* <div className="mt-8">
-                <h3 className="text-lg font-semibold mb-4">Order Items</h3>
-                {order.order_items && order.order_items.length > 0 ? (
-                    <OrdertrackingAdmin order={order as Order} />
-                ) : (
-                    <p className="text-gray-600">No items in this order.</p>
-                )}
-            </div> */}
-
-            {/* Nút hành động */}
-            <div className="flex flex-row gap-2 justify-end mt-6">
-                <Button className="text-[16px] p-4 w-32" onClick={handleSave}>
+            
+            {/* Button Save */}
+            <div className="mt-4 text-right">
+                <Button
+                    type="primary"
+                    onClick={handleSave}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+                >
                     Save
-                </Button>
-                <Button className="text-[16px] p-4 w-32" onClick={onCancel}>
-                    Cancel
                 </Button>
             </div>
         </div>

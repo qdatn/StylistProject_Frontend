@@ -1,6 +1,7 @@
 // src/types/OrderItem.ts
 import { Product } from "@src/types/Product";
 import { OrderAttribute } from "./Attribute";
+//import { PaginationType } from "./Pagination";
 
 export interface OrderItem {
   _id: string;
@@ -13,6 +14,9 @@ export interface OrderItem {
   //discounted_price: number;
   attributes: OrderAttribute[];
   //image: string[];
+}
+export interface OrderItemList {
+  data: OrderItem[];
 }
 // Đã sửa kiểu dữ liệu imageURL -> image
 // Hàm để lấy dữ liệu sản phẩm theo product_id
