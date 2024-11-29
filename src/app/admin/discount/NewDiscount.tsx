@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import mockProducts, { Product, ProductList } from "@src/types/Product";
 import { Category, CategoryList, mockCategories } from "@src/types/Category";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 const NewDiscount: React.FC = () => {
@@ -62,7 +63,12 @@ const NewDiscount: React.FC = () => {
 
         setDiscounts((prevDiscounts) => [...prevDiscounts, discountToAdd]);
         addDiscountToDB(discountToAdd);
-        alert("Discount added successfully!");
+        notification.success({
+            message: "Discount added successfully!",
+            description: "",
+            placement: "topRight",
+            duration: 2,
+          });
         navigate("/admin/discount"); // Chuyển hướng về danh sách đơn hàng
     };
 
