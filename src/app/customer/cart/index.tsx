@@ -17,6 +17,7 @@ import { OrderItem } from "@src/types/OrderItem";
 import * as Yup from "yup";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Address } from "@src/types/Address";
+import { redirect, useNavigate } from "react-router-dom";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -29,6 +30,7 @@ const CartPage = () => {
   const urlPath = import.meta.env.VITE_API_URL;
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -156,9 +158,13 @@ const CartPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const createOrderToDB = async (order: any, order_items: any[]) => {
+  const createOrderToDB = async (
+    order: any,
+    order_items: any[],
+    paymentMethod: string
+  ) => {
     try {
-      const createOrder = await axiosClient.post(`${baseUrl}/api/order`, {
+      const createOrder: any = await axiosClient.post(`${baseUrl}/api/order`, {
         order,
         order_items,
       });
@@ -170,6 +176,36 @@ const CartPage = () => {
         duration: 2,
       });
       console.log(createOrder);
+
+      if (paymentMethod === "Momo") {
+        const paymentBody = {
+          order_id: createOrder
+            ? createOrder.order._id
+            : "6744965fe71b1bb313e1d951",
+          amount: totalAmount * 100,
+          orderInfo: "Payment Service",
+          requestType: "payWithMethod",
+          extraData: "",
+          autoCapture: true,
+        };
+
+        try {
+          // Make the POST request to the MoMo API
+          const response: any = await axiosClient.post(
+            `http://localhost:5000/api/payment/momo`,
+            paymentBody
+          );
+          console.log("momo:", response);
+          // Redirect to the MoMo payment URL
+          if (response && response.payUrl) {
+            window.location.href = response.payUrl; // Navigate to the payment page
+          } else {
+            console.error("Failed to retrieve payUrl from response");
+          }
+        } catch (error) {
+          console.error("Error during payment request:", error);
+        }
+      }
     } catch (error) {
       alert(error);
     }
@@ -219,13 +255,18 @@ const CartPage = () => {
         attributes: item.cart_attributes,
       }));
     if (order_items.length) {
-      createOrderToDB(order, order_items);
-      console.log(order);
-      console.log({ order, order_items });
-      // if (!validateForm()) return;
-      order_items.map((item) => {
-        removeItem(item.product);
-      });
+      try {
+        await createOrderToDB(order, order_items, values.paymentMethod);
+
+        console.log(order);
+        console.log({ order, order_items });
+        // if (!validateForm()) return;
+        order_items.map((item) => {
+          removeItem(item.product);
+        });
+      } catch (error) {
+        console.log(error);
+      }
     } else if (!order_items.length) {
       notification.warning({
         message: "Please choose product to place order",
@@ -329,7 +370,8 @@ const CartPage = () => {
           <span>Total Amount:</span>
           <span>£{totalAmount.toFixed(2)}</span>
         </div>
-        <div className="mt-2">
+        {/* DISCOUNT */}
+        {/* <div className="mt-2">
           <label className="block">Choose Discount:</label>
           <select
             // value={discountCode}
@@ -340,7 +382,7 @@ const CartPage = () => {
             <option value="10%">10% Discount</option>
             <option value="20%">20% Discount</option>
           </select>
-        </div>
+        </div> */}
       </div>
 
       {/* Form nhập thông tin đặt hàng */}
@@ -462,7 +504,7 @@ const CartPage = () => {
               >
                 <option value="COD">COD - Cash On Delivery</option>
                 <option value="Momo">Momo</option>
-                <option value="VNPay">VNPay</option>
+                {/* <option value="VNPay">VNPay</option> */}
               </Field>
               <ErrorMessage
                 name="paymentMethod"
