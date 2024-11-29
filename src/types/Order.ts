@@ -1,4 +1,5 @@
 // models/Order.ts
+import { User } from "@src/types/auth/AuthType";
 import { Address } from "./Address";
 import { OrderItem } from "./OrderItem";
 import { PaginationType } from "./Pagination";
@@ -6,8 +7,7 @@ import mockProducts from "./Product";
 
 export interface Order {
   _id: string;
-  user: string;
-  // order_items: OrderItem[];
+  user: User;
   status: string;
   discount?: number;
   total_price: number;
@@ -29,7 +29,6 @@ export interface OrderListAdmin {
   data: Order[];
   pagination: PaginationType;
 }
-
 const calculateTotalPrice = (
   orderItems: OrderItem[],
   discount?: number
