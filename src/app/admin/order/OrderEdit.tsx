@@ -14,10 +14,10 @@ const EditOrder: React.FC = () => {
   const location = useLocation();
   const orderFromState = location.state?.order || null;
   const [order, setOrder] = useState<Order | null>(orderFromState);
-  const [orderItems, setOrderItem] = useState<OrderItemList>();
+  const [orderItems, setOrderItem] = useState<OrderItem[]>();
   const fetchOrder = async () => {
     try {
-      const orderItems = await axiosClient.getOne<OrderItemList>(`${baseUrl}/api/orderitem/order/${order?._id}`);//+
+      const orderItems = await axiosClient.getOne<OrderItem[]>(`${baseUrl}/api/orderitem/order/${order?._id}`);//+
       if (orderItems) { // Check if orderItems is not null before assigning it to state//+
         setOrderItem(orderItems);
       }
@@ -67,7 +67,7 @@ const EditOrder: React.FC = () => {
     navigate("/admin/order"); // Quay lại danh sách đơn hàng nếu hủy
   };
   console.log("dddadfdfkasfh", order)
-  console.log("akfwerewer", orderItems?.data)
+  console.log("akfwerewer", orderItems)
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Edit Order</h1>
@@ -85,7 +85,7 @@ const EditOrder: React.FC = () => {
 
             <Ordertracking
               order={order}
-              orderitems={orderItems} />
+              orderitems={orderItems!} />
           </div>
         </div>
       ) : (
