@@ -66,17 +66,17 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <div className="h-full">
-      <div className="p-4 text-center font-bold text-yellow-500 text-xl">
+    <div className="h-full flex flex-col bg-slate-900">
+      <div className="p-5 text-center font-bold text-white text-2xl border-b-2 border-gray-500">
         <Link to={role === "admin" ? "/admin" : "/"}>Style</Link>
       </div>
       <Menu
         mode="inline"
         theme="dark"
         inlineCollapsed={collapsed}
-        style={{ height: "100%", borderRight: 0 }}
+        style={{borderRight: 0, width: "200px", fontSize: "16px"}}
         items={items}
-      />
+      ></Menu>
     </div>
   );
 };
