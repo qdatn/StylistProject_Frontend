@@ -7,6 +7,7 @@ import { Comment } from "@src/types/Comment";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { Attribute } from "@src/types/Attribute";
+import { notification } from "antd";
 
 interface ReviewItemProps {
   item: OrderItem;
@@ -39,7 +40,13 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ item }) => {
         commentData
       );
       console.log("CMMT", addComment);
-      alert("Comment success");
+      // alert("Comment success");
+      notification.success({
+        message: "Comment success",
+        description: "",
+        placement: "topRight",
+        duration: 1,
+      });
     } catch (error) {}
   };
 

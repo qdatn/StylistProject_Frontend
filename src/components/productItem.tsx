@@ -46,7 +46,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
               MORE COLORS
             </div>
             <div className="px-5 py-1.5 rounded-sm border border-solid bg-stone-500 border-zinc-600 text-white text-xs font-semibold">
-              STOCK OUT
+              NEW
             </div>
           </div>
         </div>

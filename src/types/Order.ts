@@ -14,8 +14,8 @@ export interface Order {
   method?: string;
   address: Address;
   receive_date?: number;
-  createdDate?: Date;
-  updatedDate?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 export interface OrderTracking {
   order: Order;

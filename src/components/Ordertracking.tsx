@@ -42,12 +42,14 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
 
       {/* Nút hành động */}
       <div className="order-actions mt-4 flex justify-end gap-4">
-        <button
-          className="bg-gray-300 px-10 py-2 rounded font-semibold"
-          onClick={() => setIsReviewFormOpen(true)}
-        >
-          Review
-        </button>
+        {order.status === "delivered" && (
+          <button
+            className="bg-gray-300 px-10 py-2 rounded font-semibold"
+            onClick={() => setIsReviewFormOpen(true)}
+          >
+            Review
+          </button>
+        )}
         <button className="bg-gray-800 text-white px-10 py-2 rounded font-semibold">
           Detail
         </button>

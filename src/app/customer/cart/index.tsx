@@ -182,7 +182,7 @@ const CartPage = () => {
           order_id: createOrder
             ? createOrder.order._id
             : "6744965fe71b1bb313e1d951",
-          amount: totalAmount * 100,
+          amount: totalAmount * 6300,
           orderInfo: "Payment Service",
           requestType: "payWithMethod",
           extraData: "",
@@ -198,7 +198,7 @@ const CartPage = () => {
           console.log("momo:", response);
           // Redirect to the MoMo payment URL
           if (response && response.payUrl) {
-            window.location.href = response.payUrl; // Navigate to the payment page
+            // window.location.href = response.payUrl; // Navigate to the payment page
           } else {
             console.error("Failed to retrieve payUrl from response");
           }
