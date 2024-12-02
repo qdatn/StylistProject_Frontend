@@ -37,8 +37,10 @@ const productColumns: ColumnsType<Product> = [
   {
     title: "Original Price",
     dataIndex: "price",
-    render: (price: number) =>
-      typeof price === "number" ? `${price.toFixed(2)}£` : price,
+    render: (price: number) => 
+      typeof price === "number"
+        ? `${new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price)} ₫`
+        : price,
   },
   {
     title: "Discounted Price",
