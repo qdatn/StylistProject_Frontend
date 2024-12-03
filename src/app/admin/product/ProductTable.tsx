@@ -8,6 +8,7 @@ import { Product, ProductList } from "@src/types/Product";
 import { PaginationType } from "@src/types/Pagination";
 import { Console } from "console";
 import axiosClient from "@api/axiosClient";
+import { formatCurrency, formatDate } from "@utils/format";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -15,7 +16,7 @@ interface ProductTableProps {
   products: ProductList;
   onDeleteSuccess: () => void;
   onPageChange: (page: number, pageSize: number) => void;
-  pagination:PaginationType;
+  pagination: PaginationType;
 }
 
 const productColumns: ColumnsType<Product> = [
@@ -37,21 +38,17 @@ const productColumns: ColumnsType<Product> = [
   {
     title: "Original Price",
     dataIndex: "price",
-    render: (price: number) => 
-      typeof price === "number"
-        ? `${new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price)} ₫`
-        : price,
+    render: formatCurrency,
   },
   {
     title: "Discounted Price",
-    dataIndex: "discountedPrice",
-    render: (price: number) =>
-      typeof price === "number" ? `${price.toFixed(2)}£` : price,
+    dataIndex: "discounted_price",
+    render: formatCurrency,
   },
   {
     title: "Date Created",
     dataIndex: "createdAt",
-    render: (createdAt: string) => dayjs(createdAt).format("DD/MM/YYYY"),
+    render: formatDate,
   },
   {
     title: "Status",

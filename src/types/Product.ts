@@ -6,13 +6,13 @@ export interface Product {
   _id: string;
   product_name: string;
   price: number;
-  discountedPrice: number;
+  discounted_price: number;
   description?: string;
   brand: string | null; // Để có thể có giá trị null
   stock_quantity: number;
   min_quantity?: number;
   sold_quantity?: number;
-  categories: Category[] | string[]; 
+  categories: Category[] | string[];
   stock_update_date?: Date;
   status: boolean;
   images: string[];
@@ -32,7 +32,7 @@ const mockProducts: Product[] = [
     _id: "1",
     product_name: "Wrap bodice balloon sleeve maxi dress",
     price: 46.0,
-    discountedPrice: 36.0,
+    discounted_price: 36.0,
     description:
       "A detailed description of the Wrap bodice balloon sleeve maxi dress.",
     images: [
@@ -56,7 +56,7 @@ const mockProducts: Product[] = [
     _id: "2",
     product_name: "Floral print sundress",
     price: 29.0,
-    discountedPrice: 22.0,
+    discounted_price: 22.0,
     description: "A detailed description of the Floral print sundress.",
     images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,
@@ -76,7 +76,7 @@ const mockProducts: Product[] = [
     _id: "3",
     product_name: "Classic denim jacket",
     price: 60.0,
-    discountedPrice: 45.0,
+    discounted_price: 45.0,
     description: "A detailed description of the Classic denim jacket.",
     images: [
       "https://via.placeholder.com/300x400",
@@ -99,7 +99,7 @@ const mockProducts: Product[] = [
     _id: "4",
     product_name: "Classic denim jacket",
     price: 60.0,
-    discountedPrice: 45.0,
+    discounted_price: 45.0,
     description: "A detailed description of the Classic denim jacket.",
     images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,
@@ -120,7 +120,7 @@ const mockProducts: Product[] = [
     _id: "5",
     product_name: "Classic denim jacket",
     price: 60.0,
-    discountedPrice: 45.0,
+    discounted_price: 45.0,
     description: "A detailed description of the Classic denim jacket.",
     images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,
@@ -140,7 +140,7 @@ const mockProducts: Product[] = [
     _id: "6",
     product_name: "Classic denim jacket",
     price: 60.0,
-    discountedPrice: 45.0,
+    discounted_price: 45.0,
     description: "A detailed description of the Classic denim jacket.",
     images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,
@@ -160,7 +160,7 @@ const mockProducts: Product[] = [
     _id: "7",
     product_name: "Classic denim jacket",
     price: 60.0,
-    discountedPrice: 45.0,
+    discounted_price: 45.0,
     description: "A detailed description of the Classic denim jacket.",
     images: ["https://via.placeholder.com/300x400"],
     stock_quantity: 10,

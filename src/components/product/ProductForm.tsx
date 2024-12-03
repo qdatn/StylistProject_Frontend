@@ -49,7 +49,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const newErrors: Record<string, string> = {};
     if (!product.product_name) newErrors.name = "Product name is required.";
     if (!product.price || product.price <= 0) newErrors.originalPrice = "Original price must be greater than 0.";
-    if (product.discountedPrice !== undefined && product.discountedPrice < 0) newErrors.discountedPrice = "Discounted price must not be negative.";
+    if (product.discounted_price !== undefined && product.discounted_price < 0) newErrors.discountedPrice = "Discounted price must not be negative.";
     if (product.stock_quantity !== undefined && product.stock_quantity < 0) newErrors.stock_quantity = "Stock quantity cannot be negative.";
     return newErrors;
   };

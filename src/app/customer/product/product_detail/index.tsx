@@ -17,6 +17,7 @@ import formatDateTime from "@utils/formatDateTime";
 import { RootState } from "@redux/store";
 import { Cart } from "@src/types/Cart";
 import { OrderAttribute } from "@src/types/Attribute";
+import { formatCurrency } from "@utils/format";
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
@@ -218,10 +219,10 @@ const ProductDetail: React.FC = () => {
             </h1>
             <div className="text-2xl flex items-center gap-2">
               <p className="text-gray-500 line-through font-semibold">
-                £{product.price.toFixed(2)}
+                {formatCurrency(product.price)}
               </p>
               <p className="text-red-500 font-bold">
-                £{product.price.toFixed(2)}
+                {formatCurrency(product.price)}
               </p>
             </div>
 

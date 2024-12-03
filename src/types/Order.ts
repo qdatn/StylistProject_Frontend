@@ -34,7 +34,7 @@ const calculateTotalPrice = (
   discount?: number
 ): number => {
   const subtotal = orderItems.reduce((total, item) => {
-    return total + item.product.discountedPrice * item.quantity;
+    return total + item.product.discounted_price * item.quantity;
   }, 0);
   return discount ? subtotal * ((100 - discount) / 100) : subtotal;
 };

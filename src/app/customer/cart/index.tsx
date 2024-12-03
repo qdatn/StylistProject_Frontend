@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Address } from "@src/types/Address";
 import { redirect, useNavigate } from "react-router-dom";
-
+import { formatCurrency } from "@utils/format";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const CartPage = () => {
@@ -368,7 +368,7 @@ const CartPage = () => {
         ))}
         <div className="flex justify-between font-semibold mt-4">
           <span>Total Amount:</span>
-          <span>£{totalAmount.toFixed(2)}</span>
+          <span>{formatCurrency(totalAmount)}</span>
         </div>
         {/* DISCOUNT */}
         {/* <div className="mt-2">
@@ -528,7 +528,7 @@ const CartPage = () => {
             <div className="fixed bottom-0 left-0 right-0 bg-white p-4 h-20 shadow-lg flex flex-row gap-2 md:flex justify-end">
               <div className="flex flex-row gap-2 text-lg font-medium items-center">
                 <div className="truncate">Total Amount:</div>
-                <div>£{totalAmount.toFixed(2)}</div>
+                <div>{formatCurrency(totalAmount)}</div>
               </div>
               <button
                 // onClick={handleSubmit}

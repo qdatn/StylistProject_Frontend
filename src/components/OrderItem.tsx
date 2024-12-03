@@ -2,6 +2,7 @@
 import React from "react";
 import { OrderItem as OrderItemType } from "@src/types/OrderItem";
 import { Link, useNavigate } from "react-router-dom";
+import { formatCurrency } from "@utils/format";
 
 interface OrderItemProps {
   item: OrderItemType;
@@ -38,10 +39,10 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
       {/* Giá sản phẩm */}
       <div className="text-right">
         <p className="text-sm line-through text-gray-500 mb-1">
-          £{product.price.toFixed(2)}
+          {formatCurrency(product.price)}
         </p>
         <p className="text-sm text-red-500 font-semibold">
-          £{product.price.toFixed(2)}
+          {formatCurrency(product.price)}
         </p>
       </div>
     </div>

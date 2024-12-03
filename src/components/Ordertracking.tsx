@@ -4,6 +4,7 @@ import OrderItemPage from "@components/OrderItem";
 import { Order, OrderTracking } from "@src/types/Order";
 import OrderReviewForm from "./OrderReview";
 import { OrderItem } from "@src/types/OrderItem";
+import { formatCurrency } from "@utils/format";
 
 interface OrdertrackingProps {
   order: Order;
@@ -36,7 +37,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
       <div className="order-total flex justify-end pt-4">
         <span className="text-lg font-medium mr-2">Thành tiền:</span>
         <span className="text-lg font-bold text-red-500">
-          £{order.total_price.toFixed(2)}
+          {formatCurrency(order.total_price)}
         </span>
       </div>
 

@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Product } from "@src/types/Product";
+import { formatCurrency } from "@utils/format";
 
 // Định nghĩa interface cho các thuộc tính sản phẩm
 interface ProductItemProps {
@@ -10,7 +11,7 @@ interface ProductItemProps {
 
 const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
   const navigate = useNavigate();
-  const { _id, product_name, price, discountedPrice, images } = product;
+  const { _id, product_name, price, discounted_price, images } = product;
 
   const handleClick = () => {
     navigate(`/product/${_id}`);
@@ -33,11 +34,11 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
         <div className="font-semibold flex flex-col pb-2 w-full">
           <div className="flex gap-4 pb-2 text-[14px] whitespace-nowrap">
             <p className="self-start text-zinc-600 line-through">
-              £{price.toFixed(2)}
+              {formatCurrency(price)}
             </p>
             {price && (
               <p className="grow shrink font-bold text-red-500">
-                £{price.toFixed(2)}
+                {formatCurrency(price)}
               </p>
             )}
           </div>
