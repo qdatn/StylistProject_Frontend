@@ -17,28 +17,28 @@ export const OTPForm = () => {
   }, [otp]);
 
   const handleOTPClick = async (e: React.MouseEvent) => {
-    if (status === "register") {
-      setIsLoading(true);
-      try {
-        // Step 1: Verify OTP
-        const verifyOTPRes: any = await axiosClient.post(
-          `${apiUrl}/api/auth/verify`,
-          {
-            email: registerData.email.toString(),
-            otp: otp.toString().trim(),
-          }
-        );
+    setIsLoading(true);
+    try {
+      // Step 1: Verify OTP
+      const verifyOTPRes: any = await axiosClient.post(
+        `${apiUrl}/api/auth/verify`,
+        {
+          email: registerData.email.toString(),
+          otp: otp.toString().trim(),
+        }
+      );
 
-        // Step 2: Proceed with registration if OTP is verified
-        // if (verifyOTPRes.status === 200) {
-        const createAccountRes: any = axiosClient.post(
-          `${apiUrl}/api/auth/register`,
-          registerData
-        );
+      // Step 2: Proceed with registration if OTP is verified
+      // if (verifyOTPRes.status === 200) {
+      const createAccountRes: any = axiosClient.post(
+        `${apiUrl}/api/auth/register`,
+        registerData
+      );
 
-        // Step 3: Handle the response for account creation
-        // if (createAccountRes.status === 200) {
-        // alert("Registration success!");
+      // Step 3: Handle the response for account creation
+      // if (createAccountRes.status === 200) {
+      // alert("Registration success!");
+      if (status === "register") {
         navigate("/login");
         notification.success({
           message: "Account have been Register. Please login!",
@@ -46,11 +46,15 @@ export const OTPForm = () => {
           placement: "topRight",
           duration: 2,
         });
-      } catch (err: any) {
-        alert("Error: " + err.response.data.message);
-      } finally {
-        setIsLoading(false);
+      } else {
+        navigate("/resetpassword", {
+          state: { email: registerData.email.trim() },
+        });
       }
+    } catch (err: any) {
+      alert("Error: " + err.response.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
