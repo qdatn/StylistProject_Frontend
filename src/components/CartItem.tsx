@@ -92,7 +92,7 @@ const CartItem: React.FC<CartItemProps> = ({
     onSelect(newSelected);
   };
   return (
-    <div className="flex flex-col sm:flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
+    <div className="flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
       <Link to={`/product/${product._id}`}>
         <img
           src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image

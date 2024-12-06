@@ -11,23 +11,22 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { Outlet } from "react-router-dom";
 export function MainLayout() {
   return (
-    <><div className="w-[1510px]">
+    <div className="min-w-[760px] overflow-x-auto flex justify-center bg-gray-100">
+      <div className="w-full max-w-[1510px] bg-white">
+        {/* Header */}
+        <CustomerHeader />
 
-      {/* Header - Thay đổi header ở layouts/main-header/header */}
-      <CustomerHeader />
+        {/* Nội dung con */}
+        <div className="mx-auto px-8">
+          <Outlet />
+        </div>
 
-      {/* Nội dung return về ở page sẽ truyền vào children ở layout này */}
-      <div className="mx-20">
-        {/* Outlet sẽ render các page con */}
-        <Outlet />
+        {/* Footer */}
+        <CustomerFooter />
+
+        {/* Back to Top */}
+        <ScrollToTopButton />
       </div>
-
-      {/* Footer - Thay đổi footer ở layouts/main-footer/footer */}
-      <CustomerFooter />
-
-      {/* Button click to back to top page */}
-      <ScrollToTopButton />
     </div>
-    </>
   );
 }

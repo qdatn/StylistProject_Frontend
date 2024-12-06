@@ -40,9 +40,6 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
   const urlPath = import.meta.env.VITE_API_URL;
 
   const location = useLocation();
-  // const { name, category, sortBy, sortOrder } = useParams();
-  // const name = location.state.name || "";
-  // const { name, category, sortBy, sortOrder } = location.state || {};
   const [query, setQuery] = useState<any>({
     name,
     category,
@@ -113,27 +110,23 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
         dataLength={products?.data.length ?? 10}
         next={fetchMoreData}
         hasMore={hasMore}
-        loader={<Spin tip="Loading" size="small"></Spin>}
+        loader={<Spin tip="Loading" size="small" />}
         endMessage={
           <p className="mb-10 flex items-center justify-center">
-            <b>All product had been loaded</b>
+            <b>All products have been loaded</b>
           </p>
         }
       >
-        <div className="grid bg-white items-center justify-items-center min-h-screen p-8 sm:m-2">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 px-4 py-8">
           {/* Hiển thị danh sách sản phẩm */}
-          <div className="grid grid-cols-4 gap-10 ">
-            {products &&
-              products.data.map((product) => (
-                <div key={product._id} className="w-[250px]">
+          {products &&
+            products.data.map((product) => (
+              <div key={product._id} className="w-full max-w-[250px] mx-auto">
                 <ProductItem product={product} />
               </div>
-              ))}
-          </div>
+            ))}
         </div>
-
       </InfiniteScroll>
-      {/* <button onClick={handleClick}>Click herre</button> */}
     </>
   );
 };
