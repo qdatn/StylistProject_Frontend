@@ -88,10 +88,10 @@ export default function CustomerHeader() {
 
   return (
     // <!-- header -->
-    <header className="border-y-">
+    <header className="border-y sticky top-0 z-50 bg-white shadow-md">
       <div className="bg-white shadow-md">
         {/* Nav header bar 1 */}
-        <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 flex-wrap">
+        <div className="mx-auto container py-2 flex justify-between border-y-2 px-4 md:px-20 ">
           {/* <!-- Logo and Brand Name on the left side --> */}
           <div className="flex items-center">
             <Link to="/" className="text-lg font-bold text-gray-800">
@@ -141,10 +141,10 @@ export default function CustomerHeader() {
         </div>
         {/* Nav header bar 2 */}
 
-        <div className="flex items-center justify-between px-4 md:px-20 py-4 flex-wrap">
+        <div className="flex items-center justify-between px-4 md:px-20 py-4">
           {/* <!-- Navigation Links for Medium and Above Screens --> */}
 
-          <div className="hidden md:flex space-x-8">
+          <div className=" space-x-8">
             <Link
               to="#"
               className="text-gray-700 hover:underline hover:text-gray-900 transition font-bold underline"
@@ -247,13 +247,13 @@ export default function CustomerHeader() {
       {/* <!-- Menu Header Bar --> */}
       <nav className="bg-white">
         <div className="container mx-auto px-6 py-3">
-          <ul className="flex space-x-6 justify-center gap-16 flex-wrap">
+          <ul className="flex space-x-6 justify-center gap-16 flex-row ">
             <li>
               <Link
                 to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
-                NEW TODAY
+                NEW 
               </Link>
             </li>
             <li>

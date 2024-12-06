@@ -54,23 +54,23 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     try {
       const response = name
         ? await axiosClient.getOne<ProductList>(
-            `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
-            // {
-            //   params: {
-            //     name,
-            //     category: category || "All",
-            //     sortBy: sortBy || "product_name",
-            //     sortOrder: sortOrder || "asc",
-            //     page,
-            //     limit: pageSize,
-            //   },
-            // }
-          )
+          `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
+          // {
+          //   params: {
+          //     name,
+          //     category: category || "All",
+          //     sortBy: sortBy || "product_name",
+          //     sortOrder: sortOrder || "asc",
+          //     page,
+          //     limit: pageSize,
+          //   },
+          // }
+        )
         : await axiosClient.getOne<ProductList>(
-            `${urlPath}/api/product/`,
-            //pagination params
-            { page: page, limit: pageSize }
-          );
+          `${urlPath}/api/product/`,
+          //pagination params
+          { page: page, limit: pageSize }
+        );
 
       setProducts((prev) => ({
         data:
@@ -107,12 +107,6 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     console.log("PAGE:", pagination);
   }, [products, pagination]);
 
-  // Hàm lấy sản phẩm
-  // useEffect(() => {
-  //   // Thay thế dữ liệu thật bằng dữ liệu giả
-  //   setProducts(mockProducts); // Thiết lập sản phẩm với dữ liệu giả
-  // }, []);
-
   return (
     <>
       <InfiniteScroll
@@ -126,15 +120,18 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
           </p>
         }
       >
-        <div className="grid grid-rows-[auto_1fr_auto] bg-white items-center justify-items-center min-h-screen p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        <div className="grid bg-white items-center justify-items-center min-h-screen p-8 sm:m-2">
           {/* Hiển thị danh sách sản phẩm */}
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-4 gap-10 ">
             {products &&
               products.data.map((product) => (
-                <ProductItem key={product._id} product={product} /> // Truyền sản phẩm vào ProductItem
+                <div key={product._id} className="w-[250px]">
+                <ProductItem product={product} />
+              </div>
               ))}
           </div>
         </div>
+
       </InfiniteScroll>
       {/* <button onClick={handleClick}>Click herre</button> */}
     </>
