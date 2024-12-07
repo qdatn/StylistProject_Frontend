@@ -1,12 +1,14 @@
 // components/OrderForm.tsx
 import React, { useEffect, useState } from 'react';
-import { Button } from 'antd';
+import { Button, Input, Select } from 'antd';
 import { Order } from '@src/types/Order';
 import { OrderItem, OrderItemList } from '@src/types/OrderItem';
 import { Address } from "@src/types/Address";
 import OrdertrackingAdmin from './OrdertrackingAdmin';
 import axiosClient from '@api/axiosClient';
 import Ordertracking from './OrdertrackingAdmin';
+import { formatCurrency } from '@utils/format';
+import { formatDate } from '@utils/format';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -39,10 +41,14 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
             console.error("Error fetching address details:", error);
         }
     };
-   
+
     // Xử lý thay đổi dữ liệu trong form
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
+        let formattedValue = value;
+        if (name === 'createdAt' || name === 'receive_date') {
+            formattedValue =  formatDate (new Date(value));
+        }
         setOrder((prev) => ({
             ...prev,
             [name]: value,
@@ -75,7 +81,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
             <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
                 <div>
                     <label className="block font-medium">Order ID</label>
-                    <input
+                    <Input
                         type="text"
                         name="_id"
                         disabled
@@ -89,7 +95,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                 </div>
                 <div>
                     <label className="block font-medium">User</label>
-                    <input
+                    <Input
                         type="text"
                         name="user"
                         disabled
@@ -103,27 +109,32 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                 </div>
                 <div>
                     <label className="block font-medium">Status</label>
-                    <select
-                        name="status"
+                    <Select
                         value={order.status || ''}
-                        onChange={(e) => handleChange({ target: { name: e.target.name, value: e.target.value } } as React.ChangeEvent<HTMLInputElement>)}
-                        required
-                        className={`w-full mt-1 p-2 border rounded-md ${errors.status ? 'border-red-500' : ''}`}
+                        onChange={(value) => handleChange({ target: { name: 'status', value } } as React.ChangeEvent<HTMLInputElement>)}
+                        className={`w-full mt-1 h-10 rounded-md ${errors.status ? 'border-red-500' : ''}`}
                     >
                         <option value="" disabled>Select Status</option>
                         <option value="pending">Pending</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                         <option value="canceled">Canceled</option>
-                    </select>
+                    </Select>
                     {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
                 </div>
             </div>
 
             <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
                 <div>
-                    <label className="block font-medium">Total Price</label>
-                    <input
+                    <div className='flex flex-grow gap-3'>
+                        <label className="block font-medium">
+                            Total Price:
+                        </label>
+                        <p className='pr-1 pl-1 text-blue-600 rounded-sm border border-blue-200 bg-blue-50'>
+                            {formatCurrency(order.total_price || 0)}
+                        </p>
+                    </div>
+                    <Input
                         type="number"
                         name="total_price"
                         disabled
@@ -138,7 +149,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                 </div>
                 <div>
                     <label className="block font-medium">Discount</label>
-                    <input
+                    <Input
                         type="number"
                         name="discount"
                         disabled
@@ -151,6 +162,28 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     {errors.discount && <p className="text-red-500 text-sm">{errors.discount}</p>}
                 </div>
                 <div>
+                    <label className="block font-medium">Start Date</label>
+                    <Input
+                        type="date"
+                        name="createdAt"
+                        value={order.createdAt ? new Date(order.createdAt).toISOString().split('T')[0] : ''}
+                        onChange={handleChange}
+                        className={`w-full mt-1 p-2 border rounded-md ${errors.createdAt ? 'border-red-500' : ''}`}
+                    />
+                    {errors.createdAt && <p className="text-red-500 text-sm">{errors.createdAt}</p>}
+                </div>
+                <div>
+                    <label className="block font-medium">Receive Date</label>
+                    <Input
+                        type="date"
+                        name="receive_date"
+                        value={order.receive_date ? new Date(order.receive_date).toISOString().split('T')[0] : ''}
+                        onChange={handleChange}
+                        className={`w-full mt-1 p-2 border rounded-md ${errors.receive_date ? 'border-red-500' : ''}`}
+                    />
+                    {errors.receive_date && <p className="text-red-500 text-sm">{errors.receive_date}</p>}
+                </div>
+                <div>
                     <label className="block font-medium">Method</label>
                     <select
                         name="method"
@@ -159,7 +192,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         className={`w-full mt-1 p-2 border rounded-md ${errors.method ? 'border-red-500' : ''}`}
                         disabled
                     >
-                        <option value="" disabled>Select Payment Method</option>    
+                        <option value="" disabled>Select Payment Method</option>
                         <option value="Credit_card">Credit Card</option>
                         <option value="Paypal">PayPal</option>
                         <option value="COD">COD</option>
@@ -178,7 +211,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     </div>
                 </div>
             </div>
-            
+
             {/* Button Save */}
             <div className="mt-4 text-right">
                 <Button

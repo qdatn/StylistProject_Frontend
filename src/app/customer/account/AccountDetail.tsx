@@ -11,9 +11,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ user }) => {
   const [passwordVisible, setPasswordVisible] = React.useState(false);
 
   return (
-    <div className="w-3/4 bg-white p-6 rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold text-center mb-6">MY ACCOUNT</h1>
-
+    <div className="w-3/4 bg-white p-7 rounded-lg shadow-lg">
       <h2 className="text-xl font-semibold mb-4">MY DETAILS</h2>
       <p className="text-gray-600 mb-4">
         Feel free to edit any of your details below so your account is totally

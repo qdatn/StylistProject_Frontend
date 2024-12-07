@@ -45,6 +45,9 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
+          <Route path="/resetpassword" element={<ResetPasswordForm />} />
+          <Route path="/OTP" element={<OTPForm />} />
 
           {/* Public layout - guest */}
           <Route element={<RequireAuth role="guest" />}>
@@ -60,9 +63,6 @@ function App() {
           {/* Protected layout - customer */}
           <Route element={<RequireAuth role="customer" />}>
             <Route path="/account" element={<AccountPage />} />
-            <Route path="/OTP" element={<OTPForm />} />
-            <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
-            <Route path="/resetpassword" element={<ResetPasswordForm />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
