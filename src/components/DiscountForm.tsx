@@ -3,10 +3,11 @@ import { Form, Button, Select, Input, Checkbox, message } from 'antd';
 import { Discount } from '@src/types/Discount';
 import { Product } from '@src/types/Product';
 import { Category } from '@src/types/Category';
+import { formatCurrency } from '@utils/format';
 
 const { Option } = Select;
 
-type DiscountType = 'all' | 'product' | 'category' ;
+type DiscountType = 'all' | 'product' | 'category';
 
 interface DiscountFormProps {
   initialDiscount?: Partial<Discount>;
@@ -151,7 +152,14 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           {errors.value && <p className="text-red-500 text-sm">{errors.value}</p>}
         </div>
         <div>
-          <label className="block font-medium">Minimum Value</label>
+          <div className='flex flex-grow gap-3'>
+            <label className="block font-medium">
+              Minimum Value:
+            </label>
+            <p className='pr-1 pl-1 text-blue-600 rounded-sm border border-blue-200 bg-blue-50'>
+              {formatCurrency(discount.minimum_value || 0)}
+            </p>
+          </div>
           <Input
             type="number"
             name="minimum_value"
@@ -163,7 +171,14 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           {errors.minimum_value && <p className="text-red-500 text-sm">{errors.minimum_value}</p>}
         </div>
         <div>
-          <label className="block font-medium">Max Discount</label>
+        <div className='flex flex-grow gap-3'>
+            <label className="block font-medium">
+              Max Discount:
+            </label>
+            <p className='pr-1 pl-1 text-green-600 rounded-sm border border-green-200 bg-green-50'>
+              {formatCurrency(discount.max_discount || 0)}
+            </p>
+          </div>
           <Input
             type="number"
             name="max_discount"
@@ -209,15 +224,15 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
             >
               {discount.type === 'product'
                 ? products.map((product) => (
-                    <Option key={product._id} value={product._id}>
-                      {product.product_name}
-                    </Option>
-                  ))
+                  <Option key={product._id} value={product._id}>
+                    {product.product_name}
+                  </Option>
+                ))
                 : categories.map((category) => (
-                    <Option key={category._id} value={category._id}>
-                      {category.category_name}
-                    </Option>
-                  ))}
+                  <Option key={category._id} value={category._id}>
+                    {category.category_name}
+                  </Option>
+                ))}
             </Select>
             {errors.appliesTo && <p className="text-red-500 text-sm">{errors.appliesTo}</p>}
           </div>

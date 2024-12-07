@@ -1,4 +1,4 @@
-import  mockProducts  from "./Product";
+import mockProducts from "./Product";
 import mockOrders from "./Order";
 
 /**
@@ -22,7 +22,7 @@ export const getProductStatistics = () => {
     0
   );
   const totalNetRevenue = mockProducts.reduce(
-    (total, product) => total + (product.sold_quantity || 0) * product.discountedPrice,
+    (total, product) => total + (product.sold_quantity || 0) * product.discounted_price,
     0
   );
 

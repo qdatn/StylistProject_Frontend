@@ -7,6 +7,7 @@ import { ColumnsType } from 'antd/es/table';
 import axiosClient from '@api/axiosClient';
 import { PaginationType } from '@src/types/Pagination';
 import dayjs from 'dayjs';
+import { formatCurrency, formatDate } from '@utils/format';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -29,7 +30,7 @@ const orderColumns: ColumnsType<Order> = [
   {
     title: 'Total Price',
     dataIndex: 'total_price',
-    render: (price: number) => `£${price.toFixed(2)}`, // Hiển thị giá tiền với định dạng USD
+    render: formatCurrency,
   },
   {
     title: 'Status',
@@ -54,7 +55,7 @@ const orderColumns: ColumnsType<Order> = [
   {
     title: 'Created Date',
     dataIndex: 'createdAt',
-    render: (createdAt: string) => dayjs(createdAt).format("DD/MM/YYYY"), // Hiển thị ngày tạo
+    render: formatDate, // Hiển thị ngày tạo
   },
 ];
 

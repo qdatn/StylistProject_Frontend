@@ -6,6 +6,7 @@ import { Discount, DiscountList } from '@src/types/Discount'; // Import type cá»
 import { ColumnsType } from 'antd/es/table';
 import axiosClient from '@api/axiosClient';
 import { PaginationType } from '@src/types/Pagination';
+import { formatDate } from '@utils/format';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -17,10 +18,6 @@ interface DiscountTableProps {
 }
 
 const discountColumns: ColumnsType<Discount> = [
-  // {
-  //   title: 'ID',
-  //   dataIndex: '_id',
-  // },
   {
     title: 'Code',
     dataIndex: 'code',
@@ -46,12 +43,12 @@ const discountColumns: ColumnsType<Discount> = [
   {
     title: 'Start Date',
     dataIndex: 'start_date',
-    render: (date: string) => new Date(date).toLocaleDateString(),
+    render: formatDate,
   },
   {
     title: 'End Date',
     dataIndex: 'end_date',
-    render: (date: string) => new Date(date).toLocaleDateString(),
+    render: formatDate,
   },
   {
     title: 'Status',

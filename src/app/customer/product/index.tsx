@@ -40,9 +40,6 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
   const urlPath = import.meta.env.VITE_API_URL;
 
   const location = useLocation();
-  // const { name, category, sortBy, sortOrder } = useParams();
-  // const name = location.state.name || "";
-  // const { name, category, sortBy, sortOrder } = location.state || {};
   const [query, setQuery] = useState<any>({
     name,
     category,
@@ -54,23 +51,23 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     try {
       const response = name
         ? await axiosClient.getOne<ProductList>(
-            `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
-            // {
-            //   params: {
-            //     name,
-            //     category: category || "All",
-            //     sortBy: sortBy || "product_name",
-            //     sortOrder: sortOrder || "asc",
-            //     page,
-            //     limit: pageSize,
-            //   },
-            // }
-          )
+          `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
+          // {
+          //   params: {
+          //     name,
+          //     category: category || "All",
+          //     sortBy: sortBy || "product_name",
+          //     sortOrder: sortOrder || "asc",
+          //     page,
+          //     limit: pageSize,
+          //   },
+          // }
+        )
         : await axiosClient.getOne<ProductList>(
-            `${urlPath}/api/product/`,
-            //pagination params
-            { page: page, limit: pageSize }
-          );
+          `${urlPath}/api/product/`,
+          //pagination params
+          { page: page, limit: pageSize }
+        );
 
       setProducts((prev) => ({
         data:
@@ -107,36 +104,29 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     console.log("PAGE:", pagination);
   }, [products, pagination]);
 
-  // Hàm lấy sản phẩm
-  // useEffect(() => {
-  //   // Thay thế dữ liệu thật bằng dữ liệu giả
-  //   setProducts(mockProducts); // Thiết lập sản phẩm với dữ liệu giả
-  // }, []);
-
   return (
     <>
       <InfiniteScroll
         dataLength={products?.data.length ?? 10}
         next={fetchMoreData}
         hasMore={hasMore}
-        loader={<Spin tip="Loading" size="small"></Spin>}
+        loader={<Spin tip="Loading" size="small" />}
         endMessage={
           <p className="mb-10 flex items-center justify-center">
-            <b>All product had been loaded</b>
+            <b>All products have been loaded</b>
           </p>
         }
       >
-        <div className="grid grid-rows-[auto_1fr_auto] bg-white items-center justify-items-center min-h-screen p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 px-4 py-8">
           {/* Hiển thị danh sách sản phẩm */}
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {products &&
-              products.data.map((product) => (
-                <ProductItem key={product._id} product={product} /> // Truyền sản phẩm vào ProductItem
-              ))}
-          </div>
+          {products &&
+            products.data.map((product) => (
+              <div key={product._id} className="w-full max-w-[250px] mx-auto">
+                <ProductItem product={product} />
+              </div>
+            ))}
         </div>
       </InfiniteScroll>
-      {/* <button onClick={handleClick}>Click herre</button> */}
     </>
   );
 };

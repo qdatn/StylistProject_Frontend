@@ -39,7 +39,7 @@ export interface OrderItemList {
 //         orderitem_quantity,
 //         note,
 //         purchased_price: product.originalPrice,
-//         discounted_price: product.discountedPrice,
+//         discounted_price: product.discounted_price,
 //         attributes,
 //         image: product.image ? [...product.image] : [],
 //     };

@@ -13,6 +13,7 @@ import { CartProduct, updateCartAttributes } from "@redux/reducers/cartReducer";
 import { OrderAttribute } from "@src/types/Attribute";
 import { RootState } from "@redux/store";
 import { useDispatch, useSelector } from "react-redux";
+import { formatCurrency } from "@utils/format";
 
 export interface CartItemProps {
   // product: Product; // Dữ liệu sản phẩm từ Cart
@@ -91,7 +92,7 @@ const CartItem: React.FC<CartItemProps> = ({
     onSelect(newSelected);
   };
   return (
-    <div className="flex flex-col sm:flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
+    <div className="flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
       <Link to={`/product/${product._id}`}>
         <img
           src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
@@ -112,9 +113,9 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
         <div className="flex flex-row gap-2 font-bold mb-2">
           <span className="text-gray-500 line-through">
-            £{product.price.toFixed(2)}
+            {formatCurrency(product.price)}
           </span>
-          <span className="text-red-500">£{product.price.toFixed(2)}</span>
+          <span className="text-red-500">{formatCurrency(product.price)}</span>
         </div>
         <div className="flex items-center mb-2 flex-wrap">
           {product.attributes.map((attr) => (

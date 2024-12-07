@@ -277,8 +277,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     if (!product.product_name) newErrors.name = "Product name is required.";
     if (!product.price || product.price <= 0)
       newErrors.originalPrice = "Original price must be greater than 0.";
-    if (product.discountedPrice !== undefined && product.discountedPrice < 0)
-      newErrors.discountedPrice = "Discounted price must not be negative.";
+    if (product.discounted_price !== undefined && product.discounted_price < 0)
+      newErrors.discounted_price = "Discounted price must not be negative.";
     if (!product.brand) newErrors.brand = "Brand is required.";
     if (product.stock_quantity !== undefined && product.stock_quantity < 0)
       newErrors.stock_quantity = "Stock quantity cannot be negative.";
@@ -370,18 +370,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <label className="block font-medium">Discounted Price</label>
           <input
             type="number"
-            name="discountedPrice"
-            value={product.discountedPrice || product.price}
+            name="discounted_price"
+            value={product.discounted_price || 0}
             onChange={handleChange}
             min="0"
             max={product.price}
             required
             placeholder="Enter discounted price"
-            className={`w-full mt-1 p-2 border rounded-md ${errors.discountedPrice ? "border-red-500" : ""
+            className={`w-full mt-1 p-2 border rounded-md ${errors.discounted_price ? "border-red-500" : ""
               }`}
           />
-          {errors.discountedPrice && (
-            <p className="text-red-500 text-sm">{errors.discountedPrice}</p>
+          {errors.discounted_price && (
+            <p className="text-red-500 text-sm">{errors.discounted_price}</p>
           )}
         </div>
 
@@ -525,8 +525,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 type == "add"
                   ? today
                   : product.createdAt
-                  ? new Date(product.createdAt).toISOString().split("T")[0]
-                  : ""
+                    ? new Date(product.createdAt).toISOString().split("T")[0]
+                    : ""
               } // Giá trị là ngày hiện tại
               disabled // Không cho phép thay đổi
               className={`w-full mt-1 p-2 border rounded-md ${errors.createdAt ? "border-red-500" : ""
