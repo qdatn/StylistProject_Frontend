@@ -10,6 +10,8 @@ import { PaginationType } from "@src/types/Pagination";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Spin } from "antd";
 import { useLocation, useParams } from "react-router-dom";
+import { motion } from "motion/react";
+import { debounce } from "lodash";
 
 interface ProductListPageProps {
   name?: string;
@@ -30,7 +32,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
   });
   const [pagination, setPagination] = useState<PaginationType>({
     currentPage: 1,
-    pageSize: 10,
+    pageSize: 5,
     totalItems: 0,
     totalPages: 0,
   });
@@ -51,23 +53,23 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     try {
       const response = name
         ? await axiosClient.getOne<ProductList>(
-          `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
-          // {
-          //   params: {
-          //     name,
-          //     category: category || "All",
-          //     sortBy: sortBy || "product_name",
-          //     sortOrder: sortOrder || "asc",
-          //     page,
-          //     limit: pageSize,
-          //   },
-          // }
-        )
+            `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
+            // {
+            //   params: {
+            //     name,
+            //     category: category || "All",
+            //     sortBy: sortBy || "product_name",
+            //     sortOrder: sortOrder || "asc",
+            //     page,
+            //     limit: pageSize,
+            //   },
+            // }
+          )
         : await axiosClient.getOne<ProductList>(
-          `${urlPath}/api/product/`,
-          //pagination params
-          { page: page, limit: pageSize }
-        );
+            `${urlPath}/api/product/`,
+            //pagination params
+            { page: page, limit: pageSize }
+          );
 
       setProducts((prev) => ({
         data:
@@ -83,7 +85,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
       alert(error);
     }
   };
-  const fetchMoreData = async () => {
+  const fetchMoreData = debounce(async () => {
     // console.log("Bat dau fetch");
     // await setPagination(products?.pagination);
     if (pagination && pagination.currentPage! < pagination.totalPages!) {
@@ -93,7 +95,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     } else {
       setHasMore(false); // No more data to load
     }
-  };
+  });
   useEffect(() => {
     fetchProductItem(pagination?.currentPage ?? 1, pagination.pageSize!);
     // fetchData();
@@ -104,26 +106,44 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     console.log("PAGE:", pagination);
   }, [products, pagination]);
 
+  // Animation Variants for Framer Motion
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
     <>
       <InfiniteScroll
         dataLength={products?.data.length ?? 10}
         next={fetchMoreData}
         hasMore={hasMore}
-        loader={<Spin tip="Loading" size="small" />}
+        loader={
+          <Spin tip="Loading" size="large" className=" flex justify-center" />
+        }
         endMessage={
           <p className="mb-10 flex items-center justify-center">
             <b>All products have been loaded</b>
           </p>
         }
       >
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 px-4 py-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 px-4 py-8 overflow-hidden">
           {/* Hiển thị danh sách sản phẩm */}
           {products &&
-            products.data.map((product) => (
-              <div key={product._id} className="w-full max-w-[250px] mx-auto">
+            products.data.map((product, index) => (
+              <motion.div
+                key={product._id}
+                className="w-full max-w-[250px] mx-auto"
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1, // Stagger effect
+                }}
+              >
                 <ProductItem product={product} />
-              </div>
+              </motion.div>
             ))}
         </div>
       </InfiniteScroll>
