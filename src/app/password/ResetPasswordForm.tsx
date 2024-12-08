@@ -102,7 +102,7 @@ const ResetPasswordForm: React.FC = () => {
           disabled={!newPassword || !confirmPassword}
           className="w-full py-2 text-white font-semibold bg-gray-800 rounded-sm hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Reset Password
+          Change Password
         </button>
       </form>
     </div>
