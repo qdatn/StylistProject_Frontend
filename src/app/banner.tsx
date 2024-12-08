@@ -2,7 +2,7 @@ import React from "react";
 
 // Dữ liệu giả cho banner
 const banner = {
-  image: "./src/public/assets/images/banner.jpg",
+  image: "/assets/images/banner.jpg",
   title: "Welcome to Our Fashion Store",
   subtitle: "Explore the latest collections",
 };
