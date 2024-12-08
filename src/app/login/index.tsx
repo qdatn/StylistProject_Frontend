@@ -16,6 +16,7 @@ import { UserLogin } from "@src/types/auth/AuthType";
 import { Link, Navigate, redirect, useNavigate } from "react-router-dom";
 import { Alert, notification } from "antd";
 
+const apiUrl = import.meta.env.VITE_API_URL;
 // Validation schema
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email address").required("Required"),
@@ -56,7 +57,7 @@ export default function Login() {
 
     try {
       const userLogin = await axiosClient.post<UserLogin>(
-        "http://localhost:5000/api/auth/login",
+        `${apiUrl}/api/auth/login`,
         formDataRef.current
       );
 
