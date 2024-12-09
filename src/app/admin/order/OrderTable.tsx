@@ -8,6 +8,7 @@ import axiosClient from '@api/axiosClient';
 import { PaginationType } from '@src/types/Pagination';
 import dayjs from 'dayjs';
 import { formatCurrency, formatDate } from '@utils/format';
+import { User } from '@src/types/auth/AuthType';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -17,7 +18,6 @@ interface OrderTableProps {
   onPageChange: (page: number, pageSize: number) => void;
   pagination: PaginationType;
 }
-
 const orderColumns: ColumnsType<Order> = [
   {
     title: 'ID',
@@ -26,6 +26,7 @@ const orderColumns: ColumnsType<Order> = [
   {
     title: 'User',
     dataIndex: 'user',
+    render: (user: User) => user?.email || 'N/A', // Hiển thị email nếu tồn tại
   },
   {
     title: 'Total Price',
@@ -91,6 +92,8 @@ const OrderTable: React.FC<OrderTableProps> = ({
       message.error("Failed to delete Orders");
     }
   };
+  
+console.log(orderColumns)
   return (
     <div>
       <CommonTable

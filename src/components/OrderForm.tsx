@@ -47,7 +47,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
         const { name, value } = e.target;
         let formattedValue = value;
         if (name === 'createdAt' || name === 'receive_date') {
-            formattedValue =  formatDate (new Date(value));
+            formattedValue = formatDate(new Date(value));
         }
         setOrder((prev) => ({
             ...prev,
@@ -211,15 +211,22 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     </div>
                 </div>
             </div>
-
-            {/* Button Save */}
             <div className="mt-4 text-right">
+            </div>
+            {/* Button Save */}
+            <div className="flex flex-row gap-2 justify-end">
                 <Button
                     type="primary"
                     onClick={handleSave}
-                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+                    className="text-[16px] p-4 w-32 mt-6"
                 >
                     Save
+                </Button>
+                <Button
+                    onClick={onCancel}
+                    className="text-[16px] p-4 w-32 mt-6"
+                >
+                    Cancel
                 </Button>
             </div>
         </div>

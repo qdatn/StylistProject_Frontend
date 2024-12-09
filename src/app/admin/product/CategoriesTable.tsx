@@ -16,10 +16,6 @@ interface CategoryTableProps {
 }
 const categoryColumns = [
   {
-    title: 'ID',
-    dataIndex: '_id',
-  },
-  {
     title: 'Category Name',
     dataIndex: 'category_name',
   },
