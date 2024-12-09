@@ -2,17 +2,21 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
-import GoogleLoginButton from "@components/GoogleLoginButton";
+import GoogleLoginButton from "@components/GoogleLoginButton"; // Ensure this component exists
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@redux/store";
 // import { useRouter } from "next/navigation";
-import { setUser } from "@redux/reducers/userReducer";
+import { setUser } from "@redux/reducers/authReducer";
 import ErrorBoundary from "antd/es/alert/ErrorBoundary";
+import axiosClient from "@api/axiosClient";
+import { UserLogin } from "@src/types/auth/AuthType";
+import { Link, Navigate, redirect, useNavigate } from "react-router-dom";
+import { Alert, notification } from "antd";
 
-// Define validation schema with Yup
+// Validation schema
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email address").required("Required"),
   password: Yup.string()
@@ -26,67 +30,97 @@ const validationSchema = Yup.object({
     ),
 });
 
-// Define initial values
+// Initial form values
 const initialValues = {
   email: "",
   password: "",
 };
 
 export default function Login() {
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-
-  const formDataRef = useRef({ email: "", password: "" });
+  // Call auth reducer from redux to store user that
   const dispatch: AppDispatch = useDispatch();
-  const User = useSelector((state: RootState) => state.user);
 
-  console.log(import.meta.env.VITE_PUBLIC_GOOGLE_CLIENT_ID);
+  const user = useSelector((state: RootState) => state.persist.auth);
 
-  // const router = useRouter(); // hook để chuyển hướng
+  const [showPassword, setShowPassword] = useState(false);
+  const formDataRef = useRef({ email: "", password: "" });
+  const navigate = useNavigate();
+
+  console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
   const handleSubmit = async (values: { email: string; password: string }) => {
-    console.log("Login data:", values);
-    // Logic xử lý login, ví dụ gọi API login
     formDataRef.current = {
       email: values.email,
       password: values.password,
     };
-    console.log("Login data:", formDataRef);
 
     try {
-      const response = await axios.post(
+      const userLogin = await axiosClient.post<UserLogin>(
         "http://localhost:5000/api/auth/login",
         formDataRef.current
       );
-      console.log(response.data);
-      const { user, token } = response.data;
-      dispatch(setUser({ email: values.email, token }));
-      alert("Login successful!");
-      // router.push("/");
+
+      console.log("User login: ", userLogin);
+      try {
+        dispatch(setUser(userLogin));
+        notification.success({
+          message: "Login successful!",
+          description: "You have successfully logged in.",
+          placement: "topRight",
+          duration: 2,
+        });
+      } catch {
+        notification.error({
+          message: "Error",
+          description: "Can't set redux state properly.",
+          placement: "topRight",
+          duration: 1,
+        });
+      }
     } catch (err: any) {
-      alert("Error: " + err.response.data.message);
+      notification.error({
+        message: "Error",
+        description: `Something went wrong: ${err.message || err}`,
+        placement: "topRight",
+      });
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      if (user.user?.user.role === "admin") {
+        navigate("/admin");
+      } else if (user.user?.user.role === "customer") {
+        navigate("/");
+      }
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    console.log("User redux:", user);
+  }, [user]);
+
+  useEffect(() => {
+    // Xoá lịch sử để ngăn quay lại trang trước
+    window.history.replaceState(null, "", "/login");
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        {/* LOGO BEGIN */}
         <div className="flex justify-center mb-10 mt-0">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="text-5xl tracking-wider font-bold text-gray-800"
           >
             STYLE
-          </a>
+          </Link>
         </div>
-        {/* LOGO END*/}
 
-        {/* LOGIN FIELD BEGIN */}
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Login
         </h2>
 
-        {/* Formik Form */}
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -123,14 +157,13 @@ export default function Login() {
                 >
                   Password
                 </label>
-                <div className=" relative">
+                <div className="relative">
                   <Field
-                    type={showPassword ? "text" : "password"} // Toggle between text and password types
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Enter your password"
                     className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring focus:border-gray-500"
                   />
-                  {/* Button to toggle password visibility */}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -161,12 +194,12 @@ export default function Login() {
                     Remember me
                   </span>
                 </label>
-                <a
-                  href="#"
+                <Link
+                  to="/forgotpassword"
                   className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
 
               {/* Login Button */}
@@ -190,12 +223,12 @@ export default function Login() {
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
             Don&#39;t have an account?
-            <a
-              href="/register"
+            <Link
+              to="/register"
               className="text-gray-900 font-semibold hover:underline"
             >
               &nbsp;Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

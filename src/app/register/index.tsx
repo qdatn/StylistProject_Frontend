@@ -5,6 +5,9 @@ import * as Yup from "yup";
 import React, { useState, useRef } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 // import { useRouter } from "next/navigation";
 
 const validationSchema = Yup.object({
@@ -22,8 +25,7 @@ const validationSchema = Yup.object({
   confirmedPassword: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Required")
-    .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Required"),
+    .oneOf([Yup.ref("password")], "Passwords must match"),
   condition: Yup.bool().oneOf(
     [true],
     "You need to accept our terms and conditions"
@@ -40,12 +42,15 @@ const initialValues = {
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-
-  const formDataRef = useRef({ email: "", password: "", role: "customer" });
+  const formDataRef = useRef({
+    name: "",
+    email: "",
+    password: "",
+    role: "customer",
+  });
+  const navigate = useNavigate();
 
   const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:5000";
-
-  // const router = useRouter(); // hook để chuyển hướng
 
   // Define form submission handler
   const handleSubmit = async (values: {
@@ -58,17 +63,31 @@ export default function Register() {
     console.log("Registration data:", values);
     // Logic to handle registration, e.g., call registration API
     formDataRef.current = {
+      name: values.name,
       email: values.email,
       password: values.password,
       role: "customer",
     };
+    console.log(formDataRef.current.email.toString());
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        formDataRef.current
+      const sendOTP = axiosClient.getOne(
+        `${apiUrl}/api/auth/send-verification`,
+        { email: formDataRef.current.email.toString() }
       );
-      alert("Registration successful!");
-      // router.push("/login");
+      alert("OTP have been sent to your email!");
+
+      navigate("/OTP", {
+        state: {
+          registerData: formDataRef.current,
+          status: "register",
+        },
+      });
+      notification.warning({
+        message: "OTP have been sent to your email!",
+        // description: "You have successfully logged out!",
+        placement: "topRight",
+        duration: 3,
+      });
     } catch (err: any) {
       alert("Error: " + err.response.data.message);
     }
@@ -79,12 +98,12 @@ export default function Register() {
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
         {/* LOGO BEGIN */}
         <div className="flex justify-center mb-10 mt-0">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="text-5xl tracking-wider font-bold text-gray-800"
           >
             STYLE
-          </a>
+          </Link>
         </div>
         {/* LOGO END*/}
 
@@ -153,7 +172,7 @@ export default function Register() {
                 >
                   Password
                 </label>
-                <div className=" relative">
+                <div className="relative">
                   <Field
                     type={showPassword ? "text" : "password"} // Toggle between text and password types
                     id="password"
@@ -255,12 +274,12 @@ export default function Register() {
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
             Already have an account?
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-gray-900 font-semibold hover:underline"
             >
               &nbsp;Log in
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -1,76 +1,134 @@
 import Transition from "@components/Transition";
-import { MainLayout } from "../../../layout";
 // import Image from "next/image";
 // import Link from "next/link";
+import React, { useCallback, useEffect, useState } from "react";
+import ProductItem from "@components/productItem"; // Nhập component ProductItem
+import mockProducts, { ProductList } from "@src/types/Product";
+import { Product } from "@src/types/Product";
+import axiosClient from "@api/axiosClient";
+import { PaginationType } from "@src/types/Pagination";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { Spin } from "antd";
+import { useLocation, useParams } from "react-router-dom";
 
-export default function ProductList() {
-  return (
-    // <MainLayout>
-    <Transition>
-      <div className="bg-white">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold mb-6 text-center">Our Products</h1>
-
-          {/* <!-- Product Grid --> */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {/* <!-- Product Item --> */}
-            <div className="bg-white p-4 rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Product 1"
-                className="w-full h-32 object-cover mb-4 rounded"
-              />
-              <h2 className="text-xl font-semibold mb-2">Product 1</h2>
-              <p className="text-gray-600 mb-4">$29.99</p>
-              <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 transition">
-                Add to Cart
-              </button>
-            </div>
-
-            {/* <!-- Repeat the above block for more products --> */}
-            <div className="bg-white p-4 rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Product 2"
-                className="w-full h-32 object-cover mb-4 rounded"
-              />
-              <h2 className="text-xl font-semibold mb-2">Product 2</h2>
-              <p className="text-gray-600 mb-4">$39.99</p>
-              <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 transition">
-                Add to Cart
-              </button>
-            </div>
-            <div className="bg-white p-4 rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Product 1"
-                className="w-full h-32 object-cover mb-4 rounded"
-              />
-              <h2 className="text-xl font-semibold mb-2">Product 1</h2>
-              <p className="text-gray-600 mb-4">$29.99</p>
-              <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 transition">
-                Add to Cart
-              </button>
-            </div>
-
-            {/* <!-- Repeat the above block for more products --> */}
-            <div className="bg-white p-4 rounded-lg">
-              <img
-                src="https://via.placeholder.com/150"
-                alt="Product 2"
-                className="w-full h-32 object-cover mb-4 rounded"
-              />
-              <h2 className="text-xl font-semibold mb-2">Product 2</h2>
-              <p className="text-gray-600 mb-4">$39.99</p>
-              <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 transition">
-                Add to Cart
-              </button>
-            </div>
-            {/* <!-- Add more product items as needed --> */}
-          </div>
-        </div>
-      </div>
-    </Transition>
-    // </MainLayout>
-  );
+interface ProductListPageProps {
+  name?: string;
+  category?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }
+
+const ProductListPage: React.FC<ProductListPageProps> = ({
+  name,
+  category,
+  sortBy,
+  sortOrder,
+}) => {
+  const [products, setProducts] = useState<ProductList>({
+    data: [],
+    pagination: {},
+  });
+  const [pagination, setPagination] = useState<PaginationType>({
+    currentPage: 1,
+    pageSize: 10,
+    totalItems: 0,
+    totalPages: 0,
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  const urlPath = import.meta.env.VITE_API_URL;
+
+  const location = useLocation();
+  const [query, setQuery] = useState<any>({
+    name,
+    category,
+    sortBy,
+    sortOrder,
+  });
+  console.log("SERRRR", name, category, sortBy, sortOrder);
+  const fetchProductItem = async (page: number, pageSize: number) => {
+    try {
+      const response = name
+        ? await axiosClient.getOne<ProductList>(
+          `${urlPath}/api/product/search/query?name=${name}&category=${category}&sortBy=${sortBy}&sortOrder=${sortOrder}`
+          // {
+          //   params: {
+          //     name,
+          //     category: category || "All",
+          //     sortBy: sortBy || "product_name",
+          //     sortOrder: sortOrder || "asc",
+          //     page,
+          //     limit: pageSize,
+          //   },
+          // }
+        )
+        : await axiosClient.getOne<ProductList>(
+          `${urlPath}/api/product/`,
+          //pagination params
+          { page: page, limit: pageSize }
+        );
+
+      setProducts((prev) => ({
+        data:
+          page === 1
+            ? response.data
+            : [...(prev?.data ?? []), ...response.data],
+        pagination: response.pagination,
+      }));
+      setPagination(response.pagination);
+      setHasMore(page < response.pagination.totalPages!);
+      console.log(response);
+    } catch (error) {
+      alert(error);
+    }
+  };
+  const fetchMoreData = async () => {
+    // console.log("Bat dau fetch");
+    // await setPagination(products?.pagination);
+    if (pagination && pagination.currentPage! < pagination.totalPages!) {
+      const nextPage = pagination.currentPage! + 1;
+      console.log("nextPAGE:", pagination?.currentPage);
+      await fetchProductItem(nextPage, pagination.pageSize!); // Fetch next page
+    } else {
+      setHasMore(false); // No more data to load
+    }
+  };
+  useEffect(() => {
+    fetchProductItem(pagination?.currentPage ?? 1, pagination.pageSize!);
+    // fetchData();
+  }, [name, category, sortBy, sortOrder]);
+
+  useEffect(() => {
+    console.log("PRODUCT", products);
+    console.log("PAGE:", pagination);
+  }, [products, pagination]);
+
+  return (
+    <>
+      <InfiniteScroll
+        dataLength={products?.data.length ?? 10}
+        next={fetchMoreData}
+        hasMore={hasMore}
+        loader={<Spin tip="Loading" size="small" />}
+        endMessage={
+          <p className="mb-10 flex items-center justify-center">
+            <b>All products have been loaded</b>
+          </p>
+        }
+      >
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 px-4 py-8">
+          {/* Hiển thị danh sách sản phẩm */}
+          {products &&
+            products.data.map((product) => (
+              <div key={product._id} className="w-full max-w-[250px] mx-auto">
+                <ProductItem product={product} />
+              </div>
+            ))}
+        </div>
+      </InfiniteScroll>
+    </>
+  );
+};
+
+export default ProductListPage;
