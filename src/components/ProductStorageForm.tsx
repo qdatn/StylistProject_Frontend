@@ -121,7 +121,10 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
             </div>
             <div className='flex flex-row gap-2 justify-end'>
                 <div className='flex '>
-                    <Button className=' text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
+                    <Button
+                        className=' text-[16px] p-4 w-32 mt-6'
+                        type="primary"
+                        onClick={handleSave}>
                         Save
                     </Button>
                 </div>

@@ -80,7 +80,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
           selectedCategories={selectedCategories}
         />
         <div className="flex flex-row gap-2 justify-end">
-          <Button className="text-[16px] p-4 w-32 mt-6" onClick={handleSave}>
+          <Button 
+          type="primary"
+          className="text-[16px] p-4 w-32 mt-6" 
+          onClick={handleSave}>
             Save
           </Button>
           <Button className="text-[16px] p-4 w-32 mt-6" onClick={onCancel}>

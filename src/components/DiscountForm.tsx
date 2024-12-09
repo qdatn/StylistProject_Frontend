@@ -171,7 +171,7 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           {errors.minimum_value && <p className="text-red-500 text-sm">{errors.minimum_value}</p>}
         </div>
         <div>
-        <div className='flex flex-grow gap-3'>
+          <div className='flex flex-grow gap-3'>
             <label className="block font-medium">
               Max Discount:
             </label>
@@ -299,10 +299,15 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
       </div>
 
       <div className="mt-6 flex gap-2 justify-end">
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button onClick={handleSave}>
+        <Button
+          className="text-[16px] p-4 w-32 mt-6"
+          type="primary"
+          onClick={handleSave}>
           Save
         </Button>
+        <Button
+          className="text-[16px] p-4 w-32 mt-6"
+          onClick={onCancel}>Cancel</Button>
       </div>
     </div>
   );
