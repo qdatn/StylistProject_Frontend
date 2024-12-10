@@ -8,6 +8,7 @@ function createApiClient() {
   const client = axios.create({
     baseURL,
     // timeout: 10000,
+    withCredentials: true, // send cookies evey request
     headers: {
       "Content-Type": "application/json",
     },
