@@ -83,13 +83,13 @@ export default function CustomerFooter() {
           </p>
         </div>
         <div>
-          <ul className="space-x-4">
+          <ul className="space-x-4 flex-row flex">
             <li>
               <a
                 href="#"
                 className="text-xs text-gray-400 hover:text-gray-200 hover:underline"
               >
-                Terms
+              Terms
               </a>
             </li>
             <li>
@@ -97,7 +97,7 @@ export default function CustomerFooter() {
                 href="#"
                 className="text-xs text-gray-400 hover:text-gray-200 hover:underline"
               >
-                Privacy
+              Privacy
               </a>
             </li>
           </ul>
