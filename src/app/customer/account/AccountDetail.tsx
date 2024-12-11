@@ -1,14 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { UserAccount } from "@src/types/UserAccount";
 import { Button, Input } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { User } from "@src/types/auth/AuthType";
 
 interface AccountDetailsProps {
-  user: UserAccount | null;
+  initialUser: Partial<UserAccount>;
+  onSave: (user: Partial<UserAccount>) => void;
 }
 
-const AccountDetails: React.FC<AccountDetailsProps> = ({ user }) => {
-  const [passwordVisible, setPasswordVisible] = React.useState(false);
+const AccountDetails: React.FC<AccountDetailsProps> = ({ initialUser = {}, onSave }) => {
+  const [user, setUser] = useState<Partial<UserAccount>>(initialUser);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    // Safely check for `user.name` and other properties
+    if (!user.name) newErrors.name = "User name is required.";
+    if (!user.phone_number) newErrors.phone_number = "Phone number is required.";
+    if (!user.user?.email) newErrors.email = "Email is required.";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setUser((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    if (validate()) {
+      console.log("Saving user:", user);
+      onSave(user);
+    }
+  };
 
   return (
     <div className="w-3/4 bg-white p-7 rounded-lg shadow-lg">
@@ -21,26 +50,31 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ user }) => {
       <div className="space-y-4">
         <div>
           <label className="block text-gray-700 font-semibold">
-            First Name*
+            Full Name*
           </label>
           <input
             type="text"
-            value={user ? user.name.split(" ")[0] : ""}
+            name="name"
+            value={user.name || ""}
+            onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            readOnly
           />
         </div>
 
         <div>
           <label className="block text-gray-700 font-semibold">
-            Last Name*
+            Phone Number*
           </label>
           <input
             type="text"
-            value={user ? user.name.split(" ").slice(1).join(" ") : ""}
+            name="phone_number"
+            value={user.phone_number || ""}
+            onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            readOnly
           />
+          {errors.phone_number && (
+            <span className="text-red-500">{errors.phone_number}</span>
+          )}
         </div>
 
         <div>
@@ -56,7 +90,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ user }) => {
           <div className="inline w-full">
             <Input.Password
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-              value={user ? user.user.email : ""}
+              value={user ? user.user?.email : ""}
               placeholder="email"
               iconRender={(visible) =>
                 visible ? (
@@ -83,12 +117,14 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ user }) => {
         {/* Thêm các trường khác ở đây */}
       </div>
 
-      <button
-        className="mt-6 w-full bg-gray-400 text-white py-2 rounded-lg font-semibold cursor-not-allowed"
-        disabled
-      >
-        SAVE CHANGES
-      </button>
+      <div className="flex flex-row gap-2 justify-end">
+        <Button
+          onClick={handleSave}
+          className="text-[16px] p-4 w-32 mt-6"
+        >
+          Save
+        </Button>
+      </div>
     </div>
   );
 };

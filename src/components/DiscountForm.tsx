@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Select, Input, Checkbox, message } from 'antd';
+import { Form, Button, Select, Input, Checkbox, message, DatePicker } from 'antd';
 import { Discount } from '@src/types/Discount';
 import { Product } from '@src/types/Product';
 import { Category } from '@src/types/Category';
 import { formatCurrency } from '@utils/format';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -68,7 +69,19 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
     }
     setAppliesToItems(initialDiscount.apply_items || []); // Danh sách sản phẩm/danh mục được áp dụng
   };
-
+  const handleDateChange = (date: moment.Moment | null, field: "start_date" | "end_date") => {
+    if (date) {
+        setDiscount((prev) => ({
+            ...prev,
+            [field]: date.toDate(), // Đảm bảo lưu ngày dưới dạng Date object
+        }));
+    } else {
+        setDiscount((prev) => ({
+            ...prev,
+            [field]: undefined, // Nếu không có ngày chọn thì xóa giá trị
+        }));
+    }
+};    
   const handleSelectChange = (values: string[]) => {
     setAppliesToItems(values);
   };
@@ -265,22 +278,26 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
         </div>
         <div>
           <label className="block font-medium">Start Date</label>
-          <Input
+          <DatePicker
             type="date"
             name="start_date"
-            value={discount.start_date ? new Date(discount.start_date).toISOString().split('T')[0] : ''}
-            onChange={handleChange}
+            format="DD-MM-YYYY" // Định dạng ngày
+            value={discount.start_date ? moment(discount.start_date) : null}
+            onChange={(date) => handleDateChange(date, "start_date")}
+            placeholder="Select start date"
             className={`w-full mt-1 p-2 border rounded-md ${errors.startDate ? 'border-red-500' : ''}`}
           />
           {errors.startDate && <p className="text-red-500 text-sm">{errors.startDate}</p>}
         </div>
         <div>
           <label className="block font-medium">End Date</label>
-          <Input
+          <DatePicker
             type="date"
             name="end_date"
-            value={discount.end_date ? new Date(discount.end_date).toISOString().split('T')[0] : ''}
-            onChange={handleChange}
+            format="DD-MM-YYYY" // Định dạng ngày
+            value={discount.end_date ? moment(discount.end_date) : null}
+            onChange={(date) => handleDateChange(date, "end_date")}
+            placeholder="Select end date"
             className={`w-full mt-1 p-2 border rounded-md ${errors.endDate ? 'border-red-500' : ''}`}
           />
           {errors.endDate && <p className="text-red-500 text-sm">{errors.endDate}</p>}

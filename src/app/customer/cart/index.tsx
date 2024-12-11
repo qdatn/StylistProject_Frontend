@@ -54,19 +54,6 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
-    // try {
-    //   const cartItem = await axiosClient.getOne<Cart>(
-    //     `${urlPath}/api/cart/${userId}`
-    //   );
-    //   setCartItems(cartItem.products);
-    //   const initialQuantities = cartItem.products.reduce((acc, product) => {
-    //     acc[product._id] = 1; // Khởi tạo số lượng mặc định là 1
-    //     return acc;
-    //   }, {} as { [key: string]: number });
-    //   setQuantities(initialQuantities);
-    // } catch (error) {
-    //   alert(error);
-    // }
     setCartItems(cart);
     setQuantities((prevQuantities) => {
       const updatedQuantities = { ...prevQuantities };
@@ -296,24 +283,10 @@ const CartPage = () => {
       .matches(/^\d{10}$/, "Phone number must be exactly 10 digits.")
       .required("Phone number is required."),
 
-    // email: Yup.string()
-    //   .email("Invalid email address.")
-    //   .required("Email is required."),
-
     address: Yup.string()
       .trim()
       .min(5, "Address must be at least 5 characters.")
       .required("Address is required."),
-
-    // city: Yup.string()
-    //   .trim()
-    //   .min(3, "City name must be at least 3 characters.")
-    //   .required("City is required."),
-
-    // district: Yup.string()
-    //   .trim()
-    //   .min(3, "District name must be at least 3 characters.")
-    //   .required("District is required."),
 
     paymentMethod: Yup.string()
       .oneOf(["COD", "Momo", "VNPay"], "Please select a valid payment method.")
@@ -405,8 +378,6 @@ const CartPage = () => {
                 type="text"
                 name="name"
                 placeholder="Full Name"
-                // value={formData.name}
-                // onChange={handleChange}
                 className="border p-2 w-full my-4"
               />
               <ErrorMessage
@@ -414,17 +385,12 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.name && (
-                <p className="text-red-500 text-sm">{errors.name}</p>
-              )} */}
             </div>
             <div>
               <Field
                 type="text"
                 name="phone"
                 placeholder="Phone Number"
-                // value={formData.phone}
-                // onChange={handleChange}
                 className="border p-2 w-full my-4"
               />
               <ErrorMessage
@@ -432,32 +398,12 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.phone && (
-                <p className="text-red-500 text-sm">{errors.phone}</p>
-              )} */}
             </div>
-            {/* <div>
-              <Field
-                type="email"
-                name="email"
-                placeholder="Email"
-                // value={formData.email}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              />
-              <ErrorMessage
-                name="email"
-                component="p"
-                className="text-red-500 text-sm"
-              />
-            </div> */}
             <div>
               <Field
                 type="text"
                 name="address"
                 placeholder="Address"
-                // value={formData.address}
-                // onChange={handleChange}
                 className="border p-2 w-full my-4"
               />
               <ErrorMessage
@@ -465,40 +411,7 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.address && (
-                <p className="text-red-500 text-sm">{errors.address}</p>
-              )} */}
             </div>
-            {/* <div>
-              <Field
-                type="text"
-                name="city"
-                placeholder="City"
-                // value={formData.city}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              />
-              <ErrorMessage
-                name="city"
-                component="p"
-                className="text-red-500 text-sm"
-              />
-            </div> */}
-            {/* <div>
-              <Field
-                type="text"
-                name="district"
-                placeholder="District"
-                // value={formData.district}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              />
-              <ErrorMessage
-                name="district"
-                component="p"
-                className="text-red-500 text-sm"
-              />
-            </div> */}
             <div>
               <Field
                 as="select"
