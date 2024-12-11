@@ -80,7 +80,7 @@ export default function Login() {
     } catch (err: any) {
       notification.error({
         message: "Error",
-        description: `Something went wrong: ${err.message || err}`,
+        description: `Email or Password is not correct!`,
         placement: "topRight",
       });
     }

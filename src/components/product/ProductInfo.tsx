@@ -3,6 +3,8 @@ import { Button, Input, message, Modal, Upload } from "antd";
 import React, { useEffect, useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import { formatCurrency } from "@utils/format";
+import { DatePicker } from "antd";
+import moment from "moment";
 
 interface BasicProductInfoProps {
     product: Partial<Product>;
@@ -89,7 +91,19 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
         setFileList((prev) => prev.filter((item) => item.uid !== file.uid));
         message.info("Image removed.");
     };
-
+    const handleDateChange = (date: moment.Moment | null) => {
+        if (date) {
+            setProduct((prev) => ({
+                ...prev,
+                createdAt: date.toDate(),
+            }));
+        } else {
+            setProduct((prev) => ({
+                ...prev,
+                createdAt: undefined, // Xóa ngày nếu không chọn
+            }));
+        }
+    };
 
     const [setErrors] = useState<Record<string, string>>({});
     const today = new Date().toISOString().split("T")[0];
@@ -161,7 +175,7 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
                         onChange={(e) => {
                             const value = e.target.value;
                             const discountedValue = value === "" ? product.price : parseFloat(value);
-                
+
                             if (discountedValue && discountedValue <= (product.price || 0)) {
                                 setProduct((prev) => ({
                                     ...prev,
@@ -312,21 +326,20 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({ product, setProduct
                     </div>
 
                     <div>
-                        <label className="block font-medium">Create Date</label>
-                        <Input
-                            type="date"
-                            name="createdAt"
-                            value={type === "add" ? today : product.createdAt ? new Date(product.createdAt).toISOString().split("T")[0] : ""}
-                            // Giá trị là ngày hiện tại
-                            disabled
+                        <label className="block font-medium">Created At</label>
+                        <DatePicker
                             className={`w-full mt-1 p-2 border rounded-md ${errors.createdAt ? "border-red-500" : ""
                                 }`}
+                            value={product.createdAt ? moment(product.createdAt) : null} // Hiển thị giá trị ngày
+                            onChange={handleDateChange}
+                            format="DD-MM-YYYY" // Định dạng ngày
+                            placeholder="Select created date"
+                            disabled
                         />
                         {errors.createdAt && (
                             <p className="text-red-500 text-sm">{errors.createdAt}</p>
                         )}
                     </div>
-
                 </div>
             </div>
             {/* Các trường khác... */}

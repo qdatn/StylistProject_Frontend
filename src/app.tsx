@@ -35,7 +35,7 @@ import ProductListAdminPage from "@app/admin/product/ProductList";
 import ProductListPage from "@app/customer/product";
 import NotFound from "@components/NotFound";
 import ProductSearchPage from "@app/customer/product/product_search/ProductSearchPage";
-import PaymentSuccessPage from "@app/customer/order/pagement";
+import PaymentSuccessPage from "@app/customer/order/payment";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 

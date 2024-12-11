@@ -27,10 +27,8 @@ const CartPage = () => {
   const cart = useSelector(
     (state: RootState) => state.persist.cart[userId!]?.items || []
   );
-  const urlPath = import.meta.env.VITE_API_URL;
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -56,20 +54,14 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
-    // try {
-    //   const cartItem = await axiosClient.getOne<Cart>(
-    //     `${urlPath}/api/cart/${userId}`
-    //   );
-    //   setCartItems(cartItem.products);
-    //   const initialQuantities = cartItem.products.reduce((acc, product) => {
-    //     acc[product._id] = 1; // Khởi tạo số lượng mặc định là 1
-    //     return acc;
-    //   }, {} as { [key: string]: number });
-    //   setQuantities(initialQuantities);
-    // } catch (error) {
-    //   alert(error);
-    // }
     setCartItems(cart);
+    setQuantities((prevQuantities) => {
+      const updatedQuantities = { ...prevQuantities };
+      cart.map((item) => {
+        updatedQuantities[item._id] = item.quantity;
+      });
+      return updatedQuantities;
+    })
   };
 
   useEffect(() => {
@@ -182,7 +174,7 @@ const CartPage = () => {
           order_id: createOrder
             ? createOrder.order._id
             : "6744965fe71b1bb313e1d951",
-          amount: totalAmount * 6300,
+          amount: totalAmount,
           orderInfo: "Payment Service",
           requestType: "payWithMethod",
           extraData: "",
@@ -198,7 +190,7 @@ const CartPage = () => {
           console.log("momo:", response);
           // Redirect to the MoMo payment URL
           if (response && response.payUrl) {
-            // window.location.href = response.payUrl; // Navigate to the payment page
+            window.location.href = response.payUrl; // Navigate to the payment page
           } else {
             console.error("Failed to retrieve payUrl from response");
           }
@@ -250,10 +242,11 @@ const CartPage = () => {
         // _id: "",
         order: "",
         product: item._id,
-        quantity: item.quantity /*quantities[item._id] || 1*/,
+        quantity: /*item.quantity*/ quantities[item._id] || 1,
         note: "",
         attributes: item.cart_attributes,
       }));
+      console.log("ORDER ITEM: ",order_items)
     if (order_items.length) {
       try {
         await createOrderToDB(order, order_items, values.paymentMethod);
@@ -290,24 +283,10 @@ const CartPage = () => {
       .matches(/^\d{10}$/, "Phone number must be exactly 10 digits.")
       .required("Phone number is required."),
 
-    // email: Yup.string()
-    //   .email("Invalid email address.")
-    //   .required("Email is required."),
-
     address: Yup.string()
       .trim()
       .min(5, "Address must be at least 5 characters.")
       .required("Address is required."),
-
-    // city: Yup.string()
-    //   .trim()
-    //   .min(3, "City name must be at least 3 characters.")
-    //   .required("City is required."),
-
-    // district: Yup.string()
-    //   .trim()
-    //   .min(3, "District name must be at least 3 characters.")
-    //   .required("District is required."),
 
     paymentMethod: Yup.string()
       .oneOf(["COD", "Momo", "VNPay"], "Please select a valid payment method.")
@@ -358,12 +337,12 @@ const CartPage = () => {
           <CartItem
             key={item._id}
             product={item}
-            quantity={item.quantity || 1}
+            quantity={item.quantity}
             onUpdateQuantity={(newQuantity) =>
               updateQuantity(item._id, newQuantity)
             }
             onRemove={() => removeItem(item._id)}
-            onSelect={(selected) => toggleSelectItem(item._id, selected)}
+            onSelect={(selected) => {toggleSelectItem(item._id, selected), console.log(item)}}
           />
         ))}
         <div className="flex justify-between font-semibold mt-4">
@@ -399,8 +378,6 @@ const CartPage = () => {
                 type="text"
                 name="name"
                 placeholder="Full Name"
-                // value={formData.name}
-                // onChange={handleChange}
                 className="border p-2 w-full my-4"
               />
               <ErrorMessage
@@ -408,17 +385,12 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.name && (
-                <p className="text-red-500 text-sm">{errors.name}</p>
-              )} */}
             </div>
             <div>
               <Field
                 type="text"
                 name="phone"
                 placeholder="Phone Number"
-                // value={formData.phone}
-                // onChange={handleChange}
                 className="border p-2 w-full my-4"
               />
               <ErrorMessage
@@ -426,32 +398,12 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.phone && (
-                <p className="text-red-500 text-sm">{errors.phone}</p>
-              )} */}
             </div>
-            {/* <div>
-              <Field
-                type="email"
-                name="email"
-                placeholder="Email"
-                // value={formData.email}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              />
-              <ErrorMessage
-                name="email"
-                component="p"
-                className="text-red-500 text-sm"
-              />
-            </div> */}
             <div>
               <Field
                 type="text"
                 name="address"
                 placeholder="Address"
-                // value={formData.address}
-                // onChange={handleChange}
                 className="border p-2 w-full my-4"
               />
               <ErrorMessage
@@ -459,40 +411,7 @@ const CartPage = () => {
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.address && (
-                <p className="text-red-500 text-sm">{errors.address}</p>
-              )} */}
             </div>
-            {/* <div>
-              <Field
-                type="text"
-                name="city"
-                placeholder="City"
-                // value={formData.city}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              />
-              <ErrorMessage
-                name="city"
-                component="p"
-                className="text-red-500 text-sm"
-              />
-            </div> */}
-            {/* <div>
-              <Field
-                type="text"
-                name="district"
-                placeholder="District"
-                // value={formData.district}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              />
-              <ErrorMessage
-                name="district"
-                component="p"
-                className="text-red-500 text-sm"
-              />
-            </div> */}
             <div>
               <Field
                 as="select"

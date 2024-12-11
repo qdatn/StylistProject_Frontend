@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Product } from '@src/types/Product';
-import { Upload, Button, Input, message, Modal } from 'antd';
+import { Upload, Button, Input, message, Modal, Checkbox } from 'antd';
 
 interface ProductStorageFormProps {
     initialProduct?: Partial<Product>;
@@ -118,6 +118,21 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
                         {errors.sold_quantity && <p className="text-red-500 text-sm">{errors.stock_quantity}</p>}
                     </div>
                 </div>
+            </div>
+            <div>
+                <label className="block font-medium">Status</label>
+                <Checkbox
+                    checked={product.status}
+                    onChange={(e) =>
+                        setProduct({ ...product, status: e.target.checked })
+                    }
+                    className={`mt-1 ${errors.status ? "text-red-500" : ""}`}
+                >
+                    Active
+                </Checkbox>
+                {errors.status && (
+                    <p className="text-red-500 text-sm">{errors.status}</p>
+                )}
             </div>
             <div className='flex flex-row gap-2 justify-end'>
                 <div className='flex '>
