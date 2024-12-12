@@ -1,6 +1,6 @@
 // components/OrderForm.tsx
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Select } from 'antd';
+import { Button, DatePicker, Input, Select } from 'antd';
 import { Order } from '@src/types/Order';
 import { OrderItem, OrderItemList } from '@src/types/OrderItem';
 import { Address } from "@src/types/Address";
@@ -9,6 +9,7 @@ import axiosClient from '@api/axiosClient';
 import Ordertracking from './OrdertrackingAdmin';
 import { formatCurrency } from '@utils/format';
 import { formatDate } from '@utils/format';
+import moment from 'moment';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -47,14 +48,26 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
         const { name, value } = e.target;
         let formattedValue = value;
         if (name === 'createdAt' || name === 'receive_date') {
-            formattedValue =  formatDate (new Date(value));
+            formattedValue = formatDate(new Date(value));
         }
         setOrder((prev) => ({
             ...prev,
             [name]: value,
         }));
     };
-
+    const handleDateChange = (date: moment.Moment | null, field: "createdAt" | "receive_date") => {
+        if (date) {
+            setOrder((prev) => ({
+                ...prev,
+                [field]: date.toDate(), // Đảm bảo lưu ngày dưới dạng Date object
+            }));
+        } else {
+            setOrder((prev) => ({
+                ...prev,
+                [field]: undefined, // Nếu không có ngày chọn thì xóa giá trị
+            }));
+        }
+    };    
     // Kiểm tra dữ liệu trước khi lưu
     const validate = () => {
         const newErrors: Record<string, string> = {};
@@ -163,22 +176,25 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                 </div>
                 <div>
                     <label className="block font-medium">Start Date</label>
-                    <Input
-                        type="date"
+                    <DatePicker
                         name="createdAt"
-                        value={order.createdAt ? new Date(order.createdAt).toISOString().split('T')[0] : ''}
-                        onChange={handleChange}
+                        value={order.createdAt ? moment(order.createdAt) : null}
+                        format="DD-MM-YYYY" // Định dạng ngày
+                        onChange={(date) => handleDateChange(date, "createdAt")}
+                        placeholder="Select creat date"
+                        disabled
                         className={`w-full mt-1 p-2 border rounded-md ${errors.createdAt ? 'border-red-500' : ''}`}
                     />
                     {errors.createdAt && <p className="text-red-500 text-sm">{errors.createdAt}</p>}
                 </div>
                 <div>
                     <label className="block font-medium">Receive Date</label>
-                    <Input
-                        type="date"
+                    <DatePicker
                         name="receive_date"
-                        value={order.receive_date ? new Date(order.receive_date).toISOString().split('T')[0] : ''}
-                        onChange={handleChange}
+                        value={order.receive_date ? moment(order.receive_date) : null}
+                        format="DD-MM-YYYY" // Định dạng ngày
+                        onChange={(date) => handleDateChange(date, "receive_date")}
+                        placeholder="Select receive date"
                         className={`w-full mt-1 p-2 border rounded-md ${errors.receive_date ? 'border-red-500' : ''}`}
                     />
                     {errors.receive_date && <p className="text-red-500 text-sm">{errors.receive_date}</p>}
@@ -211,15 +227,22 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     </div>
                 </div>
             </div>
-
-            {/* Button Save */}
             <div className="mt-4 text-right">
+            </div>
+            {/* Button Save */}
+            <div className="flex flex-row gap-2 justify-end">
                 <Button
                     type="primary"
                     onClick={handleSave}
-                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+                    className="text-[16px] p-4 w-32 mt-6"
                 >
                     Save
+                </Button>
+                <Button
+                    onClick={onCancel}
+                    className="text-[16px] p-4 w-32 mt-6"
+                >
+                    Cancel
                 </Button>
             </div>
         </div>

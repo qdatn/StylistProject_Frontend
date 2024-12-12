@@ -33,7 +33,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
 
     // Lưu dữ liệu và gọi hàm onSave
     const handleSave = () => {
-        
+
         if (validate()) {
             console.log('Saving category:', category);
             // Chỉ cần gọi onSave và truyền dữ liệu đã cập nhật
@@ -43,21 +43,8 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
 
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
-                <div>
-                    <label className="block font-medium">Category ID</label>
-                    <input
-                        type="text"
-                        name="_id"
-                        value={category._id || ''}
-                        onChange={handleChange}
-                        placeholder="Enter Category ID"
-                        required
-                        disabled
-                        className={`w-full mt-1 p-2 border rounded-md ${errors.id ? 'border-red-500' : ''}`}
-                    />
-                    {errors.id && <p className="text-red-500 text-sm">{errors.id}</p>}
-                </div>
+            <div className="gap-y-4 md:grid-cols-2 lg:grid-cols-2">
+
                 <div>
                     <label className="block font-medium">Category Name</label>
                     <input
@@ -73,7 +60,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
                 <div className='justify-center mt-4'>
                     <label className="block font-medium">Description</label>
                     <textarea
-                        className="w-full mt-1 p-3 border rounded"
+                        className="w-full mt-1 p-3 border rounded h-40"
                         name="description"
                         value={category.description || ''}
                         onChange={handleChange}
@@ -85,7 +72,9 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialCategory = {}, onSav
 
             <div className='flex flex-row gap-2 justify-end'>
                 <div className='flex'>
-                    <Button className='text-[16px] p-4 w-32 mt-6' onClick={handleSave}>
+                    <Button className='text-[16px] p-4 w-32 mt-6'
+                        type="primary"
+                        onClick={handleSave}>
                         Save
                     </Button>
                 </div>

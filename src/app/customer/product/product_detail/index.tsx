@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@redux/reducers/cartReducer";
-
 import CommentItem from "@components/CommentItem";
 import { CommentList } from "@src/types/Comment";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
@@ -24,7 +23,6 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [comments, setComments] = useState<CommentList | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedAttributes, setSelectedAttributes] =
     useState<OrderAttribute[]>();
   const dispatch = useDispatch();
@@ -34,7 +32,6 @@ const ProductDetail: React.FC = () => {
     (state: RootState) => state.persist.cart[userId!]?.items || []
   );
   const [validationErrors, setValidationErrors] = useState<any>({});
-
   console.log(id);
   const urlPath = import.meta.env.VITE_API_URL;
 
@@ -79,8 +76,18 @@ const ProductDetail: React.FC = () => {
     }
   }, [id]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   const [addToCartSuccess, setAddToCartSuccess] = useState(true);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPosition({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomPosition({ x: 0, y: 0 });
+  };
 
   // Cập nhật handleAddToCart để hiển thị thông báo
   const handleAddToCart = async () => {
@@ -178,15 +185,29 @@ const ProductDetail: React.FC = () => {
       <div className="containermax-w-7xl mx-auto p-8 bg-white">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
           {/* Phần bên trái - Hình ảnh */}
-          <div className="flex justify-center">
-            <div className="relative w-[600px] h-[400px]">
-              <img
-                src={product.images[currentImageIndex]}
-                alt={`${product.product_name || "Product"} - ${currentImageIndex + 1}`}
-                className="object-contain w-full h-full"
-              />
+          <div className="flex justify-center lg:px-28 px-0">
+            <div className="relative w-[600px] h-[400px] flex items-center justify-center">
+              {/* Container hình ảnh */}
+              <div
+                className="w-[300px] h-[400px] overflow-hidden flex items-center justify-center rounded cursor-pointer"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+              >
+                <img
+                  src={product.images[currentImageIndex]}
+                  alt={`${product.product_name || "Product"} - ${currentImageIndex + 1
+                    }`}
+                  className="object-contain w-full h-full transform transition-transform duration-200"
+                  style={{
+                    transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                    transform:
+                      zoomPosition.x || zoomPosition.y ? "scale(1.5)" : "scale(1)",
+                  }}
+                />
+              </div>
+              {/* Nút mũi tên trái */}
               <button
-                className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-800 p-2 rounded hover:bg-gray-200"
+                className="absolute top-1/2 left-0 transform -translate-y-1/2 text-gray-800 p-2 rounded-full bg-gray-50 shadow hover:bg-gray-200"
                 onClick={() =>
                   setCurrentImageIndex((prevIndex) =>
                     prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
@@ -195,8 +216,9 @@ const ProductDetail: React.FC = () => {
               >
                 ❮
               </button>
+              {/* Nút mũi tên phải */}
               <button
-                className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-800 p-2 rounded hover:bg-gray-200"
+                className="absolute top-1/2 right-0 transform -translate-y-1/2 text-gray-800 p-2 rounded-full bg-gray-50 shadow hover:bg-gray-200"
                 onClick={() =>
                   setCurrentImageIndex((prevIndex) =>
                     prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
@@ -261,7 +283,7 @@ const ProductDetail: React.FC = () => {
         </div>
 
         {/* Phần mô tả */}
-        <div className="mt-10 w-full md:px-28 px-0">
+        <div className="mt-10 w-full lg:px-28 px-0">
           <h1 className="text-xl font-bold">Description</h1>
           <p className="text-justify mt-4 whitespace-pre-wrap">{product.description}</p>
         </div>

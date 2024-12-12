@@ -58,7 +58,6 @@ const OrderManagement: React.FC = () => {
     //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
     fetchOrderItem(page, pageSize);
   };
-
   return (
     <div>
       <div className="font-semibold text-xl p-6">Order Page</div>

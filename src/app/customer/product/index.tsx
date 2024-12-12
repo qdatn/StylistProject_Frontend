@@ -127,7 +127,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
           </p>
         }
       >
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 px-4 py-8 overflow-hidden">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 py-8 lg:pl-16 lg:pr-16 lg:min-w-[1300px] md:min-w-[800px]">
           {/* Hiển thị danh sách sản phẩm */}
           {products &&
             products.data.map((product, index) => (

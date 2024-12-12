@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "antd";
+import { Button, Checkbox } from "antd";
 import { Product } from "@src/types/Product";
 import { Attribute } from "@src/types/Attribute";
 import { Category } from "@src/types/Category";
@@ -79,8 +79,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
           onSelectedCategoriesChange={setSelectedCategories}
           selectedCategories={selectedCategories}
         />
+        <div>
+          <label className="block font-medium">Status</label>
+          <Checkbox
+            checked={product.status}
+            onChange={(e) =>
+              setProduct({ ...product, status: e.target.checked })
+            }
+            className={`mt-1 ${errors.status ? "text-red-500" : ""}`}
+          >
+            Active
+          </Checkbox>
+          {errors.status && (
+            <p className="text-red-500 text-sm">{errors.status}</p>
+          )}
+        </div>
         <div className="flex flex-row gap-2 justify-end">
-          <Button className="text-[16px] p-4 w-32 mt-6" onClick={handleSave}>
+          <Button
+            type="primary"
+            className="text-[16px] p-4 w-32 mt-6"
+            onClick={handleSave}>
             Save
           </Button>
           <Button className="text-[16px] p-4 w-32 mt-6" onClick={onCancel}>
