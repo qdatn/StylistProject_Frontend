@@ -42,8 +42,8 @@ const AccountPage = () => {
       );
       setUser(response); // Cập nhật thông tin user trong state
       notification.success({
-        message: "Order updated successfully!",
-        description: "You have successfully logged in.",
+        message: "Your info updated successfully!",
+        description: "",
         placement: "topRight",
         duration: 2,
       });
