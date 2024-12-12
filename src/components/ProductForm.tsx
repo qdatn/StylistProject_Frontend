@@ -435,7 +435,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           {/* Modal thêm ảnh từ URL */}
           <Modal
             title="Add Image by URL"
-            visible={isUrlModalOpen}
+            open={isUrlModalOpen}
             onOk={handleAddImageFromUrl}
             onCancel={() => setIsUrlModalOpen(false)}
           >
