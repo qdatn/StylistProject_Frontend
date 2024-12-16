@@ -24,8 +24,8 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ startDate, endDate, f
 
   // Sắp xếp các orders theo ngày tạo (create_date)
   const sortedOrders = [...filteredOrders].sort((a, b) => {
-    const dateA = new Date(a.create_date || 0).getTime();
-    const dateB = new Date(b.create_date || 0).getTime();
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
     return dateA - dateB; // Sắp xếp theo thứ tự tăng dần
   });
 
@@ -39,7 +39,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ startDate, endDate, f
 
   // Xử lý dữ liệu nhóm theo filterType
   const groupedData = sortedOrders.reduce((acc, order) => {
-    const orderDate = new Date(order.create_date || 0);
+    const orderDate = new Date(order.createdAt|| 0);
     const key = groupByDate(orderDate);
 
     if (!acc[key]) {
