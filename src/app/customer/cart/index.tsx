@@ -184,7 +184,7 @@ const CartPage = () => {
         try {
           // Make the POST request to the MoMo API
           const response: any = await axiosClient.post(
-            `http://localhost:5000/api/payment/momo`,
+            `${baseUrl}/api/payment/momo`,
             paymentBody
           );
           console.log("momo:", response);
