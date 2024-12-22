@@ -112,9 +112,9 @@ const CartItem: React.FC<CartItemProps> = ({
           </button>
         </div>
         <div className="flex flex-row gap-2 font-bold mb-2">
-          <span className="text-gray-500 line-through">
+          {/* <span className="text-gray-500 line-through">
             {formatCurrency(product.price)}
-          </span>
+          </span> */}
           <span className="text-red-500">{formatCurrency(product.price)}</span>
         </div>
         <div className="flex items-center mb-2 flex-wrap">

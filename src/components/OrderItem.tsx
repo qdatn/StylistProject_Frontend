@@ -38,9 +38,9 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
 
       {/* Giá sản phẩm */}
       <div className="text-right">
-        <p className="text-sm line-through text-gray-500 mb-1">
+        {/* <p className="text-sm line-through text-gray-500 mb-1">
           {formatCurrency(product.price)}
-        </p>
+        </p> */}
         <p className="text-sm text-red-500 font-semibold">
           {formatCurrency(product.price)}
         </p>
