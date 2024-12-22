@@ -6,7 +6,7 @@ import mockOrders, { Order } from "@src/types/Order";
  */
 export const filterOrdersByDate = (orders: Order[], startDate: Date, endDate: Date) => {
     return orders.filter(order => {
-        const orderDate = order.create_date ? new Date(order.create_date) : new Date();
+        const orderDate = order.createdAt? new Date(order.createdAt) : new Date();
         return orderDate >= startDate && orderDate <= endDate;
     });
 };

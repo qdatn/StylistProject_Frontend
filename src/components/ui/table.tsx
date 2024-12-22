@@ -9,7 +9,7 @@ import { Product, ProductList } from "@src/types/Product";
 const { Search } = Input;
 const urlPath = import.meta.env.VITE_API_URL;
 //const baseUrl = import.meta.env.VITE_API_URL;
-const pageSize =8
+const pageSize = 8
 interface CommonTableProps<T> extends TableProps<T> {
   columns: ColumnsType<T>;
   dataSource: T[];
@@ -19,7 +19,6 @@ interface CommonTableProps<T> extends TableProps<T> {
   onAddNew?: () => void;
   onUpdate?: (updated: T) => void;
   hideAddButton?: boolean;
-  hideHideButton?: boolean; //nhưng form không cần nút "toggle status" thì cho nút này ẩn đi
   pagination?: PaginationType;
   onDeleteSuccess?: () => void;
   onDelete?: (selectedKeys: React.Key[]) => Promise<void>; // Hàm xử lý xóa
@@ -36,7 +35,6 @@ function CommonTable<T extends { [key: string]: any }>(
     rowSelection,
     onAddNew,
     hideAddButton = false,
-    hideHideButton = false,
     onDeleteSuccess,
     onPageChange,
     pagination,
@@ -59,12 +57,12 @@ function CommonTable<T extends { [key: string]: any }>(
         // Gọi hàm xóa từ props
         await props.onDelete(selectedRowKeys);
       }
-  
+
       // Cập nhật dữ liệu bảng sau khi xóa thành công
       setTableData((prevData) =>
         prevData.filter((item) => !selectedRowKeys.includes(item[rowKey]))
       );
-  
+
       setSelectedRowKeys([]);
       if (onDeleteSuccess) {
         onDeleteSuccess();
@@ -85,17 +83,17 @@ function CommonTable<T extends { [key: string]: any }>(
   };
 
   //tương ứng với hideHidebutton để thay đổi trạng thái
-  const handleToggleStatus = () => {
-    setTableData((prevData) =>
-      prevData.map((item) =>
-        selectedRowKeys.includes(item[rowKey])
-          ? { ...item, status: !item.status } // Đảo ngược trạng thái `status`
-          : item
-      )
-    );
-    setSelectedRowKeys([]);
-    message.success("Toggled status of selected items");
-  };
+  // const handleToggleStatus = () => {
+  //   setTableData((prevData) =>
+  //     prevData.map((item) =>
+  //       selectedRowKeys.includes(item[rowKey])
+  //         ? { ...item, status: !item.status } // Đảo ngược trạng thái `status`
+  //         : item
+  //     )
+  //   );
+  //   setSelectedRowKeys([]);
+  //   message.success("Toggled status of selected items");
+  // };
 
   const mergedRowSelection = rowSelection
     ? {
@@ -104,37 +102,6 @@ function CommonTable<T extends { [key: string]: any }>(
       ...rowSelection,
     }
     : undefined;
-
-  // const fetchProductItem = async (page: number, pageSize: number) => {
-  //   try {
-  //     const response = await axiosClient.getOne<ProductList>(
-  //       `${urlPath}/api/product/`,
-  //       //pagination params
-  //       { page: page, limit: pageSize }
-  //     );
-
-  //     // Lỗi data type nếu bỏ as
-  //     setTableData(response.data as unknown as T[]);
-
-  //     setPagination(response.pagination);
-  //     // setHasMore(page < response.pagination.totalPages!);
-  //   } catch (error) {
-  //     alert(error);
-  //   }
-  // };
-
-  // const handlePageChange = (page: number) => {
-  //   // Update the pagination state
-  //   if (page <= pagination?.totalPages!) {
-  //     setPagination({
-  //       ...pagination,
-  //       currentPage: page,
-  //     });
-  //   }
-
-  //   // Simulate data fetching for the new page
-  //   fetchProductItem(page, props.pagination?.pageSize!);
-  // };
 
   return (
     <>
@@ -156,9 +123,9 @@ function CommonTable<T extends { [key: string]: any }>(
           <Space>
             <span className="text-[15px]">{`Selected ${selectedRowKeys.length} items`}</span>
             <Button onClick={handleDelete}>Delete</Button>
-            {!hideHideButton && (
+            {/* {!hideHideButton && (
               <Button onClick={handleToggleStatus}>Toggle Status</Button>
-            )}
+            )} */}
           </Space>
         </div>
       )}
@@ -170,9 +137,9 @@ function CommonTable<T extends { [key: string]: any }>(
         rowKey={rowKey}
         rowSelection={mergedRowSelection}
         pagination={false}
-        // pagination={{
-        //   pageSize: 5, // Items per page
-        // }}
+      // pagination={{
+      //   pageSize: 5, // Items per page
+      // }}
       />
       <Pagination
         className="my-4"

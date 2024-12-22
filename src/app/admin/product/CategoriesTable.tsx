@@ -71,7 +71,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
           onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
         })}
         onAddNew={handleAddNewCategory} // Hàm thêm mới danh mục
-        hideHideButton={true}
+        //hideHideButton={true}
         onDeleteSuccess={onDeleteSuccess}
         onDelete={handleDeleteCategories}
         pagination={pagination}
