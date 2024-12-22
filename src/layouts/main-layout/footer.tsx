@@ -1,6 +1,6 @@
 export default function CustomerFooter() {
   return (
-    <footer className="bg-black text-gray-300 pt-8 pb-5 justify-between items-center">
+    <footer className="bg-black text-gray-300 pt-8 pb-5 justify-between items-center lg:p-10">
       <div className="container mx-auto grid grid-cols-3 gap-x-40 justify-between">
         <div className="space-y-4 w-full">
           <h3 className="text-sm font-bold text-gray-100 ">Customer Care</h3>

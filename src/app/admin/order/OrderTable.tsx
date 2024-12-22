@@ -107,7 +107,7 @@ console.log(orderColumns)
           onClick: () => handleRowClick(record), // Điều hướng khi nhấn vào dòng
         })}
         onAddNew={handleAddNewOrder} // Hàm thêm mới đơn hàng
-        hideHideButton={true}
+        //hideHideButton={true}
         hideAddButton={true}
         pagination={orders.pagination}
         onDeleteSuccess={onDeleteSuccess}
