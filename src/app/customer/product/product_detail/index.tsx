@@ -233,7 +233,7 @@ const ProductDetail: React.FC = () => {
           <div className="mt-5 space-y-6">
             <h1 className="text-2xl font-medium text-gray-700">{product.product_name}</h1>
             <div className="text-2xl flex items-center gap-4">
-              <p className="text-gray-500 line-through font-semibold">{formatCurrency(product.price)}</p>
+              {/* <p className="text-gray-500 line-through font-semibold">{formatCurrency(product.price)}</p> */}
               <p className="text-red-500 font-bold">{formatCurrency(product.price)}</p>
             </div>
 

@@ -24,7 +24,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
       <div className="relative w-full h-[300px] overflow-hidden">
         <img
           loading="lazy"
-          src={images?.length ? images[0] : "https://via.placeholder.com/300x400"}
+          src={
+            images?.length ? images[0] : "https://via.placeholder.com/300x400"
+          }
           alt={product_name}
           className="inset-0 w-full h-[300px] object-cover group-hover:scale-110 duration-500"
         />
@@ -37,9 +39,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
           <div className="flex gap-4 pb-2 text-[14px] whitespace-nowrap">
             {discounted_price ? (
               <>
-                <p className="self-start text-zinc-600 line-through">
+                {/* <p className="self-start text-zinc-600 line-through">
                   {formatCurrency(price)}
-                </p>
+                </p> */}
                 <p className="grow shrink font-bold text-red-500">
                   {formatCurrency(discounted_price)}
                 </p>
