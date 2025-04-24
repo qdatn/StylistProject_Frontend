@@ -10,6 +10,7 @@ import {
   FileTextOutlined,
   BarChartOutlined,
   ShoppingCartOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { RootState } from "@redux/store";
 
@@ -62,6 +63,11 @@ const Sidebar: React.FC = () => {
       key: "7",
       icon: <BarChartOutlined />,
       label: <Link to="/admin/statistic">Statistic</Link>,
+    },
+    {
+      key: "8",
+      icon: <MessageOutlined />,
+      label: <Link to="/admin/chat">Message</Link>,
     },
   ];
 
