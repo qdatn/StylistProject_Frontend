@@ -60,6 +60,28 @@ export const mockUserAccounts: UserAccount[] = [
     create_date: new Date("2024-02-01"),
     update_date: new Date("2024-02-10"),
   },
+  {
+    _id: "u3",
+    user: {
+      _id: "auth3",
+      email: "admin@example.com",
+      password: "hashed_password_admin",
+      role: "admin",
+      createdAt: new Date("2023-12-01"),
+      updatedAt: new Date("2024-04-01"),
+    },
+    name: "Admin",
+    avatar: "https://i.pravatar.cc/150?img=5",
+    phone_number: "0901122334",
+    gender: "Other",
+    birthday: new Date("1985-08-20"),
+    body_shape: "Average",
+    height: 170,
+    weight: 65,
+    style_preferences: ["Professional", "Minimalist"],
+    create_date: new Date("2023-12-01"),
+    update_date: new Date("2024-04-01"),
+  }
 ];
 
 export default mockUserAccounts;
