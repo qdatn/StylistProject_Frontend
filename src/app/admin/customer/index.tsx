@@ -1,13 +1,13 @@
-// app/admin/product/OrderCategories.tsx
-import mockOrders, { Order, OrderList, OrderListAdmin } from "@src/types/Order";
+// app/admin/product/CustomerCategories.tsx
+import { UserAccount, CustomerList } from "@src/types/UserAccount";
 import React, { useEffect, useState } from "react";
-import OrderTable from "./CustomerTable";
+import CustomerTable from "./CustomerTable";
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";
 const urlPath = import.meta.env.VITE_API_URL;
-const OrderManagement: React.FC = () => {
-  //const [Orders, setOrders] = useState<Order[]>(mockOrders);
-  const [orders, setOrders] = useState<OrderListAdmin>({
+const CustomerManagement: React.FC = () => {
+  //const [Customers, setCustomers] = useState<Customer[]>(mockCustomers);
+  const [customers, setCustomers] = useState<CustomerList>({
     data: [],
     pagination: {},
   });
@@ -18,15 +18,15 @@ const OrderManagement: React.FC = () => {
     totalPages: 0,
   });
 
-  const fetchOrderItem = async (page: number, pageSize: number) => {
+  const fetchCustomerItem = async (page: number, pageSize: number) => {
     try {
-      const response = await axiosClient.getOne<OrderListAdmin>(
-        `${urlPath}/api/order/`,
+      const response = await axiosClient.getOne<CustomerList>(
+        `${urlPath}/api/userinfo/`,
         //pagination params
         { page: page, limit: pageSize }
       );
 
-      setOrders(response);
+      setCustomers(response);
 
       setPagination(response.pagination);
       // setHasMore(page < response.pagination.totalPages!);
@@ -38,12 +38,12 @@ const OrderManagement: React.FC = () => {
   const pageSize = 8
 
   useEffect(() => {
-    fetchOrderItem(pagination.currentPage!, pagination.pageSize!);
+    fetchCustomerItem(pagination.currentPage!, pagination.pageSize!);
   }, []);
 
   const refreshData = () => {
     // Fetch the updated data and set it to the state that controls `dataSource`
-    fetchOrderItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
+    fetchCustomerItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
   };
 
   const handlePageChange = (page: number) => {
@@ -54,14 +54,14 @@ const OrderManagement: React.FC = () => {
       });
     }
     //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
-    fetchOrderItem(page, pageSize);
+    fetchCustomerItem(page, pageSize);
   };
   return (
     <div>
-      <div className="font-semibold text-xl p-6">Order Page</div>
+      <div className="font-semibold text-xl p-6">Customer Page</div>
       <div>
-        <OrderTable
-          orders={orders}
+        <CustomerTable
+          customers={customers}
           onDeleteSuccess={refreshData}
           pagination={pagination}
           onPageChange={handlePageChange}
@@ -71,4 +71,4 @@ const OrderManagement: React.FC = () => {
   );
 };
 
-export default OrderManagement;
+export default CustomerManagement;

@@ -12,6 +12,7 @@ import {
   ShoppingCartOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
+import { IoPeopleOutline } from "react-icons/io5";
 import { RootState } from "@redux/store";
 
 const Sidebar: React.FC = () => {
@@ -66,6 +67,11 @@ const Sidebar: React.FC = () => {
     },
     {
       key: "8",
+      icon: <IoPeopleOutline />,
+      label: <Link to="/admin/customer">Customer</Link>,
+    },
+    {
+      key: "9",
       icon: <MessageOutlined />,
       label: <Link to="/admin/chat">Message</Link>,
     },
@@ -80,7 +86,7 @@ const Sidebar: React.FC = () => {
         mode="inline"
         theme="dark"
         inlineCollapsed={collapsed}
-        style={{borderRight: 0, width: "200px", fontSize: "16px"}}
+        style={{ borderRight: 0, width: "200px", fontSize: "16px" }}
         items={items}
       ></Menu>
     </div>

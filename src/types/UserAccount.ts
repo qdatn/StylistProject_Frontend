@@ -1,4 +1,5 @@
 import { User } from "./auth/AuthType";
+import { PaginationType } from "./Pagination";
 
 export interface UserAccount {
   _id: string; // Mã người dùng
@@ -15,6 +16,11 @@ export interface UserAccount {
   create_date: Date; // Ngày đăng ký tài khoản
   update_date: Date; // Ngày cập nhật thông tin gần nhất
 }
+export interface CustomerList {
+  data: UserAccount[];
+  pagination: PaginationType;
+}
+
 export const mockUserAccounts: UserAccount[] = [
   {
     _id: "u1",
