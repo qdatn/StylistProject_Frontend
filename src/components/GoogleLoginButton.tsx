@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { GoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
@@ -8,28 +8,39 @@ import { AppDispatch, RootState } from "@redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "@redux/reducers/authReducer";
 import { UserLogin } from "@src/types/auth/AuthType";
-import { notification } from "antd";
+import { Button, Input, Modal, notification } from "antd";
+import bcrypt from "bcryptjs";
 
 const GoogleLoginButton = () => {
   const dispatch: AppDispatch = useDispatch();
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [password, setPassword] = useState("");
+  const [userInfo, setUserInfo] = useState<UserLogin | null>(null);
   const user = useSelector((state: RootState) => state.persist.auth);
 
   const navigate = useNavigate();
 
   const handleSuccess = async (credentialResponse: any) => {
     console.log("Login Success", credentialResponse);
-    // You can handle authentication success here, e.g., send token to backend
-
     const token = credentialResponse.credential; // Token từ Google
 
     try {
-      // Gửi token đến backend để đăng nhập hoặc tạo tài khoản
       const response = await axiosClient.post<UserLogin>(
         "http://localhost:5000/api/auth/google-login",
         { token }
       );
 
-      try {
+      const isPasswordMatch = await bcrypt.compare(
+        "1234",
+        response.user.password
+      );
+      // Kiểm tra xem người dùng đã có mật khẩu chưa
+      if (isPasswordMatch) {
+        // Nếu chưa có mật khẩu, hiển thị modal nhập mật khẩu
+        setUserInfo(response);
+        setIsPasswordModalVisible(true);
+      } else {
+        // Nếu người dùng đã có mật khẩu, không cần hiển thị modal
         dispatch(setUser(response));
         notification.success({
           message: "Login successful!",
@@ -37,26 +48,66 @@ const GoogleLoginButton = () => {
           placement: "topRight",
           duration: 2,
         });
-      } catch {
-        notification.error({
-          message: "Error",
-          description: "Can't set redux state properly.",
-          placement: "topRight",
-          duration: 1,
-        });
       }
-    
+
       console.log("User authenticated:", response);
-      navigate("/");
-      // Lưu thông tin người dùng trong Redux hoặc LocalStorage nếu cần
     } catch (error) {
       console.error("Login failed:", error);
     }
   };
 
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!password || password.length < 6) {
+      notification.error({
+        message: "Password too short",
+        description: "Password must be at least 6 characters.",
+        placement: "topRight",
+        duration: 2,
+      });
+      return;
+    }
+
+    if (userInfo) {
+      try {
+        // Gửi mật khẩu mới để lưu vào DB
+        const response = await axiosClient.post<UserLogin>(
+          "http://localhost:5000/api/auth/set-password",
+          {
+            userId: userInfo.user._id,
+            password,
+          }
+        );
+
+        // Cập nhật Redux state
+        dispatch(setUser(response));
+
+        notification.success({
+          message: "Password set successfully!",
+          description: "Your password has been saved.",
+          placement: "topRight",
+          duration: 2,
+        });
+
+        setIsPasswordModalVisible(false);
+        navigate("/"); // Sau khi thành công, điều hướng đến trang chủ
+      } catch (error) {
+        console.error("Password set failed:", error);
+        notification.error({
+          message: "Error",
+          description: "There was an error saving your password.",
+          placement: "topRight",
+          duration: 2,
+        });
+      }
+    }
+  };
+
   const handleError = () => {
     console.error("Login Failed");
-    // Consider showing a user-friendly message or triggering retry
   };
 
   const login = useGoogleLogin({
@@ -81,6 +132,27 @@ const GoogleLoginButton = () => {
         useOneTap
         // className="hidden"
       />
+
+      {/* Modal để nhập mật khẩu mới */}
+      <Modal
+        title="Set Your Password"
+        visible={isPasswordModalVisible}
+        onCancel={() => setIsPasswordModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsPasswordModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handlePasswordSubmit}>
+            Submit
+          </Button>,
+        ]}
+      >
+        <Input.Password
+          value={password}
+          onChange={handlePasswordChange}
+          placeholder="Enter your password"
+        />
+      </Modal>
     </div>
   );
 };
