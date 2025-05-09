@@ -14,7 +14,7 @@ import AdminHome from "@app/admin/home";
 import { OTPForm } from "@app/password/OTP";
 import StoragePage from "@app/admin/storage";
 import Categories from "@app/admin/product/Categories";
-import CustomerList from "@app/admin/customer/CustomerList";
+import CustomerList from "@app/admin/customer";
 import OrderManagement from "@app/admin/order";
 import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
 import ResetPasswordForm from "@app/password/ResetPasswordForm";
@@ -36,6 +36,7 @@ import ProductListPage from "@app/customer/product";
 import NotFound from "@components/NotFound";
 import ProductSearchPage from "@app/customer/product/product_search/ProductSearchPage";
 import PaymentSuccessPage from "@app/customer/order/payment";
+import ChatPage from "@app/admin/chat";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -104,6 +105,10 @@ function App() {
             <Route
               path="/admin/product/categories/new"
               element={<NewCategory />}
+            />
+            <Route
+              path="/admin/chat"
+              element={<ChatPage />}
             />
             <Route path="/admin/order/new" element={<NewOrder />} />
             <Route path="/admin/discount/new" element={<NewDiscount />} />
