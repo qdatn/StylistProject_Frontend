@@ -1,19 +1,96 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { UserAccount } from "@src/types/UserAccount";
+import { useSocket } from "@api/useSocket";
+import { MessageChat } from "@src/types/Chat";
+import axiosClient from "@api/axiosClient";
 
 interface ChatBoxProps {
-  user: UserAccount; 
+  user: UserAccount;
+  currentUser: UserAccount;
 }
 
-const ChatBox: React.FC<ChatBoxProps> = ({ user }) => {
+const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  // const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<MessageChat[]>([]);
+  const socketRef = useSocket();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
+  const api = import.meta.env.VITE_API_URL;
+
+  // const handleSend = () => {
+  //   if (!message.trim()) return;
+  //   setMessages((prev) => [...prev, message]);
+  //   setMessage("");
+  // };
+
+  // fetch để lấy tất cả tin nhắn giữa hai người dùng
+  const fetchMessages = async () => {
+    try {
+      const response = await axiosClient.getMany<MessageChat>(
+        `${api}/api/chat/messages`,
+        {
+          user1Id: currentUser._id,
+          user2Id: user._id,
+        }
+      );
+
+      console.log("Fetched messages:", response);
+      if (Array.isArray(response)) {
+        setMessages(response);
+      } else {
+        setMessages([]); // Nếu không phải mảng, set lại thành mảng rỗng
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setMessages([]); // Set lại khi có lỗi
+    }
+  };
 
   const handleSend = () => {
-    if (!message.trim()) return;
-    setMessages((prev) => [...prev, message]);
-    setMessage("");
+    if (!message.trim() || !socketRef.current) return;
+
+    const msgData: MessageChat = {
+      sender: currentUser._id,
+      receiver: user._id,
+      content: message,
+    };
+
+    socketRef.current.emit("send_message", msgData);
+    setMessage(""); // Chỉ reset input
   };
+
+  // Tự động scroll xuống cuối mỗi khi có tin nhắn mới
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Nhận tin nhắn từ socket
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
+
+    const handleReceiveMessage = (data: MessageChat) => {
+      if (
+        (data.sender === user._id && data.receiver === currentUser._id) ||
+        (data.sender === currentUser._id && data.receiver === user._id)
+      ) {
+        setMessages((prev) => [...prev, data]);
+      }
+    };
+
+    socket.on("receive_message", handleReceiveMessage);
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
+  }, [socketRef.current, user._id, currentUser._id]);
+
+  // Fetch tin nhắn khi component mở
+  useEffect(() => {
+    if (user && currentUser) {
+      fetchMessages();
+    }
+  }, [user._id, currentUser._id]);
 
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-lg overflow-hidden border">
@@ -32,14 +109,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user }) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 bg-slate-100 space-y-3">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className="bg-blue-100 text-sm p-2 rounded-md self-end max-w-[70%] ml-auto"
-          >
-            {msg}
-          </div>
-        ))}
+        {messages.length > 0 ? (
+          messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`text-sm p-2 rounded-md max-w-[70%] break-words ${
+                msg.sender === currentUser._id
+                  ? "bg-blue-100 ml-auto self-end"
+                  : "bg-white self-start"
+              }`}
+            >
+              {msg.content}
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">No messages to display.</p>
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}

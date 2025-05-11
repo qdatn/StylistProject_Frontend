@@ -27,7 +27,7 @@ export function MainLayout() {
 
         {/* Back to Top */}
         <ScrollToTopButton />
-        {/* Back to Top */}
+        {/* Chat widget */}
         <UserChatWidget />
       </div>
     </div>
