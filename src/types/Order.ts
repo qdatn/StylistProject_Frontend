@@ -29,15 +29,16 @@ export interface OrderListAdmin {
   data: Order[];
   pagination: PaginationType;
 }
-const calculateTotalPrice = (
-  orderItems: OrderItem[],
-  discount?: number
-): number => {
-  const subtotal = orderItems.reduce((total, item) => {
-    return total + item.product.discounted_price * item.quantity;
-  }, 0);
-  return discount ? subtotal * ((100 - discount) / 100) : subtotal;
-};
+// const calculateTotalPrice = (
+//   orderItems: OrderItem[],
+//   discount?: number
+// ): number => {
+//   const subtotal = orderItems.reduce((total, item) => {
+//     return total + item.product.discounted_price * item.quantity;
+//   }, 0);
+//   return discount ? subtotal * ((100 - discount) / 100) : subtotal;
+// };
+
 
 const mockOrderItem: OrderItem[] = [
   // {
