@@ -33,7 +33,7 @@ const NewCategory: React.FC = () => {
 
   return (
     <div>
-      <div className="font-semibold text-xl p-6">New Product</div>
+      {/* <div className="font-semibold text-xl p-6">New Product</div> */}
       
       {/* Category Form */}
       <div className="w-full">

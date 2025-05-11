@@ -79,7 +79,7 @@ const NewDiscount: React.FC = () => {
 
     return (
         <div>
-            <div className="font-semibold text-xl p-6">New Discount</div>
+            {/* <div className="font-semibold text-xl p-6">New Discount</div> */}
             {/* Discount Form */}
             <div className="w-full">
                 <DiscountForm

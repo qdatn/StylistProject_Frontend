@@ -5,19 +5,15 @@ import { Product } from "@src/types/Product"; // Giả định bạn đã có đ
 import axiosClient from "@api/axiosClient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
-import { Cart } from "@src/types/Cart";
 import { Input, notification } from "antd";
 import {
   CartProduct,
   deleteItemFromCart,
   updateProductQuantity,
 } from "@redux/reducers/cartReducer";
-import { Order } from "@src/types/Order";
-import { OrderItem } from "@src/types/OrderItem";
 import * as Yup from "yup";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Address } from "@src/types/Address";
-import { redirect, useNavigate } from "react-router-dom";
 import { formatCurrency } from "@utils/format";
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -350,7 +346,7 @@ const CartPage = () => {
           <span>{formatCurrency(totalAmount)}</span>
         </div>
         {/* DISCOUNT */}
-        {/* <div className="mt-2">
+        <div className="mt-2">
           <label className="block">Choose Discount:</label>
           <select
             // value={discountCode}
@@ -361,7 +357,7 @@ const CartPage = () => {
             <option value="10%">10% Discount</option>
             <option value="20%">20% Discount</option>
           </select>
-        </div> */}
+        </div>
       </div>
 
       {/* Form nhập thông tin đặt hàng */}
