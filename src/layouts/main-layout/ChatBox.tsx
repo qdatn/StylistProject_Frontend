@@ -16,6 +16,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   const socketRef = useSocket();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
+  const [isUserOnline, setIsUserOnline] = useState(false);
   const api = import.meta.env.VITE_API_URL;
 
   // const handleSend = () => {
@@ -70,6 +71,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
     const socket = socketRef.current;
     if (!socket) return;
 
+    // Khi người dùng đăng nhập, gửi trạng thái "online"
+    socket.emit("user_status", currentUser._id, "online");
+    // Lưu trạng thái online vào localStorage
+    localStorage.setItem(`user_${currentUser._id}_status`, "online");
+
     const handleReceiveMessage = (data: MessageChat) => {
       if (
         (data.sender === user._id && data.receiver === currentUser._id) ||
@@ -80,10 +86,33 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
     };
 
     socket.on("receive_message", handleReceiveMessage);
+
+    // Theo dõi trạng thái người dùng online/offline
+    const handleUserStatusChange = (userId: string, status: string) => {
+      if (userId === user._id) {
+        setIsUserOnline(status === "online");
+        localStorage.setItem(`user_${user._id}_status`, status);
+      }
+    };
+
+    socket.on("user_status", handleUserStatusChange);
+
     return () => {
       socket.off("receive_message", handleReceiveMessage);
+      socket.emit("user_status", currentUser._id, "offline");
+      socket.off("user_status", handleUserStatusChange);
+      localStorage.setItem(`user_${currentUser._id}_status`, "offline");
     };
   }, [socketRef.current, user._id, currentUser._id]);
+
+  useEffect(() => {
+    const userStatus = localStorage.getItem(`user_${user._id}_status`);
+    if (userStatus === "online") {
+      setIsUserOnline(true);
+    } else {
+      setIsUserOnline(false);
+    }
+  }, [user._id]);
 
   // Fetch tin nhắn khi component mở
   useEffect(() => {
@@ -102,8 +131,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
           className="w-9 h-9 rounded-full"
         />
         <div>
-          <h3 className="font-semibold">{user.name}</h3>
-          <p className="text-sm text-blue-200">Online</p>
+          {/* <h3 className="font-semibold">{user.name}</h3> */}
+          <h3 className="font-semibold">Customer Service</h3>
+          <p className="text-sm text-blue-200">
+            {isUserOnline ? "Online" : "Offline"}
+          </p>
         </div>
       </div>
 

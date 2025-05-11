@@ -23,18 +23,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   const socketRef = useSocket();
   const socketUrl = import.meta.env.VITE_API_URL;
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isUserOnline, setIsUserOnline] = useState(false);
 
-  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
 
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket || !currentUser) return;
 
-    socket.emit("join_chat", currentUser._id);
+    // Khi người dùng đăng nhập, gửi trạng thái "online"
+    socket.emit("user_status", currentUser._id, "online");
+    // Lưu trạng thái online vào localStorage
+    localStorage.setItem(`user_${currentUser._id}_status`, "online");
 
     const handleMessage = (newMessage: MessageChat) => {
       setMessages((prev) => [...prev, newMessage]);
@@ -42,10 +44,32 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
     socket.on("receive_message", handleMessage);
 
+    // Theo dõi trạng thái người dùng online/offline
+    const handleUserStatusChange = (userId: string, status: string) => {
+      if (userId === user?._id) {
+        setIsUserOnline(status === "online");
+        localStorage.setItem(`user_${user._id}_status`, status);
+      }
+    };
+
+    socket.on("user_status", handleUserStatusChange);
+
     return () => {
       socket.off("receive_message", handleMessage);
+      socket.emit("user_status", currentUser._id, "offline");
+      socket.off("user_status", handleUserStatusChange);
+      localStorage.setItem(`user_${currentUser._id}_status`, "offline");
     };
   }, [socketRef, currentUser]);
+
+  useEffect(() => {
+    const userStatus = localStorage.getItem(`user_${user?._id}_status`);
+    if (userStatus === "online") {
+      setIsUserOnline(true);
+    } else {
+      setIsUserOnline(false);
+    }
+  }, [user?._id]);
 
   const handleDelete = () => {
     // Logic to delete the message
