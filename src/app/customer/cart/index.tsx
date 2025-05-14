@@ -19,6 +19,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Address } from "@src/types/Address";
 import { redirect, useNavigate } from "react-router-dom";
 import { formatCurrency } from "@utils/format";
+import AddressAutocomplete from "@components/AddressAutocomplete";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const CartPage = () => {
@@ -61,7 +62,7 @@ const CartPage = () => {
         updatedQuantities[item._id] = item.quantity;
       });
       return updatedQuantities;
-    })
+    });
   };
 
   useEffect(() => {
@@ -246,7 +247,7 @@ const CartPage = () => {
         note: "",
         attributes: item.cart_attributes,
       }));
-      console.log("ORDER ITEM: ",order_items)
+    console.log("ORDER ITEM: ", order_items);
     if (order_items.length) {
       try {
         await createOrderToDB(order, order_items, values.paymentMethod);
@@ -342,7 +343,9 @@ const CartPage = () => {
               updateQuantity(item._id, newQuantity)
             }
             onRemove={() => removeItem(item._id)}
-            onSelect={(selected) => {toggleSelectItem(item._id, selected), console.log(item)}}
+            onSelect={(selected) => {
+              toggleSelectItem(item._id, selected), console.log(item);
+            }}
           />
         ))}
         <div className="flex justify-between font-semibold mt-4">
@@ -400,10 +403,14 @@ const CartPage = () => {
               />
             </div>
             <div>
-              <Field
+              {/* <Field
                 type="text"
                 name="address"
                 placeholder="Address"
+                className="border p-2 w-full my-4"
+              /> */}
+              <AddressAutocomplete
+                name="address"
                 className="border p-2 w-full my-4"
               />
               <ErrorMessage
