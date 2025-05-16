@@ -50,6 +50,7 @@
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
+    "use-places-autocomplete": "^4.0.1",
     "vite": "^5.4.10",
     "yup": "^1.4.0"
   },
