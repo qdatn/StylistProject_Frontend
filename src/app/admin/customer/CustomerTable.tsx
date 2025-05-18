@@ -54,7 +54,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
     const handleRowClick = (record: UserAccount) => {
         // Điều hướng đến trang chi tiết hoặc chỉnh sửa đơn hàng
         navigate(`/admin/customer/edit/${record._id}`, {
-            state: { order: record },
+            state: { customer: record },
         });
     };
 
@@ -66,7 +66,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
         try {
             await Promise.all(
                 selectedKeys.map((id) =>
-                    axiosClient.delete(`${baseUrl}/api/customer/${id}`)
+                    axiosClient.delete(`${baseUrl}/api/auth/${id}`)
                 )
             );
             message.success("Customers deleted successfully");

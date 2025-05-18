@@ -37,6 +37,8 @@ import NotFound from "@components/NotFound";
 import ProductSearchPage from "@app/customer/product/product_search/ProductSearchPage";
 import PaymentSuccessPage from "@app/customer/order/payment";
 import ChatPage from "@app/admin/chat";
+import EditCustomer from "@app/admin/customer/CustomerEdit";
+import BodyShapePage from "@app/customer/body_shape";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -67,6 +69,7 @@ function App() {
             <Route path="/order" element={<OrderPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/body-shape" element={<BodyShapePage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 
@@ -84,6 +87,7 @@ function App() {
             <Route path="/admin/discount" element={<DiscountManagement />} />
             <Route path="/admin/statistic" element={<DashboardPage />} />
             <Route path="/admin/customer" element={<CustomerList />} />
+            <Route path="/admin/customer/edit/:id" element={<EditCustomer />} />
             <Route
               path="/admin/product/list/edit/:id"
               element={<EditProduct />}

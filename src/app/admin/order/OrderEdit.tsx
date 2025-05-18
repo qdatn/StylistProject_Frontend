@@ -76,7 +76,7 @@ const EditOrder: React.FC = () => {
   console.log("akfwerewer", orderItems)
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Edit Order</h1>
+      {/* <h1 className="font-semibold text-xl p-6">Edit Order</h1> */}
       {order ? (
         <div>
           <div>

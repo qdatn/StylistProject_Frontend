@@ -290,10 +290,10 @@ export default function CustomerHeader() {
             </li>
             <li>
               <Link
-                to="#"
+                to="/body-shape"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
-                SALE
+                BODY SHAPE
               </Link>
             </li>
           </ul>

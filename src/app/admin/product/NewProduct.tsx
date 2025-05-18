@@ -38,7 +38,7 @@ const NewProduct: React.FC = () => {
 
   return (
     <div>
-      <div className="font-semibold text-xl p-6">New Product</div>
+      {/* <div className="font-semibold text-xl p-6">New Product</div> */}
       {/* Product Form */}
       <div className="w-full">
         <ProductForm onSave={handleAddProduct} onCancel={handelCancel} type="add"/>
