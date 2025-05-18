@@ -17,7 +17,20 @@ export interface Discount {
 export interface DiscountList {
     data: Discount[];
     pagination: PaginationType;
-  }
+}
+export interface DiscountAvailable {
+    data: Discount[];
+    message: String;
+}
+
+
+export interface PriceWithDiscount {
+    data: {
+        discountAmount: number;
+        finalPrice: number;
+    }
+    message: String;
+}
 
 const mockDiscounts: Discount[] = [
     {

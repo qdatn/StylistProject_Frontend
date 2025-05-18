@@ -1,23 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CartItem from "@components/CartItem";
 import { Product } from "@src/types/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
+import { Discount, DiscountAvailable, PriceWithDiscount } from "@src/types/Discount";
 import axiosClient from "@api/axiosClient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
-import { Cart } from "@src/types/Cart";
 import { Input, notification } from "antd";
 import {
   CartProduct,
   deleteItemFromCart,
   updateProductQuantity,
 } from "@redux/reducers/cartReducer";
-import { Order } from "@src/types/Order";
-import { OrderItem } from "@src/types/OrderItem";
 import * as Yup from "yup";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Address } from "@src/types/Address";
-import { redirect, useNavigate } from "react-router-dom";
 import { formatCurrency } from "@utils/format";
 import AddressAutocomplete from "@components/AddressAutocomplete";
 const baseUrl = import.meta.env.VITE_API_URL;
@@ -51,8 +48,10 @@ const CartPage = () => {
   });
   const [cartItems, setCartItems] = useState<CartProduct[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
-  const [discountCode, setDiscountCode] = useState<string>("");
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [selectedDiscountCode, setSelectedDiscountCode] = useState<string>(""); const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const [finalPrice, setFinalPrice] = useState<number>(0);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
     setCartItems(cart);
@@ -68,22 +67,78 @@ const CartPage = () => {
   useEffect(() => {
     fetchCartItem();
   }, []);
-
-  const applyDiscount = (amount: number) => {
-    if (discountCode === "10%") return amount * 0.9;
-    if (discountCode === "20%") return amount * 0.8;
-    return amount;
-  };
-
-  const totalAmount = applyDiscount(
-    cartItems.reduce((total, item) => {
-      if (selectedItems.includes(item._id)) {
-        return total + item.price * (quantities[item._id] || 1);
-      }
-      return total;
-    }, 0)
+  // Tính tổng tiền chưa giảm giá
+  const subtotal = useMemo(
+    () =>
+      cartItems.reduce((total, item) => {
+        if (selectedItems.includes(item._id)) {
+          return total + item.price * (quantities[item._id] || 1);
+        }
+        return total;
+      }, 0),
+    [cartItems, selectedItems, quantities]
   );
 
+  // Fetch available discounts khi có thay đổi
+  useEffect(() => {
+    const fetchAvailableDiscounts = async () => {
+      try {
+        const discountList = await axiosClient.post<DiscountAvailable>(
+          `${baseUrl}/api/discount/available-discounts`,
+          {
+            productIds: selectedItems,
+            totalPrice: subtotal,
+          }
+        );
+        setDiscounts(discountList.data);
+      } catch (error) {
+        notification.error({
+          message: "Error loading discounts",
+          description: "Failed to fetch available discounts",
+        });
+      }
+    };
+
+    if (selectedItems.length > 0 && subtotal > 0) {
+      fetchAvailableDiscounts();
+    }
+  }, [selectedItems, subtotal]);
+
+  // Reset discount khi subtotal thay đổi
+  useEffect(() => {
+    setFinalPrice(subtotal);
+    setDiscountAmount(0);
+    setSelectedDiscountCode("");
+  }, [subtotal]);
+
+  //apply discount 
+  const handleApplyDiscount = async (code: string) => {
+    try {
+      const response = await axiosClient.post<PriceWithDiscount>(
+        `${baseUrl}/api/discount/apply-discount`,
+        {
+          code,
+          productIds: selectedItems,
+          totalPrice: subtotal,
+        }
+      );
+
+      setDiscountAmount(response.data.discountAmount);
+      setFinalPrice(response.data.finalPrice);
+      notification.success({
+        message: "Discount applied successfully",
+      });
+    } catch (error: any) {
+      notification.error({
+        message: "Discount error",
+        description: error.response?.data?.message || "Failed to apply discount",
+      });
+      setFinalPrice(subtotal);
+      setDiscountAmount(0);
+    }
+  };
+
+  //update quantity
   const updateQuantity = (itemId: string, newQuantity: number) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
@@ -175,7 +230,7 @@ const CartPage = () => {
           order_id: createOrder
             ? createOrder.order._id
             : "6744965fe71b1bb313e1d951",
-          amount: totalAmount,
+          amount: finalPrice,
           orderInfo: "Payment Service",
           requestType: "payWithMethod",
           extraData: "",
@@ -231,8 +286,8 @@ const CartPage = () => {
       user: userId ?? "",
       status:
         values.paymentMethod == "COD" ? "Pending" : "Waiting for payment!",
-      discount: 20,
-      total_price: totalAmount,
+      discount: discountAmount,
+      total_price: finalPrice,
       method: values.paymentMethod,
       address: address?._id,
     };
@@ -350,21 +405,44 @@ const CartPage = () => {
         ))}
         <div className="flex justify-between font-semibold mt-4">
           <span>Total Amount:</span>
-          <span>{formatCurrency(totalAmount)}</span>
+          <span>{formatCurrency(finalPrice)}</span>
         </div>
-        {/* DISCOUNT */}
-        {/* <div className="mt-2">
+        {/* Phần discount */}
+        <div className="mt-2">
           <label className="block">Choose Discount:</label>
           <select
-            // value={discountCode}
-            // onChange={(e) => setDiscountCode(e.target.value)}
+            value={selectedDiscountCode}
+            onChange={(e) => {
+              setSelectedDiscountCode(e.target.value);
+              handleApplyDiscount(e.target.value);
+            }}
             className="border p-2 w-full"
           >
             <option value="">Select Discount</option>
-            <option value="10%">10% Discount</option>
-            <option value="20%">20% Discount</option>
+            {discounts.map((discount) => (
+              <option key={discount._id} value={discount.code}>
+                {discount.code} ({discount.value}% off)
+              </option>
+            ))}
           </select>
-        </div> */}
+        </div>
+
+        {/* Phần hiển thị tổng tiền */}
+        <div className="flex justify-between font-semibold mt-4">
+          <span>Subtotal:</span>
+          <span>{formatCurrency(subtotal)}</span>
+        </div>
+
+
+        <div className="flex justify-between text-red-500 mt-2">
+          <span>Discount:</span>
+          <span>-{formatCurrency(discountAmount)}</span>
+        </div>
+
+        <div className="flex justify-between font-semibold mt-2 border-t pt-2">
+          <span>Total Amount:</span>
+          <span>{formatCurrency(finalPrice)}</span>
+        </div>
       </div>
 
       {/* Form nhập thông tin đặt hàng */}
@@ -373,7 +451,7 @@ const CartPage = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({}) => (
+        {({ }) => (
           <Form className="md:w-1/3 p-4 text-gray-700">
             <h2 className="text-lg font-semibold mb-4">Information</h2>
             <div>
@@ -445,7 +523,7 @@ const CartPage = () => {
               // onClick={handleSubmit}
               type="submit"
               className="bg-yellow-500 text-white py-2 px-4 rounded w-full"
-              // disabled={!isValid || !Object.keys(touched).length}
+            // disabled={!isValid || !Object.keys(touched).length}
             >
               Place Order
             </button>
@@ -454,13 +532,13 @@ const CartPage = () => {
             <div className="fixed bottom-0 left-0 right-0 bg-white p-4 h-20 shadow-lg flex flex-row gap-2 md:flex justify-end">
               <div className="flex flex-row gap-2 text-lg font-medium items-center">
                 <div className="truncate">Total Amount:</div>
-                <div>{formatCurrency(totalAmount)}</div>
+                <div>{formatCurrency(finalPrice)}</div>
               </div>
               <button
                 // onClick={handleSubmit}
                 type="submit"
                 className="bg-yellow-500 text-lg font-medium text-white py-2 px-4 rounded w-[400px] h-full"
-                // disabled={!isValid || !Object.keys(touched).length}
+              // disabled={!isValid || !Object.keys(touched).length}
               >
                 Place Order
               </button>
