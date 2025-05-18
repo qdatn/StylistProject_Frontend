@@ -25,6 +25,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isUserOnline, setIsUserOnline] = useState(false);
 
+  const currentUserId = currentUser?.user._id;
+  const userId = user?.user._id;
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -34,9 +37,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     if (!socket || !currentUser) return;
 
     // Khi người dùng đăng nhập, gửi trạng thái "online"
-    socket.emit("user_status", currentUser._id, "online");
+    socket.emit("user_status", currentUserId, "online");
     // Lưu trạng thái online vào localStorage
-    localStorage.setItem(`user_${currentUser._id}_status`, "online");
+    localStorage.setItem(`user_${currentUserId}_status`, "online");
 
     const handleMessage = (newMessage: MessageChat) => {
       setMessages((prev) => [...prev, newMessage]);
@@ -48,7 +51,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     const handleUserStatusChange = (userId: string, status: string) => {
       if (userId === user?._id) {
         setIsUserOnline(status === "online");
-        localStorage.setItem(`user_${user._id}_status`, status);
+        localStorage.setItem(`user_${userId}_status`, status);
       }
     };
 
@@ -56,9 +59,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
     return () => {
       socket.off("receive_message", handleMessage);
-      socket.emit("user_status", currentUser._id, "offline");
+      socket.emit("user_status", currentUserId, "offline");
       socket.off("user_status", handleUserStatusChange);
-      localStorage.setItem(`user_${currentUser._id}_status`, "offline");
+      localStorage.setItem(`user_${currentUserId}_status`, "offline");
     };
   }, [socketRef, currentUser]);
 
@@ -88,8 +91,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     if (!message.trim() || !currentUser || !user) return;
 
     const newMessage: MessageChat = {
-      sender: currentUser._id,
-      receiver: user._id,
+      sender: currentUserId as string,
+      receiver: userId as string,
       content: message,
     };
 
@@ -146,7 +149,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
             <div
               key={idx}
               className={`text-sm p-2 rounded-md max-w-[70%] break-words ${
-                msg.sender === currentUser?._id
+                msg.sender === currentUser?.user._id
                   ? "bg-blue-100 ml-auto self-end"
                   : "bg-white self-start"
               }`}

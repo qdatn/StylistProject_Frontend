@@ -42,7 +42,7 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectUser }) => {
       <div className="space-y-2">
         {users.map((user) => (
           <div
-            key={user._id}
+            key={user.user._id}
             onClick={() => onSelectUser(user)}
             className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded cursor-pointer"
           >
