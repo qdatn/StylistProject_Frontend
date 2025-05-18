@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { UserAccount } from "@src/types/UserAccount";
 import { useSocket } from "@api/useSocket";
-import { MessageChat } from "@src/types/Chat";
+import { MessageChat, ProductRecommend } from "@src/types/Chat";
 import axiosClient from "@api/axiosClient";
+import formatGeminiResponse from "@utils/formatGeminiResponse";
+import { useNavigate } from "react-router-dom";
 
 interface ChatBoxProps {
   user: UserAccount;
   currentUser: UserAccount;
 }
+
+const BOT_ID = "bot";
 
 const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   const [message, setMessage] = useState("");
@@ -19,6 +23,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   const [isUserOnline, setIsUserOnline] = useState(false);
   const api = import.meta.env.VITE_API_URL;
 
+  const currentUserId = currentUser.user._id;
+  const userId = user.user._id;
+
+  const navigate = useNavigate();
   // const handleSend = () => {
   //   if (!message.trim()) return;
   //   setMessages((prev) => [...prev, message]);
@@ -28,17 +36,42 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   // fetch để lấy tất cả tin nhắn giữa hai người dùng
   const fetchMessages = async () => {
     try {
-      const response = await axiosClient.getMany<MessageChat>(
+      // Lần 1: Lấy tin nhắn giữa currentUserId và admin
+      const response1 = await axiosClient.getMany<MessageChat>(
         `${api}/api/chat/messages`,
         {
-          user1Id: currentUser._id,
-          user2Id: user._id,
+          user1Id: currentUserId,
+          user2Id: userId,
         }
       );
 
-      console.log("Fetched messages:", response);
-      if (Array.isArray(response)) {
-        setMessages(response);
+      // Lần 2: Lấy tin nhắn giữa currentUserId và BOT
+      const response2 = await axiosClient.getMany<MessageChat>(
+        `${api}/api/chat/messages`,
+        {
+          user1Id: currentUserId,
+          user2Id: BOT_ID,
+        }
+      );
+
+      console.log("Fetched messages with user:", response1);
+      console.log("Fetched messages with bot:", response2);
+
+      // Gộp và sắp xếp tin nhắn nếu muốn
+      const allMessages = [
+        ...(Array.isArray(response1) ? response1 : []),
+        ...(Array.isArray(response2) ? response2 : []),
+      ];
+
+      // Sắp xếp tin nhắn theo thời gian gửi
+      allMessages.sort(
+        (a: MessageChat, b: MessageChat) =>
+          new Date(a.createdAt ?? "").getTime() -
+          new Date(b.createdAt ?? "").getTime()
+      );
+
+      if (Array.isArray(allMessages)) {
+        setMessages(allMessages);
       } else {
         setMessages([]); // Nếu không phải mảng, set lại thành mảng rỗng
       }
@@ -52,8 +85,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
     if (!message.trim() || !socketRef.current) return;
 
     const msgData: MessageChat = {
-      sender: currentUser._id,
-      receiver: user._id,
+      sender: currentUserId,
+      receiver: userId,
       content: message,
     };
 
@@ -72,14 +105,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
     if (!socket) return;
 
     // Khi người dùng đăng nhập, gửi trạng thái "online"
-    socket.emit("user_status", currentUser._id, "online");
+    socket.emit("user_status", currentUserId, "online");
     // Lưu trạng thái online vào localStorage
-    localStorage.setItem(`user_${currentUser._id}_status`, "online");
+    localStorage.setItem(`user_${currentUserId}_status`, "online");
 
     const handleReceiveMessage = (data: MessageChat) => {
       if (
-        (data.sender === user._id && data.receiver === currentUser._id) ||
-        (data.sender === currentUser._id && data.receiver === user._id)
+        (data.sender === userId && data.receiver === currentUserId) ||
+        (data.sender === currentUserId && data.receiver === userId)
       ) {
         setMessages((prev) => [...prev, data]);
       }
@@ -89,9 +122,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
 
     // Theo dõi trạng thái người dùng online/offline
     const handleUserStatusChange = (userId: string, status: string) => {
-      if (userId === user._id) {
+      if (userId === userId) {
         setIsUserOnline(status === "online");
-        localStorage.setItem(`user_${user._id}_status`, status);
+        localStorage.setItem(`user_${userId}_status`, status);
       }
     };
 
@@ -99,27 +132,85 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
 
     return () => {
       socket.off("receive_message", handleReceiveMessage);
-      socket.emit("user_status", currentUser._id, "offline");
+      socket.emit("user_status", currentUserId, "offline");
       socket.off("user_status", handleUserStatusChange);
-      localStorage.setItem(`user_${currentUser._id}_status`, "offline");
+      localStorage.setItem(`user_${currentUserId}_status`, "offline");
     };
-  }, [socketRef.current, user._id, currentUser._id]);
+  }, [socketRef.current, userId, currentUserId]);
 
   useEffect(() => {
-    const userStatus = localStorage.getItem(`user_${user._id}_status`);
+    const userStatus = localStorage.getItem(`user_${userId}_status`);
     if (userStatus === "online") {
       setIsUserOnline(true);
     } else {
       setIsUserOnline(false);
     }
-  }, [user._id]);
+  }, [userId]);
 
   // Fetch tin nhắn khi component mở
   useEffect(() => {
     if (user && currentUser) {
       fetchMessages();
     }
-  }, [user._id, currentUser._id]);
+  }, [userId, currentUserId]);
+
+  const handleSuggestedPrompt = async (prompt: string) => {
+    if (!currentUser?.body_shape || currentUser.body_shape === "No Provided") {
+      navigate("/body-shape");
+      return;
+    } else {
+      try {
+        // Gửi prompt như một tin nhắn từ currentUser đến bot
+        const userMessage: MessageChat = {
+          sender: currentUserId,
+          receiver: BOT_ID,
+          content: prompt,
+        };
+
+        // Gửi tin nhắn lên socket
+        socketRef.current?.emit("send_message", userMessage);
+
+        // // Lưu tin nhắn vào DB (giả định API là POST /api/chat/messages)
+        // await axiosClient.post(`${api}/api/chat/messages`, userMessage);
+
+        // Thêm vào UI
+        setMessages((prev) => [...prev, userMessage]);
+
+        // Gọi API gợi ý sản phẩm (response là 1 chuỗi hoặc object chứa content)
+        const response = await axiosClient.getOne<{ content: string }>(
+          `${api}/api/chat/recommend/${currentUserId}`
+        );
+
+        // Nếu response.content là chuỗi JSON, parse ra:
+        let products: ProductRecommend[] = [];
+
+        try {
+          // const parsed = JSON.parse(response.content);
+          if (Array.isArray(response.content)) {
+            products = response.content;
+          }
+        } catch (e) {
+          console.error("Failed to parse product recommendations:", e);
+        }
+
+        const botMessage: MessageChat = {
+          sender: BOT_ID,
+          receiver: currentUserId,
+          content: "__RECOMMEND__", // để đánh dấu đây là message đặc biệt
+          recommendProducts: products,
+        };
+
+        // Thêm tin nhắn bot vào UI
+        setMessages((prev) => [...prev, botMessage]);
+
+        //  // Gửi tin nhắn lên socket của bot lưu vào DB
+        socketRef.current?.emit("send_message", botMessage);
+        // await axiosClient.post(`${api}/api/chat/messages`, botMessage);
+      } catch (err) {
+        console.error("Error sending suggested prompt:", err);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-lg overflow-hidden border">
@@ -146,18 +237,56 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
             <div
               key={idx}
               className={`text-sm p-2 rounded-md max-w-[70%] break-words ${
-                msg.sender === currentUser._id
+                msg.sender === currentUserId
                   ? "bg-blue-100 ml-auto self-end"
                   : "bg-white self-start"
               }`}
             >
-              {msg.content}
+              {/* Kiểm tra nếu là dạng gợi ý sản phẩm */}
+              {msg.content === "__RECOMMEND__" && msg.recommendProducts ? (
+                <div className="space-y-2">
+                  {msg.recommendProducts.map((product) => (
+                    <div
+                      key={product.productId}
+                      className="p-3 border border-gray-300 rounded-md shadow-sm hover:shadow-md transition bg-slate-50"
+                    >
+                      <a
+                        href={product.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <h3 className="font-semibold text-blue-600 hover:underline">
+                          {product.name}
+                        </h3>
+                        {/* <p className="text-gray-700 text-sm">
+                          {product.description}
+                        </p> */}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>{msg.content}</p>
+              )}
             </div>
           ))
         ) : (
           <p className="text-center text-gray-500">No messages to display.</p>
         )}
         <div ref={messagesEndRef} />
+      </div>
+      {/* Suggested Prompts */}
+      <div className="p-3 border-t bg-white flex flex-wrap gap-2">
+        {["Which cloth suitable with my bodyshape?"].map((prompt, index) => (
+          <button
+            key={index}
+            onClick={() => handleSuggestedPrompt(prompt)}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-xs"
+          >
+            {prompt}
+          </button>
+        ))}
       </div>
 
       {/* Input */}

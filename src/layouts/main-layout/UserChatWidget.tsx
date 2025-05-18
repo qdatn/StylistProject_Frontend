@@ -36,6 +36,7 @@ const UserChatWidget: React.FC = () => {
   const currentUserId: string = useSelector(
     (state: RootState) => state.persist.auth.user?.user._id as string
   );
+  console.log("Current User ID:", currentUserId);
 
   useEffect(() => {
     const loadCurrentUser = async () => {

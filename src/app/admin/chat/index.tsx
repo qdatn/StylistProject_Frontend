@@ -52,8 +52,8 @@ const ChatPage = () => {
           const response = await axiosClient.getMany<MessageChat>(
             `${api}/api/chat/messages`,
             {
-              user1Id: currentUser?._id,
-              user2Id: selectedUser?._id,
+              user1Id: currentUserId,
+              user2Id: selectedUser?.user._id,
             }
           );
 
