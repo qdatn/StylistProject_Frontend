@@ -68,8 +68,8 @@ export default function BodyShapePage() {
 
   const handleAnalyze = async (file: File) => {
     setIsAnalyzing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsAnalyzing(false);
+    // await new Promise(resolve => setTimeout(resolve, 2000));
+    // setIsAnalyzing(false);
   };
 
   return (
@@ -95,7 +95,7 @@ export default function BodyShapePage() {
 
       <ImageUploader
         onUpload={handleAnalyze}
-        isLoading={isAnalyzing}
+        // isLoading={isAnalyzing}
       />
 
       <div className="space-y-20 pb-20">
