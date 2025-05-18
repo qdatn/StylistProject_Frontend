@@ -3,7 +3,6 @@ import { UserAccount } from "@src/types/UserAccount";
 import { useSocket } from "@api/useSocket";
 import { MessageChat, ProductRecommend } from "@src/types/Chat";
 import axiosClient from "@api/axiosClient";
-import formatGeminiResponse from "@utils/formatGeminiResponse";
 import { useNavigate } from "react-router-dom";
 
 interface ChatBoxProps {
