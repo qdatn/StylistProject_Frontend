@@ -66,13 +66,13 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
         if (!notice.user?.length) newErrors.id = 'Notification email is required.';
         if (!notice.title) newErrors.title = 'Notification title is required.';
         if (!notice.type) newErrors.type = 'Notification type is required.';
+        if (!notice.content) newErrors.content = 'Notification content is required.';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSave = () => {
         if (validate()) {
-            console.log('Saving notice:', notice);
             onSave(notice)
         }
     };

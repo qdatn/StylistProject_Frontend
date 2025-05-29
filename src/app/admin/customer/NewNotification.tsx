@@ -4,27 +4,32 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Notification } from "@src/types/Notification";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const NewNotification: React.FC = () => {
- // const [categories, setNotifications] = useState<Notification[]>(mockNotifications);
+  //const [notice, setNotifications] = useState<Notification[]>();
   const navigate = useNavigate();
   const addNotificationToDB = async (notice: Notification) => {
     try {
       const addNotification = axiosClient.post<Notification>(
-        `${baseUrl}/api/notice`,
-       notice
+        `${baseUrl}/api/notification`,
+        notice
       );
     } catch (error) {
       alert(error);
     }
   };
   const handleAddNotification = (newNotification: Partial<Notification>) => {
-    const categoryToAdd: Notification = { ...newNotification, id: newNotification._id } as Notification;
-    //setNotifications((prevNotification) => [...prevNotification, categoryToAdd]);
-    addNotificationToDB(categoryToAdd);
-    alert('Add successfully');
+    const notificationToAdd: Notification = { ...newNotification, id: newNotification._id } as Notification;
+    addNotificationToDB(notificationToAdd);
+    notification.success({
+      message: "Discount added successfully!",
+      description: "",
+      placement: "topRight",
+      duration: 2,
+    });
     navigate("/admin/notification/list"); // Chuyển hướng về danh sách sản phẩm
   };
   const handelCancel = () => {
@@ -34,13 +39,13 @@ const NewNotification: React.FC = () => {
   return (
     <div>
       {/* <div className="font-semibold text-xl p-6">New Product</div> */}
-      
+
       {/* Notification Form */}
       <div className="w-full">
         <NotificationForm
-        onSave={handleAddNotification}
-        onCancel={handelCancel} 
-        type="add"
+          onSave={handleAddNotification}
+          onCancel={handelCancel}
+          type="add"
         />
       </div>
     </div>
