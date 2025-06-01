@@ -19,3 +19,6 @@ export interface NotificationList {
   data: Notification[];
   pagination: PaginationType;
 }
+export interface NotificationCustomerList {
+  data: Notification[];
+}
