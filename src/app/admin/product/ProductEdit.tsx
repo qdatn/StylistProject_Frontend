@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ProductForm from "@components/product/ProductForm";
 import mockProducts, { Product } from "@src/types/Product";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -63,7 +64,12 @@ const EditProduct: React.FC = () => {
 
       // Thông báo thành công
       console.log("Updated Product:", updatedProductWithId);
-      alert("Product updated successfully!");
+      notification.success({
+        message: "Product updated successfully!",
+        description: "",
+        placement: "topRight",
+        duration: 2,
+      });
       navigate("/admin/product/list"); // Chuyển hướng về danh sách sản phẩm
     }
   };

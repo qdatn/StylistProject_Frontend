@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import mockProducts, { Product } from "@src/types/Product";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -29,7 +30,12 @@ const NewProduct: React.FC = () => {
     } as Product;
     setProducts((prevProducts) => [...prevProducts, productToAdd]);
     addProductToDB(productToAdd);
-    alert("Add successfully");
+    notification.success({
+      message: "Product added successfully!",
+      description: "",
+      placement: "topRight",
+      duration: 2,
+    });
     navigate("/admin/product/list"); // Chuyển hướng về danh sách sản phẩm
   };
   const handelCancel = () => {
@@ -41,7 +47,7 @@ const NewProduct: React.FC = () => {
       {/* <div className="font-semibold text-xl p-6">New Product</div> */}
       {/* Product Form */}
       <div className="w-full">
-        <ProductForm onSave={handleAddProduct} onCancel={handelCancel} type="add"/>
+        <ProductForm onSave={handleAddProduct} onCancel={handelCancel} type="add" />
       </div>
     </div>
   );

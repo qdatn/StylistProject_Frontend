@@ -47,12 +47,12 @@ const EditCustomer: React.FC = () => {
       });
 
       // Chuyển hướng về trang danh sách danh mục
-      navigate("/admin/customer");
+      navigate("/admin/customer/list");
     }
   };
 
   const handleCancel = () => {
-    navigate("/admin/customer"); // Quay lại danh sách danh mục
+    navigate("/admin/customer/list"); // Quay lại danh sách danh mục
   };
 
   return (

@@ -10,7 +10,7 @@ interface CustomerFormProps {
     type: string;
 }
 
-const CustomerForm: React.FC<CustomerFormProps> = ({ initialCustomer = {}, onSave, onCancel, type }) => {
+const CustomerForm: React.FC<CustomerFormProps> = ({ initialCustomer = {}, onSave, onCancel }) => {
     const [customer, setCustomer] = useState<Partial<UserAccount>>(initialCustomer);
     const [errors, setErrors] = useState<Record<string, string>>({});
 

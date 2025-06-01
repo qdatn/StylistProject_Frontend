@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import mockProducts, { Product } from "@src/types/Product";
 import ProductStorageForm from "@components/ProductStorageForm";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 const EditProductStorage: React.FC = () => {
@@ -56,7 +57,12 @@ const EditProductStorage: React.FC = () => {
 
       // Thông báo thành công
       console.log("Updated Product:", updatedProductWithId);
-      alert("Product updated successfully!");
+      notification.success({
+        message: "Product updated successfully!",
+        description: "",
+        placement: "topRight",
+        duration: 2,
+      });
       navigate("/admin/storage"); // Chuyển hướng về danh sách sản phẩm
     };
   }
