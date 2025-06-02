@@ -89,14 +89,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
           onSelectedCategoriesChange={setSelectedCategories}
           selectedCategories={selectedCategories}
         />
-        <div>
-          <label className="block font-medium">Status</label>
+        <div className='flex items-center space-x-4'>
+          <label className="block font-medium">Status: </label>
           <Checkbox
             checked={product.status}
             onChange={(e) =>
               setProduct({ ...product, status: e.target.checked })
             }
-            className={`mt-1 font-medium text-base ${errors.status ? "text-red-500" : ""}`}
+            className={`font-medium text-lg ${errors.status ? "text-red-500" : ""}`}
           >
             Active
           </Checkbox>

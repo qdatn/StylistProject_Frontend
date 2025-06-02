@@ -42,7 +42,7 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
                 <div>
                     <label className="block font-medium">Product ID</label>
                     <input
@@ -74,9 +74,8 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
 
             </div>
 
-            <div className="mt-6 flex flex-row gap-6">
-                <div className='w-1/2 justify-center'>
-
+            <div className="mt-6 flex flex-row">
+                <div className='w-1/2 justify-center space-y-4'>
                     <div>
                         <label className="block font-medium">Stock Quantity</label>
                         <input
@@ -119,14 +118,14 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
                     </div>
                 </div>
             </div>
-            <div>
+            <div className='flex items-center space-x-4 mt-4'>
                 <label className="block font-medium">Status</label>
                 <Checkbox
                     checked={product.status}
                     onChange={(e) =>
                         setProduct({ ...product, status: e.target.checked })
                     }
-                    className={`mt-1 ${errors.status ? "text-red-500" : ""}`}
+                    className={`text-lg font-medium ${errors.status ? "text-red-500" : ""}`}
                 >
                     Active
                 </Checkbox>

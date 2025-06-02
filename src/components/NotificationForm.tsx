@@ -80,7 +80,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
             {/* Title */}
-            <div className='mb-6'>
+            <div className='mb-4'>
                 <label className="block font-medium mb-2">Notification Title</label>
                 <Input
                     name="title"
@@ -90,7 +90,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                 />
                 {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {/* User Select */}
                 <div>

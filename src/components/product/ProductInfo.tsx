@@ -313,7 +313,7 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
         <div className=" justify-center mt-4 ">
           <label className=" block font-medium">Decription</label>
           <textarea
-            className="w-full mt-1 p-3 border rounded"
+            className="w-full h-32 mt-1 p-3 border rounded"
             name="description"
             value={product.description || ""}
             onChange={handleChange} // Thêm sự kiện onChange
@@ -325,8 +325,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-row ">
-        <div className="w-1/2 justify-center pr-6">
+      <div className="mt-4 flex flex-row ">
+        <div className="w-1/2 justify-center pr-6 space-y-4">
           <div>
             <label className="block font-medium">Stock Quantity</label>
             <Input

@@ -230,7 +230,7 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
         </div>
 
         {(discount.type === "product" || discount.type === "category") && (
-          <div className="pb-5">
+          <div>
             <label className="block font-medium">
               {discount.type === "product" ? "Products" : "Categories"}
             </label>
@@ -324,20 +324,21 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           />
           {errors.endDate && <p className="text-red-500 text-sm">{errors.endDate}</p>}
         </div>
-        <div>
-          <label className="block font-medium">Status</label>
+        <div className='flex items-center space-x-4'>
+          <label className="block font-medium">Status: </label>
           <Checkbox
             checked={discount.status}
             onChange={(e) => setDiscount({ ...discount, status: e.target.checked })}
-            className={`mt-1 ${errors.status ? 'text-red-500' : ''}`}
+            className={`text-lg font-medium  ${errors.status ? "text-red-500" : ""}`}
           >
             Active
           </Checkbox>
+
           {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
         </div>
       </div>
 
-      <div className="mt-6 flex gap-2 justify-end">
+      <div className="mt-4 flex gap-2 justify-end">
         <Button
           className="text-[16px] p-4 w-32 mt-6"
           type="primary"
