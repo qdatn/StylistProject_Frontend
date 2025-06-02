@@ -24,7 +24,7 @@ const productColumns: ColumnsType<Product> = [
     title: "Image",
     dataIndex: "images",
     render: (images: string) => (
-      <img src={images[0]} alt="product" style={{ width: 50, height: 50 }} />
+      <img src={images?.[0]} alt="product" style={{ width: 50, height: 50 }} />
     ),
   },
   {
@@ -41,11 +41,6 @@ const productColumns: ColumnsType<Product> = [
     render: formatCurrency,
   },
   {
-    title: "Discounted Price",
-    dataIndex: "discounted_price",
-    render: formatCurrency,
-  },
-  {
     title: "Date Created",
     dataIndex: "createdAt",
     render: formatDate,
@@ -55,7 +50,7 @@ const productColumns: ColumnsType<Product> = [
     dataIndex: "status",
     render: (status: boolean) => (
       <Tag color={status ? "green" : "volcano"}>
-        {status ? "Available" : "Out of stock"}
+        {status ? "Available" : "Unavailable"}
       </Tag>
     ),
     filters: [

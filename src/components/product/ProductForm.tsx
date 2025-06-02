@@ -77,7 +77,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       ...product,
       categories: selectedCategories,
     };
-    onSave(productToSave); // Gọi hàm lưu
+    onSave(productToSave);
   };
 
   return (
@@ -96,12 +96,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={(e) =>
               setProduct({ ...product, status: e.target.checked })
             }
-            className={`mt-1 ${errors.status ? "text-red-500" : ""}`}
+            className={`mt-1 font-medium text-base ${errors.status ? "text-red-500" : ""}`}
           >
             Active
           </Checkbox>
           {errors.status && (
-            <p className="text-red-500 text-sm">{errors.status}</p>
+            <p className="font-medium text-red-500">{errors.status}</p>
           )}
         </div>
         <div className="flex flex-row gap-2 justify-end">
