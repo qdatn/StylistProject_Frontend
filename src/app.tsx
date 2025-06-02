@@ -42,7 +42,7 @@ import BodyShapePage from "@app/customer/body_shape";
 import NotificationManagement from "@app/admin/customer/NotificationList";
 import EditNotification from "@app/admin/customer/NotificationEdit";
 import NewNotification from "@app/admin/customer/NewNotification";
-import FashionServeyPage from "@app/customer/servey";
+import FashionSurveyPage from "@app/customer/survey";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -74,7 +74,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/body-shape" element={<BodyShapePage />} />
-            <Route path="/servey" element={<FashionServeyPage />} />
+            <Route path="/survey" element={<FashionSurveyPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 

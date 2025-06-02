@@ -368,10 +368,10 @@ export default function CustomerHeader() {
             </li>
             <li>
               <Link
-                to="#"
+                to="/survey"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
-                BRANDS
+                PERSONAL STYLE
               </Link>
             </li>
             <li>

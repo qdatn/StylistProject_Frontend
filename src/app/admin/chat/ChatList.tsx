@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { CustomerList, UserAccount } from "@src/types/UserAccount";
-import { mockUserAccounts } from "@src/types/UserAccount";
 import axiosClient from "@api/axiosClient";
 
 interface ChatListProps {
