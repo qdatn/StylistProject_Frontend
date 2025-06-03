@@ -64,7 +64,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 </div>
 
                 {/* Tổng tiền */}
-                <div className="order-total flex justify-end pt-4 border-t">
+                <div className="order-total flex justify-end pt-4">
                     <div className="text-right">
                         {order.discount && order.discount > 0 && (
                             <p className="mb-1">
