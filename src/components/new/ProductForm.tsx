@@ -8,7 +8,7 @@ import ProductAttribute from './ProductAttribute';
 
 interface ProductFormProps {
     initialProduct?: Partial<Product>;
-    onSave: (product: Partial<Product>) => void;
+    onSave: (product: Partial<Product>, filesToUpload: File[], imagesToDelete: string[]) => void;
     onCancel: () => void;
     type: string;
 }
@@ -23,6 +23,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const [categories, setCategories] = useState<Category[]>([]);
     const [attributes, setAttributes] = useState<Attribute[]>([]);
     const [activeStep, setActiveStep] = useState(0);
+    const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+    const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
 
     const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -50,8 +52,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
         setProduct(prev => ({ ...prev, variants }));
     };
 
+    const handleImagesToDeleteChange = (images: string[]) => {
+        setImagesToDelete(images);
+    };
+
     const handleSubmit = () => {
-        onSave(product);
+        onSave(product, filesToUpload, imagesToDelete);
     };
 
     const steps = [
@@ -62,6 +68,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     product={product}
                     categories={categories}
                     onChange={handleProductInfoChange}
+                    onFilesChange={setFilesToUpload}
+                    onImagesToDeleteChange={handleImagesToDeleteChange}
                 />
             )
         },

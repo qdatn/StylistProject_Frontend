@@ -5,6 +5,7 @@ import ProductForm from "@components/new/ProductForm";
 import { Product } from "@src/types/new/Product";
 import axiosClient from "@api/axiosClient";
 import { notification } from "antd";
+import axios from "axios";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -17,19 +18,68 @@ const EditProduct: React.FC = () => {
 
   const [product, setProduct] = useState<Product | null>(productFromState);
 
-  const updateProductInDB = async (updatedProduct: Product) => {
-    try {
-      const updateProduct = await axiosClient.put<Product>(
-        `${baseUrl}/api/product/${id}`,
-        updatedProduct
+  const updateProductInDB = async (
+    updatedProduct: Product,
+    filesToUpload: File[],
+    imagesToDelete: string[]
+  ) => {
+    // try {
+    //   const updateProduct = await axiosClient.put<Product>(
+    //     `${baseUrl}/api/product/${id}`,
+    //     updatedProduct
+    //   );
+    // } catch (error) {
+    //   console.log(error);
+    //   alert(error);
+    // }
+    // Step 0: Xóa ảnh cũ nếu có
+    if (imagesToDelete.length > 0) {
+      await Promise.all(
+        imagesToDelete.map(async (imageUrl) => {
+          await axiosClient.post(`${baseUrl}/api/product/delete-img/${id}`, {
+            imageUrl,
+          });
+        })
       );
-    } catch (error) {
-      console.log(error);
-      alert(error);
     }
+    // Step 1: Upload new images if any
+    let uploadedImageUrls: string[] = [];
+    if (filesToUpload.length > 0) {
+      const formData = new FormData();
+      filesToUpload.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const uploadResponse = await axios.post<{ imageUrls: string[] }>(
+        `${baseUrl}/api/product/upload/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      uploadedImageUrls = uploadResponse.data.imageUrls;
+    }
+
+    // Step 2: Update product with new image URLs
+    const updatedImages = [
+      ...(updatedProduct.images || []),
+      ...uploadedImageUrls,
+    ];
+
+    await axiosClient.put<Product>(`${baseUrl}/api/product/${id}`, {
+      ...updatedProduct,
+      images: updatedImages,
+    });
   };
 
-  const handleUpdateProduct = (updatedProduct: Partial<Product>) => {
+  const handleUpdateProduct = async (
+    updatedProduct: Partial<Product>,
+    filesToUpload: File[],
+    imagesToDelete: string[] 
+  ) => {
     if (product) {
       // Đảm bảo rằng _id luôn có giá trị và không bị mất khi cập nhật
       const updatedProductWithId: Product = {
@@ -47,7 +97,8 @@ const EditProduct: React.FC = () => {
       // Cập nhật lại danh mục trong state
       setProduct(updatedProductWithId);
 
-      updateProductInDB(updatedProductWithId);
+      // updateProductInDB(updatedProductWithId);
+      await updateProductInDB(updatedProductWithId, filesToUpload, imagesToDelete);
 
       // Thông báo thành công
       console.log("Updated Product:", updatedProductWithId);
