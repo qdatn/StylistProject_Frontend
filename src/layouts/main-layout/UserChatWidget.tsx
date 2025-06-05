@@ -5,6 +5,7 @@ import { UserAccount } from "@src/types/UserAccount";
 import axiosClient from "@api/axiosClient";
 import { AppDispatch, RootState } from "@redux/store";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 // Dữ liệu mock cho admin (người nhận tin nhắn)
 // const adminAccount: UserAccount = mockUserAccounts.find(
@@ -33,6 +34,8 @@ const UserChatWidget: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
 
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
   const currentUserId: string = useSelector(
     (state: RootState) => state.persist.auth.user?.user._id as string
   );
@@ -52,6 +55,12 @@ const UserChatWidget: React.FC = () => {
 
     loadCurrentUser();
   }, [currentUserId]);
+
+  useEffect(() => {
+    if (isOpen && !currentUserId) {
+      navigate("/login");
+    }
+  }, [isOpen]);
 
   return (
     <>
