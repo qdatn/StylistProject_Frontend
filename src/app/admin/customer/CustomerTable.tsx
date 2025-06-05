@@ -53,7 +53,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
 
     const handleRowClick = (record: UserAccount) => {
         // Điều hướng đến trang chi tiết hoặc chỉnh sửa đơn hàng
-        navigate(`/admin/customer/edit/${record._id}`, {
+        navigate(`/admin/customer/list/edit/${record._id}`, {
             state: { customer: record },
         });
     };

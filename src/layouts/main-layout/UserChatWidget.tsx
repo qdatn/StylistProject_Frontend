@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import ChatBox from "@layouts/main-layout/ChatBox";
-import { UserAccount, mockUserAccounts } from "@src/types/UserAccount";
+import { UserAccount } from "@src/types/UserAccount";
 import axiosClient from "@api/axiosClient";
 import { AppDispatch, RootState } from "@redux/store";
 import { useDispatch, useSelector } from "react-redux";

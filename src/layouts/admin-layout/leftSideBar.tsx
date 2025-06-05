@@ -68,10 +68,20 @@ const Sidebar: React.FC = () => {
     {
       key: "8",
       icon: <IoPeopleOutline />,
-      label: <Link to="/admin/customer">Customer</Link>,
+      label: "Customer",
+      children: [
+        {
+          key: "9",
+          label: <Link to="/admin/customer/list">Customer</Link>,
+        },
+        {
+          key: "10",
+          label: <Link to="/admin/notification/list">Notification</Link>,
+        },
+      ],
     },
     {
-      key: "9",
+      key: "11",
       icon: <MessageOutlined />,
       label: <Link to="/admin/chat">Message</Link>,
     },

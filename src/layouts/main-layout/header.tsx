@@ -10,7 +10,10 @@ import axiosClient from "@api/axiosClient";
 import { clearUser } from "@redux/reducers/authReducer";
 import { Badge, notification } from "antd";
 import { selectCartCount } from "@redux/reducers/cartReducer";
+import { IoNotificationsOutline } from 'react-icons/io5';
 import { ProductList } from "@src/types/Product";
+import { Notification, NotificationCustomerList } from "@src/types/Notification";
+import NotificationCustomer from "./NotificationCustomer";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 export default function CustomerHeader() {
@@ -20,11 +23,67 @@ export default function CustomerHeader() {
   const cartCount = useSelector(selectCartCount(userId!));
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [archievedCount, setArchievedCount] = useState(0);
+
 
   // State to manage hover visibility
   const [showPopup, setShowPopup] = useState(false);
+  useEffect(() => {
+
+    const fetchUnreadCount = async () => {
+
+      if (!userId) return;
+
+      try {
+        const response = await axiosClient.getOne<NotificationCustomerList>(`${baseUrl}/api/notification/user/${userId}`);
+        setNotifications(response.data);
+
+        // Đếm số thông báo chưa đọc
+        const unread = response.data.filter((noti) => noti.status === "unread").length;
+        setUnreadNotificationCount(unread);
+        console.log('-------------', userId)
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchUnreadCount();
+
+  }, [userId]);
+
+  const markAsArchieved = async () => {
+    try {
+      // Lọc danh sách các thông báo chưa đọc
+      const unreadNotifications = notifications.filter(noti => noti.status === "unread");
+
+      // Gửi request PUT cho từng thông báo để cập nhật thành "archieved"
+      await Promise.all(
+        unreadNotifications.map(noti =>
+          axiosClient.put(`${baseUrl}/api/notification/${noti._id}`, {
+            status: "archieved"
+          })
+        )
+      );
+
+      // Cập nhật danh sách notification ở frontend
+      const updatedList = notifications.map(noti =>
+        noti.status === "unread" ? { ...noti, status: "archieved" } : noti
+      );
+
+      setNotifications(updatedList);
+      setUnreadNotificationCount(0); // Vì tất cả đã được archieved
+    } catch (error) {
+      console.error("Failed to mark notifications as archieved:", error);
+    }
+  };
+  useEffect(() => {
+    const count = notifications.filter(noti => noti.status === "unread").length;
+    setUnreadNotificationCount(count);
+  }, [notifications]);
 
   // Search click
   const handleSearch = async (e: any) => {
@@ -195,7 +254,7 @@ export default function CustomerHeader() {
                 // to={user.auth.isLogin ? "/account" : "/login"}
                 className="flex items-center text-gray-700 hover:bg-gray-50 px- hover:rounded py-2 cursor-pointer"
                 onClick={handleProfileClick}
-                // onMouseLeave={handleMouseLeave}
+              // onMouseLeave={handleMouseLeave}
               >
                 <Badge offset={[10, 0]}>
                   <AiOutlineUser className="text-2xl" />
@@ -224,7 +283,34 @@ export default function CustomerHeader() {
                 </div>
               )}
             </div>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  if (isLogin) {
+                    setNotificationOpen(prev => !prev);
+                  } else {
+                    navigate("/login");
+                  }
+                }}
+                className="flex items-center text-gray-700 hover:bg-gray-50 px-2 hover:rounded py-2"
+              >
+                <Badge count={unreadNotificationCount} offset={[10, 0]}>
+                  <button
+                    onClick={() => markAsArchieved()}
+                  >
+                    <IoNotificationsOutline className="text-2xl"
+                    />
 
+                  </button>
+                </Badge>
+              </button>
+
+              <NotificationCustomer
+                isOpen={notificationOpen}
+                onClose={() => setNotificationOpen(false)}
+                userId={userId!}
+              />
+            </div>
             {/* <!-- Cart Icon --> */}
             {user && (
               <Link
@@ -282,10 +368,10 @@ export default function CustomerHeader() {
             </li>
             <li>
               <Link
-                to="#"
+                to="/survey"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
-                BRANDS
+                PERSONAL STYLE
               </Link>
             </li>
             <li>

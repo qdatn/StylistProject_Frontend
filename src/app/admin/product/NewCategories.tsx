@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Category, mockCategories } from "@src/types/Category";
 import axiosClient from "@api/axiosClient";
+import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -24,7 +25,12 @@ const NewCategory: React.FC = () => {
     const categoryToAdd: Category = { ...newCategory, id: newCategory._id } as Category;
     //setCategories((prevCategory) => [...prevCategory, categoryToAdd]);
     addCategoryToDB(categoryToAdd);
-    alert('Add successfully');
+    notification.success({
+      message: "Category added successfully!",
+      description: "",
+      placement: "topRight",
+      duration: 2,
+    });
     navigate("/admin/product/categories"); // Chuyển hướng về danh sách sản phẩm
   };
   const handelCancel = () => {

@@ -95,7 +95,7 @@ const CartItem: React.FC<CartItemProps> = ({
     <div className="flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
       <Link to={`/product/${product._id}`}>
         <img
-          src={product.images?.[0]} // Sử dụng ảnh đầu tiên trong mảng image
+          src={product.images?.length ? product.images?.[0] : "../src/public/assets/images/default-product-image.png"} // Sử dụng ảnh đầu tiên trong mảng image
           alt={product.product_name}
           className="w-20 h-20 object-cover rounded-lg mr-4"
         />

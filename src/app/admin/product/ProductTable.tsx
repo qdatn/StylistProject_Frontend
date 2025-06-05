@@ -4,7 +4,7 @@ import { message, Tag } from "antd";
 import dayjs from "dayjs";
 import CommonTable from "@components/ui/table";
 import { ColumnsType } from "antd/es/table";
-import { Product, ProductList } from "@src/types/Product";
+import { Product, ProductList, ProductVariant } from "@src/types/new/Product";
 import { PaginationType } from "@src/types/Pagination";
 import { Console } from "console";
 import axiosClient from "@api/axiosClient";
@@ -24,7 +24,7 @@ const productColumns: ColumnsType<Product> = [
     title: "Image",
     dataIndex: "images",
     render: (images: string) => (
-      <img src={images[0]} alt="product" style={{ width: 50, height: 50 }} />
+      <img src={images?.[0]} alt="product" style={{ width: 50, height: 50 }} />
     ),
   },
   {
@@ -33,17 +33,23 @@ const productColumns: ColumnsType<Product> = [
   },
   {
     title: "Quantity",
-    dataIndex: "stock_quantity",
+    dataIndex: "variants",
+    render: (variants: ProductVariant[]) => {
+      const totalStock = variants.reduce((sum, v) => sum + v.stock_quantity, 0);
+      return totalStock;
+    },
   },
   {
     title: "Original Price",
-    dataIndex: "price",
-    render: formatCurrency,
-  },
-  {
-    title: "Discounted Price",
-    dataIndex: "discounted_price",
-    render: formatCurrency,
+    dataIndex: "variants",
+    render: (variants: ProductVariant[]) => {
+      const prices = variants.map(v => v.price);
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      return min === max
+        ? formatCurrency(min)
+        : `${formatCurrency(min)} - ${formatCurrency(max)}`;
+    },
   },
   {
     title: "Date Created",
@@ -55,7 +61,7 @@ const productColumns: ColumnsType<Product> = [
     dataIndex: "status",
     render: (status: boolean) => (
       <Tag color={status ? "green" : "volcano"}>
-        {status ? "Available" : "Out of stock"}
+        {status ? "Available" : "Unavailable"}
       </Tag>
     ),
     filters: [

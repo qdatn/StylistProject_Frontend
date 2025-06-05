@@ -39,6 +39,10 @@ import PaymentSuccessPage from "@app/customer/order/payment";
 import ChatPage from "@app/admin/chat";
 import EditCustomer from "@app/admin/customer/CustomerEdit";
 import BodyShapePage from "@app/customer/body_shape";
+import NotificationManagement from "@app/admin/customer/NotificationList";
+import EditNotification from "@app/admin/customer/NotificationEdit";
+import NewNotification from "@app/admin/customer/NewNotification";
+import FashionSurveyPage from "@app/customer/survey";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -70,6 +74,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/body-shape" element={<BodyShapePage />} />
+            <Route path="/survey" element={<FashionSurveyPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 
@@ -86,8 +91,11 @@ function App() {
             <Route path="/admin/order" element={<OrderManagement />} />
             <Route path="/admin/discount" element={<DiscountManagement />} />
             <Route path="/admin/statistic" element={<DashboardPage />} />
-            <Route path="/admin/customer" element={<CustomerList />} />
-            <Route path="/admin/customer/edit/:id" element={<EditCustomer />} />
+            <Route path="/admin/customer/list" element={<CustomerList />} />
+            <Route path="/admin/customer/list/edit/:id" element={<EditCustomer />} />
+            <Route path="/admin/notification/list" element={<NotificationManagement />} />
+            <Route path="/admin/notification/list/edit/:id" element={<EditNotification />} />
+            <Route path="/admin/notification/list/new" element={<NewNotification />} />
             <Route
               path="/admin/product/list/edit/:id"
               element={<EditProduct />}
