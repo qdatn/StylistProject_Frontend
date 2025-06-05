@@ -18,7 +18,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
       {/* Hình ảnh sản phẩm */}
       <Link to={`/product/${product._id}`}>
         <img
-          src={product.images ? product.images?.[0] : ""} // Sử dụng ảnh đầu tiên trong mảng image
+          src={product.images ? product.images?.[0] : "../src/public/assets/images/body-shape-banner.jpg"} // Sử dụng ảnh đầu tiên trong mảng image
           alt={product.product_name}
           className="w-20 h-24 object-cover mr-4"
         />

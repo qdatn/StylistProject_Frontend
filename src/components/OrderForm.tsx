@@ -90,7 +90,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
     };
 
     return (
-        <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-extrabold text-blue-800">
+                    {type === 'add' ? 'New Order' : 'Update Order'}
+                </h2>
+            </div>
             <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
                 <div>
                     <label className="block font-medium">Order ID</label>

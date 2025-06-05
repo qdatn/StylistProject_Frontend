@@ -16,7 +16,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
   console.log("ODDEDASD", order);
   console.log("ODDEDASD ITEM", orderitems);
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
+    <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-5xl mx-auto">
       {/* Trạng thái đơn hàng */}
       <div className="order-status mb-4 flex justify-end items-center border-b pb-2">
         <span className="text-lg font-semibold text-gray-600">
@@ -32,12 +32,19 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
           ))}
       </div>
 
-      {/* Tổng tiền - căn phải */}
-      <div className="order-total flex justify-end pt-4">
-        <span className="text-lg font-medium mr-2">Thành tiền:</span>
-        <span className="text-lg font-bold text-red-500">
-          {formatCurrency(order.total_price)}
-        </span>
+      {/* Tổng tiền */}
+      <div className="order-total flex justify-end pt-4 border-t">
+        <div className="text-right">
+          {order.discount && order.discount > 0 && (
+            <p className="mb-1">
+              <span className="font-medium">Discount:</span>{" "}
+              -{formatCurrency(order.discount)}
+            </p>
+          )}
+          <p className="text-lg font-bold mt-2">
+            Total: {formatCurrency(order.total_price)}
+          </p>
+        </div>
       </div>
     </div>
   );

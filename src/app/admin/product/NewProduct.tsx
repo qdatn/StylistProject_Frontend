@@ -1,7 +1,7 @@
 // app/admin/product/ProductList.tsx
-import ProductForm from "@components/product/ProductForm";
+import ProductForm from "@components/new/ProductForm";
 import React, { useState } from "react";
-import mockProducts, { Product } from "@src/types/Product";
+import  { Product } from "@src/types/new/Product";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "@api/axiosClient";
 import { notification } from "antd";
@@ -9,7 +9,6 @@ import { notification } from "antd";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const NewProduct: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
   const navigate = useNavigate();
 
   const addProductToDB = async (product: Product) => {
@@ -28,7 +27,6 @@ const NewProduct: React.FC = () => {
       ...newProduct,
       // id: newProduct._id || `prod-${Date.now()}`,
     } as Product;
-    setProducts((prevProducts) => [...prevProducts, productToAdd]);
     addProductToDB(productToAdd);
     notification.success({
       message: "Product added successfully!",

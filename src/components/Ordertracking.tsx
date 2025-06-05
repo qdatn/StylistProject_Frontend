@@ -5,6 +5,7 @@ import { Order, OrderTracking } from "@src/types/Order";
 import OrderReviewForm from "./OrderReview";
 import { OrderItem } from "@src/types/OrderItem";
 import { formatCurrency } from "@utils/format";
+import OrderDetailModal from "./OrderDetailModal";
 
 interface OrdertrackingProps {
   order: Order;
@@ -13,6 +14,7 @@ interface OrdertrackingProps {
 
 const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   console.log("ODDEDASD", order);
   console.log("ODDEDASD ITEM", orderitems);
@@ -51,7 +53,10 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
             Review
           </button>
         )}
-        <button className="bg-gray-800 text-white px-10 py-2 rounded font-semibold">
+        <button
+          className="bg-gray-800 text-white px-10 py-2 rounded font-semibold"
+          onClick={() => setIsDetailModalOpen(true)}
+        >
           Detail
         </button>
       </div>
@@ -65,6 +70,14 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
             onClose={() => setIsReviewFormOpen(false)}
           />
         </div>
+      )}
+      {/* Modal Chi Tiết Đơn Hàng */}
+      {isDetailModalOpen && (
+        <OrderDetailModal
+          order={order}
+          orderitems={orderitems}
+          onClose={() => setIsDetailModalOpen(false)}
+        />
       )}
     </div>
   );
