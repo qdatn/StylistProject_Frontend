@@ -16,7 +16,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
   console.log("ODDEDASD", order);
   console.log("ODDEDASD ITEM", orderitems);
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
+    <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-5xl mx-auto">
       {/* Trạng thái đơn hàng */}
       <div className="order-status mb-4 flex justify-end items-center border-b pb-2">
         <span className="text-lg font-semibold text-gray-600">

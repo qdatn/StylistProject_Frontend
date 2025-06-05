@@ -40,8 +40,12 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
         }
     };
     return (
-        <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
-
+        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-extrabold text-blue-800">
+                    {type === 'add' ? 'New Product' : 'Update Product'}
+                </h2>
+            </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
                 <div>
                     <label className="block font-medium">Product ID</label>

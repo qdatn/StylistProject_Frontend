@@ -1,34 +1,21 @@
 // app/admin/product/EditProduct.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import ProductForm from "@components/product/ProductForm";
-import mockProducts, { Product } from "@src/types/Product";
+import ProductForm from "@components/new/ProductForm";
+import { Product } from "@src/types/new/Product";
 import axiosClient from "@api/axiosClient";
 import { notification } from "antd";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const EditProduct: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Lấy ID sản phẩm từ URL
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Lấy product từ state nếu có, nếu không thì có thể fetch từ server
   const location = useLocation();
   const productFromState = location.state?.product || null;
 
   const [product, setProduct] = useState<Product | null>(productFromState);
-
-  // useEffect(() => {
-  //   // Tìm sản phẩm theo ID trong mockProducts
-  //   console.log(product)
-  //   const existingProduct = mockProducts.find((prod) => prod._id === id);
-  //   if (existingProduct) {
-  //     setProduct(existingProduct);
-  //   } else {
-  //     alert("Không tìm thấy sản phẩm.");
-  //     navigate("/admin/product/list"); // Quay lại danh sách nếu không tìm thấy sản phẩm
-  //   }
-  // }, [id, navigate]);
 
   const updateProductInDB = async (updatedProduct: Product) => {
     try {
@@ -51,11 +38,11 @@ const EditProduct: React.FC = () => {
         _id: product._id, // Đảm bảo rằng _id không bị mất
       };
 
-      // Cập nhật danh mục trong mockCategories (nếu cần)
-      const index = mockProducts.findIndex((cat) => cat._id === product._id);
-      if (index !== -1) {
-        mockProducts[index] = { ...mockProducts[index], ...updatedProduct };
-      }
+      // // Cập nhật danh mục trong mockCategories (nếu cần)
+      // const index = mockProducts.findIndex((cat) => cat._id === product._id);
+      // if (index !== -1) {
+      //   mockProducts[index] = { ...mockProducts[index], ...updatedProduct };
+      // }
 
       // Cập nhật lại danh mục trong state
       setProduct(updatedProductWithId);
@@ -85,7 +72,7 @@ const EditProduct: React.FC = () => {
           initialProduct={product}
           onSave={handleUpdateProduct}
           onCancel={handelCancel}
-          type="edit"
+          type="update"
         />
       ) : (
         <p>Đang tải dữ liệu sản phẩm...</p>

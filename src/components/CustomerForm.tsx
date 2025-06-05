@@ -43,7 +43,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ initialCustomer = {}, onSav
     };
 
     return (
-        <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-extrabold text-blue-800">
+                    Customer Page
+                </h2>
+            </div>
             <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
 
                 <div>
@@ -98,7 +103,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ initialCustomer = {}, onSav
                         {customer.body_shape || ''}
                     </div>
                 </div>
-                <div className='justify-center'>
+                {/* <div className='justify-center'>
                     <label className="block font-medium">Height</label>
                     <div className={`w-full mt-1 p-2 border rounded-md ${errors.height ? 'border-red-500' : ''}`}>
                         {customer.height || 'No Provided'}
@@ -109,7 +114,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ initialCustomer = {}, onSav
                     <div className={`w-full mt-1 p-2 border rounded-md ${errors.weight ? 'border-red-500' : ''}`}>
                         {customer.weight || 'No Provided'}
                     </div>
-                </div>
+                </div> */}
             </div>
 
             <div className='flex flex-row gap-2 justify-end'>
