@@ -334,7 +334,7 @@ const ProductAttribute: React.FC<ProductAttributeProps> = ({
                                         <td className="border p-2">
                                             <input
                                                 type="number"
-                                                value={variant.min_quantity || 1}
+                                                value={variant.min_quantity || 0}
                                                 onChange={(e) =>
                                                     handleVariantChange(index, 'min_quantity', Number(e.target.value))
                                                 }
