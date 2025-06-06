@@ -1,7 +1,7 @@
 import Transition from "@components/Transition";
 import React, { useCallback, useEffect, useState } from "react";
 import ProductItem from "@components/productItem";
-import mockProducts, { ProductList } from "@src/types/Product";
+import { ProductList } from "@src/types/new/Product";
 import { Product } from "@src/types/Product";
 import axiosClient from "@api/axiosClient";
 import { PaginationType } from "@src/types/Pagination";

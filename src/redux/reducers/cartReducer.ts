@@ -1,10 +1,11 @@
 import { RootState } from "@redux/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Product } from "@src/types/Product";
+import { Product, ProductVariant } from "@src/types/new/Product";
 import { OrderAttribute } from "@src/types/Attribute";
 
 export interface CartProduct extends Product {
   quantity: number;
+  price: number;
   cart_attributes: OrderAttribute[];
 }
 
@@ -18,6 +19,21 @@ const initialState: CartState = {
   "": { items: [] },
 };
 
+// Hàm so sánh mảng thuộc tính
+const areAttributesEqual = (
+  a: OrderAttribute[],
+  b: OrderAttribute[]
+): boolean => {
+  if (a.length !== b.length) return false;
+  const aMap = new Map(a.map((attr) => [attr.key, attr.value]));
+  for (const attr of b) {
+    if (aMap.get(attr.key) !== attr.value) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -28,10 +44,12 @@ const cartSlice = createSlice({
         userId: string;
         product: Product;
         quantity: number;
+        price: number;
         cart_attributes?: OrderAttribute[];
       }>
     ) => {
-      const { userId, product, quantity, cart_attributes } = action.payload;
+      const { userId, product, quantity, price, cart_attributes } =
+        action.payload;
 
       // Kiểm tra xem userId đã có trong state chưa
       if (!state[userId]) {
@@ -41,7 +59,7 @@ const cartSlice = createSlice({
       const userCart = state[userId].items;
 
       const existingProduct = state[userId].items.find(
-        (item) => item._id === product._id
+        (item) => item._id === product._id && areAttributesEqual(item.cart_attributes, cart_attributes!)
       );
 
       if (existingProduct) {
@@ -49,21 +67,25 @@ const cartSlice = createSlice({
         existingProduct.quantity += quantity;
       } else {
         // Nếu sản phẩm chưa tồn tại, thêm vào giỏ hàng với số lượng
-        state[userId].items.push({
+        userCart.push({
           ...product,
           quantity,
-          cart_attributes: cart_attributes || [],
+          price,
+          // cart_attributes: cart_attributes || [],
+          cart_attributes: [...cart_attributes!],
         });
       }
     },
     deleteItemFromCart: (
       state,
-      action: PayloadAction<{ userId: string; productId: string }>
+      action: PayloadAction<{ userId: string; productId: string, cart_attributes: OrderAttribute[] }>
     ) => {
       // Lọc bỏ sản phẩm có _id tương ứng với productId
-      const { userId, productId } = action.payload;
+      const { userId, productId, cart_attributes } = action.payload;
       state[userId].items = state[userId].items.filter(
-        (item) => item._id !== productId
+        (item) => !(item._id === productId && 
+          areAttributesEqual(item.cart_attributes, cart_attributes))
+          // item._id !== productId
       );
     },
     updateProductQuantity: (
@@ -72,12 +94,14 @@ const cartSlice = createSlice({
         userId: string;
         productId: string;
         quantity: number;
+        cart_attributes: OrderAttribute[];
       }>
     ) => {
       // Tìm sản phẩm
-      const { userId, productId, quantity } = action.payload;
+      const { userId, productId, quantity, cart_attributes } = action.payload;
       const product = state[userId].items.find(
-        (item) => item._id === productId
+        (item) => item._id === productId && 
+        areAttributesEqual(item.cart_attributes, cart_attributes)
       );
 
       if (product) {
@@ -89,18 +113,20 @@ const cartSlice = createSlice({
       action: PayloadAction<{
         userId: string;
         productId: string;
-        cart_attributes: OrderAttribute[];
+        oldAttributes: OrderAttribute[];
+        newAttributes: OrderAttribute[];
       }>
     ) => {
       // Tìm sản phẩm trong giỏ hàng
-      const { userId, productId, cart_attributes } = action.payload;
+      const { userId, productId, oldAttributes, newAttributes } = action.payload;
       const product = state[userId].items.find(
-        (item) => item._id === productId
+        (item) => item._id === productId && 
+            areAttributesEqual(item.cart_attributes, oldAttributes)
       );
 
       if (product) {
         // Cập nhật thuộc tính của sản phẩm
-        product.cart_attributes = cart_attributes;
+        product.cart_attributes = newAttributes;
       }
     },
   },

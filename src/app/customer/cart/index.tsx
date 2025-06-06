@@ -1,8 +1,12 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import CartItem from "@components/CartItem";
-import { Product } from "@src/types/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
-import { Discount, DiscountAvailable, PriceWithDiscount } from "@src/types/Discount";
+import { Product } from "@src/types/new/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
+import {
+  Discount,
+  DiscountAvailable,
+  PriceWithDiscount,
+} from "@src/types/Discount";
 import axiosClient from "@api/axiosClient";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@redux/store";
@@ -17,6 +21,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Address } from "@src/types/Address";
 import { formatCurrency } from "@utils/format";
 import AddressAutocomplete from "@components/AddressAutocomplete";
+import { OrderAttribute } from "@src/types/Attribute";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 const CartPage = () => {
@@ -49,7 +54,8 @@ const CartPage = () => {
   const [cartItems, setCartItems] = useState<CartProduct[]>([]);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [selectedDiscountCode, setSelectedDiscountCode] = useState<string>(""); const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedDiscountCode, setSelectedDiscountCode] = useState<string>("");
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [finalPrice, setFinalPrice] = useState<number>(0);
   const fetchCartItem = async () => {
@@ -58,7 +64,7 @@ const CartPage = () => {
     setQuantities((prevQuantities) => {
       const updatedQuantities = { ...prevQuantities };
       cart.map((item) => {
-        updatedQuantities[item._id] = item.quantity;
+        updatedQuantities[item._id!] = item.quantity;
       });
       return updatedQuantities;
     });
@@ -71,8 +77,8 @@ const CartPage = () => {
   const subtotal = useMemo(
     () =>
       cartItems.reduce((total, item) => {
-        if (selectedItems.includes(item._id)) {
-          return total + item.price * (quantities[item._id] || 1);
+        if (selectedItems.includes(item._id!)) {
+          return total + item.price * (quantities[item._id!] || 1);
         }
         return total;
       }, 0),
@@ -111,7 +117,7 @@ const CartPage = () => {
     setSelectedDiscountCode("");
   }, [subtotal]);
 
-  //apply discount 
+  //apply discount
   const handleApplyDiscount = async (code: string) => {
     try {
       const response = await axiosClient.post<PriceWithDiscount>(
@@ -131,7 +137,8 @@ const CartPage = () => {
     } catch (error: any) {
       notification.error({
         message: "Discount error",
-        description: error.response?.data?.message || "Failed to apply discount",
+        description:
+          error.response?.data?.message || "Failed to apply discount",
       });
       setFinalPrice(subtotal);
       setDiscountAmount(0);
@@ -139,7 +146,7 @@ const CartPage = () => {
   };
 
   //update quantity
-  const updateQuantity = (itemId: string, newQuantity: number) => {
+  const updateQuantity = (itemId: string, newQuantity: number, cart_attributes: OrderAttribute[]) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [itemId]: newQuantity,
@@ -151,6 +158,7 @@ const CartPage = () => {
         userId: userId!,
         productId: itemId,
         quantity: newQuantity,
+        cart_attributes
       })
     );
   };
@@ -170,11 +178,17 @@ const CartPage = () => {
       alert(error);
     }
   };
-  const removeItem = (itemId: string) => {
+  const removeItem = (itemId: string, cart_attributes: OrderAttribute[]) => {
     try {
       console.log(itemId);
       deleteProductInCart(itemId);
-      dispatch(deleteItemFromCart({ userId: userId!, productId: itemId }));
+      dispatch(
+        deleteItemFromCart({
+          userId: userId!,
+          productId: itemId,
+          cart_attributes,
+        })
+      );
       setCartItems((prevItems) =>
         prevItems.filter((item) => item._id !== itemId)
       );
@@ -293,12 +307,13 @@ const CartPage = () => {
     };
 
     const order_items = cartItems
-      .filter((item) => selectedItems.includes(item._id))
+      .filter((item) => selectedItems.includes(item._id!))
       .map((item) => ({
         // _id: "",
         order: "",
         product: item._id,
-        quantity: /*item.quantity*/ quantities[item._id] || 1,
+        quantity: /*item.quantity*/ quantities[item._id!] || 1,
+        price: item.price,
         note: "",
         attributes: item.cart_attributes,
       }));
@@ -311,7 +326,7 @@ const CartPage = () => {
         console.log({ order, order_items });
         // if (!validateForm()) return;
         order_items.map((item) => {
-          removeItem(item.product);
+          removeItem(item.product!, item.attributes);
         });
       } catch (error) {
         console.log(error);
@@ -395,9 +410,9 @@ const CartPage = () => {
             product={item}
             quantity={item.quantity}
             onUpdateQuantity={(newQuantity) =>
-              updateQuantity(item._id, newQuantity)
+              updateQuantity(item._id, newQuantity, item.cart_attributes)
             }
-            onRemove={() => removeItem(item._id)}
+            onRemove={() => removeItem(item._id, item.cart_attributes)}
             onSelect={(selected) => {
               toggleSelectItem(item._id, selected), console.log(item);
             }}
@@ -433,7 +448,6 @@ const CartPage = () => {
           <span>{formatCurrency(subtotal)}</span>
         </div>
 
-
         <div className="flex justify-between text-red-500 mt-2">
           <span>Discount:</span>
           <span>-{formatCurrency(discountAmount)}</span>
@@ -451,7 +465,7 @@ const CartPage = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ }) => (
+        {({}) => (
           <Form className="md:w-1/3 p-4 text-gray-700">
             <h2 className="text-lg font-semibold mb-4">Information</h2>
             <div>
@@ -523,7 +537,7 @@ const CartPage = () => {
               // onClick={handleSubmit}
               type="submit"
               className="bg-yellow-500 text-white py-2 px-4 rounded w-full"
-            // disabled={!isValid || !Object.keys(touched).length}
+              // disabled={!isValid || !Object.keys(touched).length}
             >
               Place Order
             </button>
@@ -538,7 +552,7 @@ const CartPage = () => {
                 // onClick={handleSubmit}
                 type="submit"
                 className="bg-yellow-500 text-lg font-medium text-white py-2 px-4 rounded w-[400px] h-full"
-              // disabled={!isValid || !Object.keys(touched).length}
+                // disabled={!isValid || !Object.keys(touched).length}
               >
                 Place Order
               </button>
