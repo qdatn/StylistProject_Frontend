@@ -15,11 +15,13 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
     navigate(`/product/${_id}`);
   };
 
-  // Tìm giá thấp nhất trong variants
+  // Tìm giá thấp nhất và cao nhất trong variants
   const minPrice = variants && variants.length > 0
     ? Math.min(...variants.map((v) => v.price))
     : 0;
-
+  const maxPrice = variants && variants.length > 0
+    ? Math.max(...variants.map((v) => v.price))
+    : 0;
   return (
     <div
       onClick={handleClick}
@@ -31,7 +33,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
           src={
             images?.length
               ? images[0]
-              : "../src/public/assets/images/default-product-image.png" 
+              : "../src/public/assets/images/default-product-image.png"
           }
           alt={product_name}
           className="inset-0 w-full h-[300px] object-cover group-hover:scale-110 duration-500"
@@ -46,7 +48,12 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
         <div className="font-semibold flex flex-col pb-2 w-[250px]">
           <div className="flex gap-4 pb-2 text-[14px] whitespace-nowrap">
             <p className="grow shrink font-bold text-red-500">
-              {minPrice > 0 ? formatCurrency(minPrice) : "Liên hệ"}
+              {minPrice > 0 && maxPrice > 0
+                ? minPrice === maxPrice
+                  ? formatCurrency(minPrice)
+                  : `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`
+                : "Contact"}
+
             </p>
           </div>
 

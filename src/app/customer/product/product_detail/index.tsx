@@ -99,8 +99,24 @@ const ProductDetail: React.FC = () => {
     setZoomPosition({ x: 0, y: 0 });
   };
 
+  // Check if attribute option is available (stock > 0)
+  const isOptionAvailable = (key: string, value: string): boolean => {
+    if (!product?.variants) return false;
+    
+    return product.variants.some(variant => 
+      variant.attributes.some(attr => 
+        attr.key === key && 
+        attr.value === value
+      ) &&
+      variant.stock_quantity > 0
+    );
+  };
+
   // Handle attribute selection
   const handleAttributeChange = (key: string, value: string) => {
+    // Prevent selection if option is unavailable
+    if (!isOptionAvailable(key, value)) return;
+
     const newAttributes = {
       ...selectedAttributes,
       [key]: value
@@ -357,18 +373,27 @@ const ProductDetail: React.FC = () => {
                     {key}:
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {attributeOptions[key]?.map((value) => (
-                      <button
-                        key={value}
-                        onClick={() => handleAttributeChange(key, value)}
-                        className={`px-4 py-2 rounded-full text-sm border ${selectedAttributes[key] === value
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-300 hover:border-gray-400'
+                    {attributeOptions[key]?.map((value) => {
+                      const isAvailable = isOptionAvailable(key, value);
+                      const isSelected = selectedAttributes[key] === value;
+                      
+                      return (
+                        <button
+                          key={value}
+                          title={!isAvailable ? "Out of stock" : undefined}
+                          onClick={() => handleAttributeChange(key, value)}
+                          disabled={!isAvailable}
+                          className={`px-4 py-2 rounded-full text-sm border ${!isAvailable 
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' 
+                            : isSelected
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
                           }`}
-                      >
-                        {value}
-                      </button>
-                    ))}
+                        >
+                          {value}
+                        </button>
+                      );
+                    })}
                   </div>
                   {validationErrors[key] && (
                     <p className="mt-1 text-red-500 text-sm">
