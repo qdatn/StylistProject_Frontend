@@ -196,18 +196,37 @@ const CartItem: React.FC<CartItemProps> = ({
             }
             value={quantity}
             onChange={(e) =>
-              onUpdateQuantity &&
-              onUpdateQuantity(
-                Math.max(
-                  1,
-                  Math.min(
-                    Number(e.target.value),
+              //   onUpdateQuantity &&
+              //   onUpdateQuantity(
+              //     Math.max(
+              //       1,
+              //       Math.min(
+              //         Number(e.target.value),
+              //         product.variants?.find((variant) =>
+              //           arraysEqual(variant.attributes, product.cart_attributes)
+              //         )?.stock_quantity as number
+              //       )
+              //     )
+              //   )
+              {
+                const val = e.target.value;
+
+                if (val === "") {
+                  // Nếu input bị xoá hết thì không cập nhật quantity để tránh NaN
+                  return;
+                }
+
+                const num = Number(val);
+
+                if (!isNaN(num) && num >= 1) {
+                  const maxQty =
                     product.variants?.find((variant) =>
                       arraysEqual(variant.attributes, product.cart_attributes)
-                    )?.stock_quantity as number
-                  )
-                )
-              )
+                    )?.stock_quantity ?? Infinity;
+
+                  onUpdateQuantity && onUpdateQuantity(Math.min(num, maxQty));
+                }
+              }
             }
             className="text-center w-14 border"
           />
@@ -217,7 +236,7 @@ const CartItem: React.FC<CartItemProps> = ({
               quantity >=
               (product.variants?.find((variant) =>
                 arraysEqual(variant.attributes, product.cart_attributes)
-              )?.stock_quantity as number) 
+              )?.stock_quantity as number)
             }
             className="p-1 rounded-r text-gray-600 hover:bg-gray-200"
           >
