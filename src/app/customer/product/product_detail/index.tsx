@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@redux/reducers/cartReducer";
 import CommentItem from "@components/CommentItem";
 import { CommentList } from "@src/types/Comment";
-import { AiOutlinePlus, AiOutlineMinus, AiOutlineShoppingCart } from "react-icons/ai";
+import {
+  AiOutlinePlus,
+  AiOutlineMinus,
+  AiOutlineShoppingCart,
+} from "react-icons/ai";
 import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { notification, Select } from "antd";
@@ -24,8 +28,12 @@ const ProductDetail: React.FC = () => {
   const [comments, setComments] = useState<CommentList | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+    null
+  );
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >({});
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.persist.auth);
   const userId = user.user?.user._id;
@@ -37,10 +45,18 @@ const ProductDetail: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<any>({});
   const urlPath = import.meta.env.VITE_API_URL;
 
-
   const scrollToReviews = () => {
-    reviewRef.current?.scrollIntoView({ behavior: 'smooth' });
+    reviewRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+  if (id) {
+    window.scrollTo(0, 0); // ✅ Scroll lên đầu trang
+    fetchProductDetail();
+    fetchComment();
+  }
+}, [id]);
+
   // Get product detail
   const fetchProductDetail = async () => {
     try {
@@ -53,7 +69,7 @@ const ProductDetail: React.FC = () => {
       if (response.variants && response.variants.length > 0) {
         setSelectedVariant(response.variants[0]);
         const initialAttributes: Record<string, string> = {};
-        response.variants[0].attributes.forEach(attr => {
+        response.variants[0].attributes.forEach((attr) => {
           initialAttributes[attr.key] = attr.value;
         });
         setSelectedAttributes(initialAttributes);
@@ -89,7 +105,8 @@ const ProductDetail: React.FC = () => {
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const { left, top, width, height } =
+      e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
     setZoomPosition({ x, y });
@@ -102,13 +119,12 @@ const ProductDetail: React.FC = () => {
   // Check if attribute option is available (stock > 0)
   const isOptionAvailable = (key: string, value: string): boolean => {
     if (!product?.variants) return false;
-    
-    return product.variants.some(variant => 
-      variant.attributes.some(attr => 
-        attr.key === key && 
-        attr.value === value
-      ) &&
-      variant.stock_quantity > 0
+
+    return product.variants.some(
+      (variant) =>
+        variant.attributes.some(
+          (attr) => attr.key === key && attr.value === value
+        ) && variant.stock_quantity > 0
     );
   };
 
@@ -119,23 +135,24 @@ const ProductDetail: React.FC = () => {
 
     const newAttributes = {
       ...selectedAttributes,
-      [key]: value
+      [key]: value,
     };
 
     setSelectedAttributes(newAttributes);
 
     // Find matching variant
     if (product?.variants) {
-      const matchingVariant = product.variants.find(variant =>
-        variant.attributes.every(attr =>
-          newAttributes[attr.key] === attr.value
+      const matchingVariant = product.variants.find((variant) =>
+        variant.attributes.every(
+          (attr) => newAttributes[attr.key] === attr.value
         )
       );
 
       if (matchingVariant) {
         setSelectedVariant(matchingVariant);
+        setQuantity(1);
         // Reset quantity if exceeds new variant stock
-        setQuantity(prev => Math.min(prev, matchingVariant.stock_quantity));
+        setQuantity((prev) => Math.min(prev, matchingVariant.stock_quantity));
       } else {
         setSelectedVariant(null);
       }
@@ -159,16 +176,16 @@ const ProductDetail: React.FC = () => {
       const userId = user.user?.user._id;
 
       // Update cart via API
-      await axiosClient.put<Cart>(
-        `${urlPath}/api/cart/${userId}`,
-        {
-          products: [{
-            productId: productId?.toString(),
-            variantId: selectedVariant._id,
-            quantity
-          }]
-        }
-      );
+      await axiosClient.put<Cart>(`${urlPath}/api/cart/${userId}`, {
+        products: [
+          productId?.toString(),
+          // {
+          //   productId: productId?.toString(),
+          //   // variantId: selectedVariant._id,
+          //   // quantity,
+          // },
+        ],
+      });
 
       // Update local state
       const updatedProduct = await axiosClient.getOne<Product>(
@@ -178,7 +195,7 @@ const ProductDetail: React.FC = () => {
 
       // Find updated variant
       const updatedVariant = updatedProduct.variants?.find(
-        v => v._id === selectedVariant._id
+        (v) => v._id === selectedVariant._id
       );
 
       if (updatedVariant) {
@@ -192,15 +209,18 @@ const ProductDetail: React.FC = () => {
           product: {
             ...product,
             // Use selected variant's price and stock
-            price: selectedVariant.price,
-            stock_quantity: selectedVariant.stock_quantity
+            // // price: selectedVariant.price,
+            // stock_quantity: selectedVariant.stock_quantity
           },
-          variant: selectedVariant,
+          // variant: selectedVariant,
           quantity,
-          cart_attributes: Object.entries(selectedAttributes).map(([key, value]) => ({
-            key,
-            value
-          }))
+          price: selectedVariant.price,
+          cart_attributes: Object.entries(selectedAttributes).map(
+            ([key, value]) => ({
+              key,
+              value,
+            })
+          ),
         })
       );
       notification.success({
@@ -218,11 +238,12 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  if (!product) return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
+  if (!product)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
 
   // Find available options for each attribute
   const attributeOptions: Record<string, string[]> = {};
@@ -231,17 +252,17 @@ const ProductDetail: React.FC = () => {
   if (product.variants && product.variants.length > 0) {
     // First, collect all attribute keys from all variants
     const allKeys = new Set<string>();
-    product.variants.forEach(variant => {
-      variant.attributes.forEach(attr => {
+    product.variants.forEach((variant) => {
+      variant.attributes.forEach((attr) => {
         allKeys.add(attr.key);
       });
     });
 
     // Then collect unique values for each key
-    Array.from(allKeys).forEach(key => {
+    Array.from(allKeys).forEach((key) => {
       const values = new Set<string>();
-      product.variants?.forEach(variant => {
-        const attr = variant.attributes.find(a => a.key === key);
+      product.variants?.forEach((variant) => {
+        const attr = variant.attributes.find((a) => a.key === key);
         if (attr) {
           values.add(attr.value);
         }
@@ -257,12 +278,14 @@ const ProductDetail: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black opacity-70 z-0"></div>
           <div className="relative z-10 px-10 py-8 text-center max-w-md w-full">
-            <h3 className="text-2xl font-bold text-white mb-4">Product Unavailable</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Product Unavailable
+            </h3>
             <p className="text-white mb-6">
               We're sorry, this item is currently out of stock.
             </p>
             <button
-              onClick={() => window.location.href = '/'}
+              onClick={() => (window.location.href = "/")}
               className="inline-block w-full px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium"
             >
               Continue Shopping
@@ -271,7 +294,11 @@ const ProductDetail: React.FC = () => {
         </div>
       )}
 
-      <div className={`${product.status === false ? 'opacity-60 pointer-events-none' : ''}`}>
+      <div
+        className={`${
+          product.status === false ? "opacity-60 pointer-events-none" : ""
+        }`}
+      >
         {/* Product Main Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20">
           {/* Image Gallery */}
@@ -283,30 +310,41 @@ const ProductDetail: React.FC = () => {
                 onMouseLeave={handleMouseLeave}
               >
                 <img
-                  src={product.images?.length ? product.images[currentImageIndex] : DEFAULT_IMAGE}
+                  src={
+                    product.images?.length
+                      ? product.images[currentImageIndex]
+                      : DEFAULT_IMAGE
+                  }
                   alt={product.product_name}
                   className="object-contain max-h-full max-w-full"
                   style={{
                     transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                    transform: zoomPosition.x || zoomPosition.y ? "scale(1.8)" : "scale(1)",
+                    transform:
+                      zoomPosition.x || zoomPosition.y
+                        ? "scale(1.8)"
+                        : "scale(1)",
                   }}
                 />
               </div>
 
               <button
                 className="absolute top-1/2 left-4 transform -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100"
-                onClick={() => setCurrentImageIndex(prev =>
-                  prev === 0 ? (product.images?.length || 1) - 1 : prev - 1
-                )}
+                onClick={() =>
+                  setCurrentImageIndex((prev) =>
+                    prev === 0 ? (product.images?.length || 1) - 1 : prev - 1
+                  )
+                }
               >
                 <FaChevronLeft className="text-gray-700" />
               </button>
 
               <button
                 className="absolute top-1/2 right-4 transform -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100"
-                onClick={() => setCurrentImageIndex(prev =>
-                  prev === (product.images?.length || 1) - 1 ? 0 : prev + 1
-                )}
+                onClick={() =>
+                  setCurrentImageIndex((prev) =>
+                    prev === (product.images?.length || 1) - 1 ? 0 : prev + 1
+                  )
+                }
               >
                 <FaChevronRight className="text-gray-700" />
               </button>
@@ -318,8 +356,11 @@ const ProductDetail: React.FC = () => {
                 {product.images.map((img, index) => (
                   <button
                     key={index}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${currentImageIndex === index ? 'border-blue-500' : 'border-gray-200'
-                      }`}
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${
+                      currentImageIndex === index
+                        ? "border-blue-500"
+                        : "border-gray-200"
+                    }`}
                     onClick={() => setCurrentImageIndex(index)}
                   >
                     <img
@@ -336,7 +377,9 @@ const ProductDetail: React.FC = () => {
           {/* Product Info */}
           <div className="mt-5 space-y-6">
             <div className="mb-6">
-              <h1 className="text-2xl font-medium text-gray-600">{product.product_name}</h1>
+              <h1 className="text-2xl font-medium text-gray-600">
+                {product.product_name}
+              </h1>
               {/* <div className="flex items-center mt-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -376,18 +419,19 @@ const ProductDetail: React.FC = () => {
                     {attributeOptions[key]?.map((value) => {
                       const isAvailable = isOptionAvailable(key, value);
                       const isSelected = selectedAttributes[key] === value;
-                      
+
                       return (
                         <button
                           key={value}
                           title={!isAvailable ? "Out of stock" : undefined}
                           onClick={() => handleAttributeChange(key, value)}
                           disabled={!isAvailable}
-                          className={`px-4 py-2 rounded-full text-sm border ${!isAvailable 
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' 
-                            : isSelected
-                              ? 'border-blue-500 bg-blue-50 text-blue-700'
-                              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                          className={`px-4 py-2 rounded-full text-sm border ${
+                            !isAvailable
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+                              : isSelected
+                              ? "border-blue-500 bg-blue-50 text-blue-700"
+                              : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                           }`}
                         >
                           {value}
@@ -409,42 +453,57 @@ const ProductDetail: React.FC = () => {
               <div className="flex items-center border rounded-lg overflow-hidden">
                 <button
                   className="h-11 w-11 flex items-center justify-center bg-gray-100 hover:bg-gray-200"
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  disabled={!selectedVariant}
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={
+                    !selectedVariant || selectedVariant.stock_quantity <= 0
+                  }
                 >
                   <AiOutlineMinus className="text-gray-600" />
                 </button>
-                <span className="w-20 text-center font-medium">{quantity}</span>
+                <span className="w-20 text-center font-medium">
+                  {selectedVariant && selectedVariant.stock_quantity > 0
+                    ? quantity
+                    : 0}
+                </span>
                 <button
                   className="h-11 w-11 flex items-center justify-center bg-gray-100 hover:bg-gray-200"
-                  onClick={() => setQuantity(q =>
-                    Math.min(q + 1, selectedVariant?.stock_quantity || 1)
-                  )}
-                  disabled={!selectedVariant}
+                  onClick={() =>
+                    setQuantity((q) =>
+                      Math.min(q + 1, selectedVariant?.stock_quantity || 1)
+                    )
+                  }
+                  disabled={
+                    !selectedVariant || selectedVariant.stock_quantity <= 0
+                  }
                 >
                   <AiOutlinePlus className="text-gray-600" />
                 </button>
               </div>
-              {selectedVariant && (
-                <div className="mt-1 text-green-600 font-medium">
-                  In Stock: {selectedVariant.stock_quantity}
-                </div>
-              )}
-
+              {selectedVariant &&
+                (selectedVariant.stock_quantity > 0 ? (
+                  <div className="mt-1 text-green-600 font-medium">
+                    In Stock: {selectedVariant.stock_quantity}
+                  </div>
+                ) : (
+                  <div className="mt-1 text-red-600 font-medium">
+                    In Stock: {selectedVariant.stock_quantity}
+                  </div>
+                ))}
             </div>
             <button
-              className={`w-3/5 gap-2 flex-1 flex items-center justify-center py-3 font-semibold text-white rounded-lg transition-colors ${selectedVariant
-                ? "bg-gray-700 hover:bg-blue-500"
-                : "bg-gray-500 cursor-not-allowed"
-                }`}
+              className={`w-3/5 gap-2 flex-1 flex items-center justify-center py-3 font-semibold text-white rounded-lg transition-colors ${
+                selectedVariant
+                  ? selectedVariant.stock_quantity > 0
+                    ? "bg-gray-700 hover:bg-blue-500"
+                    : "bg-gray-400 cursor-not-allowed"
+                  : "bg-gray-500 cursor-not-allowed"
+              }`}
               onClick={handleAddToCart}
-              disabled={!selectedVariant}
+              disabled={!selectedVariant || selectedVariant.stock_quantity <= 0}
             >
               <AiOutlineShoppingCart className="text-lg" />
               {selectedVariant ? "ADD TO BAG" : "SELECT OPTIONS"}
             </button>
-
-
           </div>
         </div>
 
@@ -468,10 +527,12 @@ const ProductDetail: React.FC = () => {
 
           {/* Description */}
           <div className="mt-6 prose prose-lg max-w-none text-gray-600 space-y-3 mb-2">
-            <h2 className="text-xl font-semibold text-gray-800 ">Description</h2>
+            <h2 className="text-xl font-semibold text-gray-800 ">
+              Description
+            </h2>
             <div>
-              <span className="font-medium">Category:</span>{' '}
-              {product.categories?.[0]?.category_name || 'Electronics'}
+              <span className="font-medium">Category:</span>{" "}
+              {product.categories?.[0]?.category_name || "Electronics"}
             </div>
             <div>
               <span className="font-medium">Brand:</span> {product.brand}

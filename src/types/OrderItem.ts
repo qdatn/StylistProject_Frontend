@@ -9,6 +9,7 @@ export interface OrderItem {
   product: Product;
   //product_name: string;
   quantity: number;
+  price: number;
   note?: string;
   //purchased_price: number;
   //discounted_price: number;

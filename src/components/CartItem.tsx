@@ -14,6 +14,7 @@ import { OrderAttribute } from "@src/types/Attribute";
 import { RootState } from "@redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { formatCurrency } from "@utils/format";
+import { ProductVariant } from "@src/types/new/Product";
 
 export interface CartItemProps {
   // product: Product; // Dữ liệu sản phẩm từ Cart
@@ -23,6 +24,9 @@ export interface CartItemProps {
   onSelect: (selected: boolean) => void; // Hàm để chọn sản phẩm
   quantity: number; // Số lượng sản phẩm trong giỏ hàng
 }
+
+const arraysEqual = (a: any[], b: any[]) =>
+  a.length === b.length && a.every((val, index) => val === b[index]);
 
 // Hàm để lấy hình ảnh sản phẩm dựa trên ID
 
@@ -74,8 +78,9 @@ const CartItem: React.FC<CartItemProps> = ({
       dispatch(
         updateCartAttributes({
           userId: userId,
-          productId: product._id,
-          cart_attributes: selectedAttributes!,
+          productId: product._id as string,
+          oldAttributes: product.cart_attributes,
+          newAttributes: selectedAttributes!,
         })
       );
     }
@@ -91,11 +96,37 @@ const CartItem: React.FC<CartItemProps> = ({
     setIsSelected(newSelected);
     onSelect(newSelected);
   };
+
+  // Get attribute from variants
+  const getAttributesFromVariants = (variants?: ProductVariant[]) => {
+    const attributeMap: { [key: string]: Set<string> } = {};
+
+    variants?.forEach((variant) => {
+      variant.attributes.forEach((attr) => {
+        if (!attributeMap[attr.key]) {
+          attributeMap[attr.key] = new Set();
+        }
+        attributeMap[attr.key].add(attr.value);
+      });
+    });
+
+    return Object.entries(attributeMap).map(([key, valueSet]) => ({
+      key,
+      value: Array.from(valueSet),
+    }));
+  };
+
+  const productAttributes = getAttributesFromVariants(product.variants);
+
   return (
     <div className="flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
       <Link to={`/product/${product._id}`}>
         <img
-          src={product.images?.length ? product.images?.[0] : "../src/public/assets/images/default-product-image.png"} // Sử dụng ảnh đầu tiên trong mảng image
+          src={
+            product.images?.length
+              ? product.images?.[0]
+              : "../src/public/assets/images/default-product-image.png"
+          } // Sử dụng ảnh đầu tiên trong mảng image
           alt={product.product_name}
           className="w-20 h-20 object-cover rounded-lg mr-4"
         />
@@ -118,7 +149,7 @@ const CartItem: React.FC<CartItemProps> = ({
           <span className="text-red-500">{formatCurrency(product.price)}</span>
         </div>
         <div className="flex items-center mb-2 flex-wrap">
-          {product.attributes.map((attr) => (
+          {productAttributes.map((attr) => (
             <div key={attr.key} className="flex items-center mr-4 mb-2">
               <label className="mr-2 text-[15px]">{attr.key}:</label>
               <div className="relative">
@@ -136,7 +167,7 @@ const CartItem: React.FC<CartItemProps> = ({
                   }
                   className="text-[15px] appearance-none px-4 py-2 text-gray-700 focus:outline-none bg-white pr-6"
                 >
-                  {attr.value.map((option) => (
+                  {attr.value.map((option: any) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
@@ -158,22 +189,55 @@ const CartItem: React.FC<CartItemProps> = ({
           <Input
             type="text"
             min="1"
-            max={product.stock_quantity}
+            max={
+              product.variants?.find((variant) =>
+                arraysEqual(variant.attributes, product.cart_attributes)
+              )?.stock_quantity
+            }
             value={quantity}
             onChange={(e) =>
-              onUpdateQuantity &&
-              onUpdateQuantity(
-                Math.max(
-                  1,
-                  Math.min(Number(e.target.value), product.stock_quantity)
-                )
-              )
+              //   onUpdateQuantity &&
+              //   onUpdateQuantity(
+              //     Math.max(
+              //       1,
+              //       Math.min(
+              //         Number(e.target.value),
+              //         product.variants?.find((variant) =>
+              //           arraysEqual(variant.attributes, product.cart_attributes)
+              //         )?.stock_quantity as number
+              //       )
+              //     )
+              //   )
+              {
+                const val = e.target.value;
+
+                if (val === "") {
+                  // Nếu input bị xoá hết thì không cập nhật quantity để tránh NaN
+                  return;
+                }
+
+                const num = Number(val);
+
+                if (!isNaN(num) && num >= 1) {
+                  const maxQty =
+                    product.variants?.find((variant) =>
+                      arraysEqual(variant.attributes, product.cart_attributes)
+                    )?.stock_quantity ?? Infinity;
+
+                  onUpdateQuantity && onUpdateQuantity(Math.min(num, maxQty));
+                }
+              }
             }
             className="text-center w-14 border"
           />
           <button
             onClick={() => onUpdateQuantity && onUpdateQuantity(quantity + 1)}
-            disabled={quantity >= product.stock_quantity}
+            disabled={
+              quantity >=
+              (product.variants?.find((variant) =>
+                arraysEqual(variant.attributes, product.cart_attributes)
+              )?.stock_quantity as number)
+            }
             className="p-1 rounded-r text-gray-600 hover:bg-gray-200"
           >
             <AiOutlinePlus />
