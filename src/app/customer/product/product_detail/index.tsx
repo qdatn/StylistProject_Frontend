@@ -48,6 +48,15 @@ const ProductDetail: React.FC = () => {
   const scrollToReviews = () => {
     reviewRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+  if (id) {
+    window.scrollTo(0, 0); // ✅ Scroll lên đầu trang
+    fetchProductDetail();
+    fetchComment();
+  }
+}, [id]);
+
   // Get product detail
   const fetchProductDetail = async () => {
     try {
@@ -141,6 +150,7 @@ const ProductDetail: React.FC = () => {
 
       if (matchingVariant) {
         setSelectedVariant(matchingVariant);
+        setQuantity(1);
         // Reset quantity if exceeds new variant stock
         setQuantity((prev) => Math.min(prev, matchingVariant.stock_quantity));
       } else {
@@ -444,11 +454,17 @@ const ProductDetail: React.FC = () => {
                 <button
                   className="h-11 w-11 flex items-center justify-center bg-gray-100 hover:bg-gray-200"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  disabled={!selectedVariant}
+                  disabled={
+                    !selectedVariant || selectedVariant.stock_quantity <= 0
+                  }
                 >
                   <AiOutlineMinus className="text-gray-600" />
                 </button>
-                <span className="w-20 text-center font-medium">{quantity}</span>
+                <span className="w-20 text-center font-medium">
+                  {selectedVariant && selectedVariant.stock_quantity > 0
+                    ? quantity
+                    : 0}
+                </span>
                 <button
                   className="h-11 w-11 flex items-center justify-center bg-gray-100 hover:bg-gray-200"
                   onClick={() =>
@@ -456,25 +472,34 @@ const ProductDetail: React.FC = () => {
                       Math.min(q + 1, selectedVariant?.stock_quantity || 1)
                     )
                   }
-                  disabled={!selectedVariant}
+                  disabled={
+                    !selectedVariant || selectedVariant.stock_quantity <= 0
+                  }
                 >
                   <AiOutlinePlus className="text-gray-600" />
                 </button>
               </div>
-              {selectedVariant && (
-                <div className="mt-1 text-green-600 font-medium">
-                  In Stock: {selectedVariant.stock_quantity}
-                </div>
-              )}
+              {selectedVariant &&
+                (selectedVariant.stock_quantity > 0 ? (
+                  <div className="mt-1 text-green-600 font-medium">
+                    In Stock: {selectedVariant.stock_quantity}
+                  </div>
+                ) : (
+                  <div className="mt-1 text-red-600 font-medium">
+                    In Stock: {selectedVariant.stock_quantity}
+                  </div>
+                ))}
             </div>
             <button
               className={`w-3/5 gap-2 flex-1 flex items-center justify-center py-3 font-semibold text-white rounded-lg transition-colors ${
                 selectedVariant
-                  ? "bg-gray-700 hover:bg-blue-500"
+                  ? selectedVariant.stock_quantity > 0
+                    ? "bg-gray-700 hover:bg-blue-500"
+                    : "bg-gray-400 cursor-not-allowed"
                   : "bg-gray-500 cursor-not-allowed"
               }`}
               onClick={handleAddToCart}
-              disabled={!selectedVariant}
+              disabled={!selectedVariant || selectedVariant.stock_quantity <= 0}
             >
               <AiOutlineShoppingCart className="text-lg" />
               {selectedVariant ? "ADD TO BAG" : "SELECT OPTIONS"}
