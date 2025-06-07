@@ -5,6 +5,17 @@ import { MessageChat, ProductRecommend } from "@src/types/Chat";
 import axiosClient from "@api/axiosClient";
 import { useNavigate } from "react-router-dom";
 
+// Tạo component cho hiệu ứng loading
+const LoadingDots = () => {
+  return (
+    <div className="flex space-x-1">
+      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-300"></div>
+    </div>
+  );
+};
+
 interface ChatBoxProps {
   user: UserAccount;
   currentUser: UserAccount;
@@ -20,6 +31,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
   const [isUserOnline, setIsUserOnline] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const api = import.meta.env.VITE_API_URL;
 
   const currentUserId = currentUser.user._id;
@@ -159,6 +171,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
       return;
     } else {
       try {
+        setIsLoading(true);
         // Gửi prompt như một tin nhắn từ currentUser đến bot
         const userMessage: MessageChat = {
           sender: currentUserId,
@@ -174,6 +187,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
 
         // Thêm vào UI
         setMessages((prev) => [...prev, userMessage]);
+
+        // Tạo tin nhắn loading
+        const loadingMessage: MessageChat = {
+          sender: BOT_ID,
+          receiver: currentUserId,
+          content: "__LOADING__", // Đánh dấu là tin nhắn loading
+        };
+        setMessages((prev) => [...prev, loadingMessage]);
 
         // Gọi API gợi ý sản phẩm (response là 1 chuỗi hoặc object chứa content)
         const response = await axiosClient.getOne<{ content: string }>(
@@ -192,6 +213,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
           console.error("Failed to parse product recommendations:", e);
         }
 
+        // Tạo tin nhắn thông báo từ bot
+        const notificationMessage: MessageChat = {
+          sender: BOT_ID,
+          receiver: currentUserId,
+          content: "These are products that suitable for your body shape",
+        };
+
         const botMessage: MessageChat = {
           sender: BOT_ID,
           receiver: currentUserId,
@@ -199,14 +227,50 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
           recommendProducts: products,
         };
 
+        // Thay thế tin nhắn loading bằng kết quả thực
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          // Tìm và xóa tin nhắn loading
+          const loadingIndex = newMessages.findIndex(
+            (msg) => msg.content === "__LOADING__"
+          );
+          if (loadingIndex !== -1) {
+            newMessages.splice(loadingIndex, 1);
+          }
+          // Thêm tin nhắn thông báo và sản phẩm
+          return [...newMessages, notificationMessage, botMessage];
+        });
+
         // Thêm tin nhắn bot vào UI
-        setMessages((prev) => [...prev, botMessage]);
+        // setMessages((prev) => [...prev, notificationMessage, botMessage]);
 
         //  // Gửi tin nhắn lên socket của bot lưu vào DB
+        socketRef.current?.emit("send_message", notificationMessage);
         socketRef.current?.emit("send_message", botMessage);
         // await axiosClient.post(`${api}/api/chat/messages`, botMessage);
       } catch (err) {
         console.error("Error sending suggested prompt:", err);
+        // Xử lý lỗi: xóa tin nhắn loading và hiển thị thông báo lỗi
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const loadingIndex = newMessages.findIndex(
+            (msg) => msg.content === "__LOADING__"
+          );
+          if (loadingIndex !== -1) {
+            newMessages.splice(loadingIndex, 1);
+          }
+          return [
+            ...newMessages,
+            {
+              sender: BOT_ID,
+              receiver: currentUserId,
+              content:
+                "Sorry, I couldn't find recommendations. Please try again later.",
+            },
+          ];
+        });
+      } finally {
+        setIsLoading(false); // Kết thúc loading
       }
     }
   };
@@ -241,8 +305,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
                   : "bg-white self-start"
               }`}
             >
-              {/* Kiểm tra nếu là dạng gợi ý sản phẩm */}
-              {msg.content === "__RECOMMEND__" && msg.recommendProducts ? (
+              {/* Hiển thị hiệu ứng loading */}
+              {msg.content === "__LOADING__" ? (
+                <LoadingDots />
+              ) : msg.content === "__RECOMMEND__" && msg.recommendProducts ? (
                 <div className="space-y-2">
                   {msg.recommendProducts.map((product) => (
                     <div
