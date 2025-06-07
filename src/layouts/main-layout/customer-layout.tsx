@@ -9,6 +9,7 @@ import store from "@redux/store";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { Outlet } from "react-router-dom";
+import UserChatWidget from "./UserChatWidget";
 export function MainLayout() {
   return (
     <div className="min-w-[760px] overflow-x-auto flex justify-center bg-gray-100">
@@ -26,6 +27,8 @@ export function MainLayout() {
 
         {/* Back to Top */}
         <ScrollToTopButton />
+        {/* Chat widget */}
+        <UserChatWidget />
       </div>
     </div>
   );

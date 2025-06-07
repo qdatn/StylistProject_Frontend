@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProductTable from "./ProductTable";
-import { Product, ProductList } from "@src/types/Product";
+import { Product, ProductList } from "@src/types/new/Product";
 import mockProducts from "@src/types/Product"; // Import hàm cập nhật sản phẩm
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";

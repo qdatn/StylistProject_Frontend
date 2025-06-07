@@ -14,7 +14,7 @@ import AdminHome from "@app/admin/home";
 import { OTPForm } from "@app/password/OTP";
 import StoragePage from "@app/admin/storage";
 import Categories from "@app/admin/product/Categories";
-import CustomerList from "@app/admin/customer/CustomerList";
+import CustomerList from "@app/admin/customer";
 import OrderManagement from "@app/admin/order";
 import ForgotPasswordForm from "@app/password/ForgotPasswordForm";
 import ResetPasswordForm from "@app/password/ResetPasswordForm";
@@ -36,6 +36,13 @@ import ProductListPage from "@app/customer/product";
 import NotFound from "@components/NotFound";
 import ProductSearchPage from "@app/customer/product/product_search/ProductSearchPage";
 import PaymentSuccessPage from "@app/customer/order/payment";
+import ChatPage from "@app/admin/chat";
+import EditCustomer from "@app/admin/customer/CustomerEdit";
+import BodyShapePage from "@app/customer/body_shape";
+import NotificationManagement from "@app/admin/customer/NotificationList";
+import EditNotification from "@app/admin/customer/NotificationEdit";
+import NewNotification from "@app/admin/customer/NewNotification";
+import FashionSurveyPage from "@app/customer/survey";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -66,6 +73,8 @@ function App() {
             <Route path="/order" element={<OrderPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/body-shape" element={<BodyShapePage />} />
+            <Route path="/survey" element={<FashionSurveyPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
 
@@ -82,7 +91,11 @@ function App() {
             <Route path="/admin/order" element={<OrderManagement />} />
             <Route path="/admin/discount" element={<DiscountManagement />} />
             <Route path="/admin/statistic" element={<DashboardPage />} />
-            <Route path="/admin/customer" element={<CustomerList />} />
+            <Route path="/admin/customer/list" element={<CustomerList />} />
+            <Route path="/admin/customer/list/edit/:id" element={<EditCustomer />} />
+            <Route path="/admin/notification/list" element={<NotificationManagement />} />
+            <Route path="/admin/notification/list/edit/:id" element={<EditNotification />} />
+            <Route path="/admin/notification/list/new" element={<NewNotification />} />
             <Route
               path="/admin/product/list/edit/:id"
               element={<EditProduct />}
@@ -104,6 +117,10 @@ function App() {
             <Route
               path="/admin/product/categories/new"
               element={<NewCategory />}
+            />
+            <Route
+              path="/admin/chat"
+              element={<ChatPage />}
             />
             <Route path="/admin/order/new" element={<NewOrder />} />
             <Route path="/admin/discount/new" element={<NewDiscount />} />

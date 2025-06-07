@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Checkbox } from "antd";
+import { Button, Checkbox, message } from "antd";
 import { Product } from "@src/types/Product";
 import { Attribute } from "@src/types/Attribute";
 import { Category } from "@src/types/Category";
@@ -49,7 +49,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const newErrors: Record<string, string> = {};
     if (!product.product_name) newErrors.name = "Product name is required.";
     if (!product.price || product.price <= 0) newErrors.originalPrice = "Original price must be greater than 0.";
-    if (product.discounted_price !== undefined && product.discounted_price < 0) newErrors.discountedPrice = "Discounted price must not be negative.";
+    // if (
+    //   product.discounted_price !== undefined && 
+    //   product.discounted_price < 0 || (
+    //     !product.discounted_price || !product.price ||
+    //     product.discounted_price > product.price
+    //   )
+    // ) 
+    // {
+    //   message.error(`Discounted price cannot be greater than original price.`)
+    //   newErrors.discounted_price = " Discounted price cannot be negative.";
+    // }
     if (product.stock_quantity !== undefined && product.stock_quantity < 0) newErrors.stock_quantity = "Stock quantity cannot be negative.";
     return newErrors;
   };
@@ -67,7 +77,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       ...product,
       categories: selectedCategories,
     };
-    onSave(productToSave); // Gọi hàm lưu
+    onSave(productToSave);
   };
 
   return (
@@ -79,19 +89,19 @@ const ProductForm: React.FC<ProductFormProps> = ({
           onSelectedCategoriesChange={setSelectedCategories}
           selectedCategories={selectedCategories}
         />
-        <div>
-          <label className="block font-medium">Status</label>
+        <div className='flex items-center space-x-4'>
+          <label className="block font-medium">Status: </label>
           <Checkbox
             checked={product.status}
             onChange={(e) =>
               setProduct({ ...product, status: e.target.checked })
             }
-            className={`mt-1 ${errors.status ? "text-red-500" : ""}`}
+            className={`font-medium text-lg ${errors.status ? "text-red-500" : ""}`}
           >
             Active
           </Checkbox>
           {errors.status && (
-            <p className="text-red-500 text-sm">{errors.status}</p>
+            <p className="font-medium text-red-500">{errors.status}</p>
           )}
         </div>
         <div className="flex flex-row gap-2 justify-end">

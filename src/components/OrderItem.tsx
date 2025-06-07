@@ -9,7 +9,7 @@ interface OrderItemProps {
 }
 
 const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
-  const { product, quantity, attributes } = item;
+  const { product, quantity, attributes, price } = item;
   console.log("ITEM", item);
   console.log(attributes);
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
       {/* Hình ảnh sản phẩm */}
       <Link to={`/product/${product._id}`}>
         <img
-          src={product.images ? product.images?.[0] : ""} // Sử dụng ảnh đầu tiên trong mảng image
+          src={product.images ? product.images?.[0] : "../src/public/assets/images/body-shape-banner.jpg"} // Sử dụng ảnh đầu tiên trong mảng image
           alt={product.product_name}
           className="w-20 h-24 object-cover mr-4"
         />
@@ -30,7 +30,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
           {product.product_name}
         </h2>
         <p className="text-sm mb-1 pb-2">
-          Phân loại:{" "}
+          Attribute: {" "}
           {attributes.map((attr) => `${attr.key}: ${attr.value}`).join(", ")}
         </p>
         <p className="text-sm mb-1">{quantity}x</p>
@@ -42,7 +42,7 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
           {formatCurrency(product.price)}
         </p> */}
         <p className="text-sm text-red-500 font-semibold">
-          {formatCurrency(product.price)}
+          {formatCurrency(price)}
         </p>
       </div>
     </div>

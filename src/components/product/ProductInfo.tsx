@@ -70,7 +70,7 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
               }
             );
 
-            console.log("LINK",result);
+            console.log("LINK", result);
             if (result && result.data.imageUrl) {
               // Tạo URL tạm thời nếu chưa có
               file.url = result.data.imageUrl;
@@ -144,14 +144,14 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
   const handleRemoveImage = (file: any) => {
     // setFileList((prev) => prev.filter((item) => item.uid !== file.uid));
     setFileList((prev) => prev.filter(async (item) => {
-        console.log("DELETE ITEM:",file); // Xem chi tiết các thuộc tính của item
-        if(item.uid !== file.uid){
-            const result = await axiosClient.post(`${baseUrl}/api/product/delete-img/${product._id}`,{
-                imageUrl: file.url
-            })
-        }
-        return item.uid !== file.uid;
-      }));
+      console.log("DELETE ITEM:", file); // Xem chi tiết các thuộc tính của item
+      if (item.uid !== file.uid) {
+        const result = await axiosClient.post(`${baseUrl}/api/product/delete-img/${product._id}`, {
+          imageUrl: file.url
+        })
+      }
+      return item.uid !== file.uid;
+    }));
     message.info("Image removed.");
   };
   const handleDateChange = (date: moment.Moment | null) => {
@@ -185,9 +185,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
             placeholder="Enter product ID"
             required
             disabled
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.id ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.id ? "border-red-500" : ""
+              }`}
           />
           {errors.id && <p className="text-red-500 text-sm">{errors.id}</p>}
         </div>
@@ -199,9 +198,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
             value={product.product_name || ""}
             onChange={handleChange}
             placeholder="Enter product name"
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.name ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.name ? "border-red-500" : ""
+              }`}
           />
           {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
@@ -221,49 +219,32 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
             min="0"
             required
             placeholder="Enter original price"
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.originalPrice ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.originalPrice ? "border-red-500" : ""
+              }`}
           />
           {errors.originalPrice && (
             <p className="text-red-500 text-sm">{errors.originalPrice}</p>
           )}
         </div>
 
-        <div>
+        {/* <div>
           <label className="block font-medium">Discounted Price</label>
           <Input
             type="number"
             name="discounted_price"
             value={product.discounted_price || product.price}
-            onChange={(e) => {
-              const value = e.target.value;
-              const discountedValue =
-                value === "" ? product.price : parseFloat(value);
-
-              if (discountedValue && discountedValue <= (product.price || 0)) {
-                setProduct((prev) => ({
-                  ...prev,
-                  discounted_price: discountedValue,
-                }));
-              } else if (value !== "") {
-                message.error(
-                  "Discounted price cannot be greater than original price."
-                );
-              }
-            }}
+            onChange={handleChange}
             min="0"
             max={product.price}
             required
             placeholder="Enter discounted price"
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.discounted_price ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.discounted_price ? "border-red-500" : ""
+              }`}
           />
           {errors.discounted_price && (
             <p className="text-red-500 text-sm">{errors.discounted_price}</p>
           )}
-        </div>
+        </div> */}
 
         <div>
           <label className="block font-medium">Brand</label>
@@ -274,9 +255,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
             onChange={handleChange}
             placeholder="Enter brand"
             required
-            className={`w-full mt-1 p-2 border rounded-md ${
-              errors.brand ? "border-red-500" : ""
-            }`}
+            className={`w-full mt-1 p-2 border rounded-md ${errors.brand ? "border-red-500" : ""
+              }`}
           />
           {errors.brand && (
             <p className="text-red-500 text-sm">{errors.brand}</p>
@@ -333,7 +313,7 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
         <div className=" justify-center mt-4 ">
           <label className=" block font-medium">Decription</label>
           <textarea
-            className="w-full mt-1 p-3 border rounded"
+            className="w-full h-32 mt-1 p-3 border rounded"
             name="description"
             value={product.description || ""}
             onChange={handleChange} // Thêm sự kiện onChange
@@ -345,8 +325,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-row ">
-        <div className="w-1/2 justify-center pr-6">
+      <div className="mt-4 flex flex-row ">
+        <div className="w-1/2 justify-center pr-6 space-y-4">
           <div>
             <label className="block font-medium">Stock Quantity</label>
             <Input
@@ -357,9 +337,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
               min="0"
               required
               placeholder="Enter stock quantity"
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.stock_quantity ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.stock_quantity ? "border-red-500" : ""
+                }`}
             />
             {errors.stock_quantity && (
               <p className="text-red-500 text-sm">{errors.stock_quantity}</p>
@@ -374,9 +353,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
               onChange={handleChange}
               min="0"
               placeholder="Enter stock quantity"
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.min_quantity ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.min_quantity ? "border-red-500" : ""
+                }`}
             />
             {errors.min_quantity && (
               <p className="text-red-500 text-sm">{errors.min_quantity}</p>
@@ -391,9 +369,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
               onChange={handleChange}
               min="0"
               placeholder="Enter stock quantity"
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.sold_quantity ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.sold_quantity ? "border-red-500" : ""
+                }`}
             />
             {errors.sold_quantity && (
               <p className="text-red-500 text-sm">{errors.stock_quantity}</p>
@@ -403,9 +380,8 @@ const BasicProductInfo: React.FC<BasicProductInfoProps> = ({
           <div>
             <label className="block font-medium">Created At</label>
             <DatePicker
-              className={`w-full mt-1 p-2 border rounded-md ${
-                errors.createdAt ? "border-red-500" : ""
-              }`}
+              className={`w-full mt-1 p-2 border rounded-md ${errors.createdAt ? "border-red-500" : ""
+                }`}
               value={product.createdAt ? moment(product.createdAt) : null} // Hiển thị giá trị ngày
               onChange={handleDateChange}
               format="DD-MM-YYYY" // Định dạng ngày

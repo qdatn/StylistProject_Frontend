@@ -3,6 +3,7 @@ import OrderForm from "@components/OrderForm"; // Import form cho order
 import React, { useState } from "react";
 import mockOrders, { Order } from "@src/types/Order"; // Import dữ liệu mẫu và type
 import { useNavigate } from "react-router-dom";
+import { notification } from "antd";
 
 const NewOrder: React.FC = () => {
     const [orders, setOrders] = useState<Order[]>(mockOrders); // State lưu danh sách orders
@@ -17,7 +18,12 @@ const NewOrder: React.FC = () => {
         } as Order;
 
         setOrders((prevOrders) => [...prevOrders, orderToAdd]);
-        alert("Order added successfully!");
+        notification.success({
+            message: "Order added successfully!",
+            description: "",
+            placement: "topRight",
+            duration: 2,
+        });
         navigate("/admin/order"); // Chuyển hướng về danh sách đơn hàng
     };
 
@@ -28,13 +34,13 @@ const NewOrder: React.FC = () => {
 
     return (
         <div>
-            <div className="font-semibold text-xl p-6">New Order</div>
+            {/* <div className="font-semibold text-xl p-6">New Order</div> */}
             {/* Order Form */}
             <div className="w-full">
-                <OrderForm 
-                onSave={handleAddOrder} 
-                onCancel={handleCancel} 
-                type="add"/>
+                <OrderForm
+                    onSave={handleAddOrder}
+                    onCancel={handleCancel}
+                    type="add" />
             </div>
         </div>
     );

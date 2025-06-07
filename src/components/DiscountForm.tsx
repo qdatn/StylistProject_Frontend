@@ -29,25 +29,34 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
 }) => {
   const [discount, setDiscount] = useState<Partial<Discount>>(initialDiscount);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [appliesToType, setAppliesToType] = useState<DiscountType>('all');
+  const [appliesToType, setAppliesToType] = useState<DiscountType>(
+    initialDiscount?.type ? initialDiscount.type as DiscountType : 'all'
+  );
   const [appliesToItems, setAppliesToItems] = useState<(string | Product | Category)[]>([]);
-
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (initialDiscount) {
+      const type = initialDiscount.type as DiscountType || 'all';
+      setAppliesToType(type);
+
+      // Convert apply_items to array of IDs
+      const items = initialDiscount.apply_items
+        ? initialDiscount.apply_items.map(item =>
+          typeof item === 'object' ? (item as Product | Category)._id : item
+        )
+        : [];
+      setAppliesToItems(items);
+
       form.setFieldsValue({
         ...initialDiscount,
-        apply_items: initialDiscount.apply_items?.map((item) =>
-          typeof item === "string"
-            ? item // If it's a string (ID), keep as is
-            : appliesToType === "product"
-              ? (item as Product).product_name // If it's a product object, map to its name
-              : (item as Category).category_name // If it's a category object, map to its name
-        ),
+        type: type,
+        apply_items: type === 'all' ? undefined : items,
+        start_date: initialDiscount.start_date ? moment(initialDiscount.start_date) : null,
+        end_date: initialDiscount.end_date ? moment(initialDiscount.end_date) : null,
       });
     }
-  }, [initialDiscount, appliesToType]);
+  }, [initialDiscount, products, categories, form]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,19 +78,20 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
     }
     setAppliesToItems(initialDiscount.apply_items || []); // Danh sách sản phẩm/danh mục được áp dụng
   };
+
   const handleDateChange = (date: moment.Moment | null, field: "start_date" | "end_date") => {
     if (date) {
-        setDiscount((prev) => ({
-            ...prev,
-            [field]: date.toDate(), // Đảm bảo lưu ngày dưới dạng Date object
-        }));
+      setDiscount((prev) => ({
+        ...prev,
+        [field]: date.toDate(), // Đảm bảo lưu ngày dưới dạng Date object
+      }));
     } else {
-        setDiscount((prev) => ({
-            ...prev,
-            [field]: undefined, // Nếu không có ngày chọn thì xóa giá trị
-        }));
+      setDiscount((prev) => ({
+        ...prev,
+        [field]: undefined, // Nếu không có ngày chọn thì xóa giá trị
+      }));
     }
-};    
+  };
   const handleSelectChange = (values: string[]) => {
     setAppliesToItems(values);
   };
@@ -136,7 +146,12 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
     }
   };
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-extrabold text-blue-800">
+                    {type === 'add' ? 'New Discount' : 'Update Discount'}
+                </h2>
+            </div>
       <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
         <div>
           <label className="block font-medium">Discount Code</label>
@@ -219,23 +234,33 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
         </div>
 
-        {(discount.type === 'product' || discount.type === 'category') && (
-          <div className="pb-5">
+        {(discount.type === "product" || discount.type === "category") && (
+          <div>
             <label className="block font-medium">
-              {discount.type === 'product' ? 'Products' : 'Categories'}
+              {discount.type === "product" ? "Products" : "Categories"}
             </label>
             <Select
               mode="multiple"
-              placeholder={`Select ${discount.type === 'product' ? 'products' : 'categories'}`}
+              placeholder={`Select ${discount.type === "product" ? "products" : "categories"}`}
               onChange={handleSelectChange}
-              value={appliesToItems.map((item) =>
-                typeof item === 'string' ? item : item._id
-              )}
+              value={appliesToItems
+                .filter((item) =>
+                  discount.type === "product"
+                    ? products.some((product) => product._id === (typeof item === "string" ? item : item._id))
+                    : categories.some((category) => category._id === (typeof item === "string" ? item : item._id))
+                )
+                .map((item) =>
+                  typeof item === "string"
+                    ? item
+                    : discount.type === "product"
+                      ? (item as Product).product_name
+                      : (item as Category).category_name
+                )}
               className="w-full mt-1"
               showSearch
               optionFilterProp="children"
             >
-              {discount.type === 'product'
+              {discount.type === "product"
                 ? products.map((product) => (
                   <Option key={product._id} value={product._id}>
                     {product.product_name}
@@ -249,7 +274,9 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
             </Select>
             {errors.appliesTo && <p className="text-red-500 text-sm">{errors.appliesTo}</p>}
           </div>
-        )}
+        )
+        }
+
       </div>
       <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
         <div>
@@ -302,20 +329,21 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
           />
           {errors.endDate && <p className="text-red-500 text-sm">{errors.endDate}</p>}
         </div>
-        <div>
-          <label className="block font-medium">Status</label>
+        <div className='flex items-center space-x-4'>
+          <label className="block font-medium">Status: </label>
           <Checkbox
             checked={discount.status}
             onChange={(e) => setDiscount({ ...discount, status: e.target.checked })}
-            className={`mt-1 ${errors.status ? 'text-red-500' : ''}`}
+            className={`text-lg font-medium  ${errors.status ? "text-red-500" : ""}`}
           >
             Active
           </Checkbox>
+
           {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
         </div>
       </div>
 
-      <div className="mt-6 flex gap-2 justify-end">
+      <div className="mt-4 flex gap-2 justify-end">
         <Button
           className="text-[16px] p-4 w-32 mt-6"
           type="primary"
