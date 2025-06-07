@@ -33,7 +33,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
           src={
             images?.length
               ? images[0]
-              : "../src/public/assets/images/default-product-image.png"
+              : "/assets/images/default-product-image.png"
           }
           alt={product_name}
           className="inset-0 w-full h-[300px] object-cover group-hover:scale-110 duration-500"

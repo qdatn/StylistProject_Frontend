@@ -76,7 +76,7 @@ export default function BodyShapePage() {
     <div className="min-h-screen ">
       <div className="relative w-[75vw] h-[250px] md:h-[300px] lg:h-[500px] overflow-hidden mx-auto">
         <img
-          src="./src/public/assets/images/body-shape-banner.jpg"
+          src="/assets/images/body-shape-banner.jpg"
           alt="Body Shape Banner"
           className="object-cover w-full h-full"
         />

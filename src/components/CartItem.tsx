@@ -125,7 +125,7 @@ const CartItem: React.FC<CartItemProps> = ({
           src={
             product.images?.length
               ? product.images?.[0]
-              : "../src/public/assets/images/default-product-image.png"
+              : "/assets/images/default-product-image.png"
           } // Sử dụng ảnh đầu tiên trong mảng image
           alt={product.product_name}
           className="w-20 h-20 object-cover rounded-lg mr-4"

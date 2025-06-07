@@ -20,7 +20,7 @@ import { OrderAttribute } from "@src/types/Attribute";
 import { formatCurrency } from "@utils/format";
 import { Product, ProductVariant } from "@src/types/new/Product";
 
-const DEFAULT_IMAGE = "../src/public/assets/images/default-product-image.png";
+const DEFAULT_IMAGE = "/assets/images/default-product-image.png";
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
