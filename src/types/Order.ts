@@ -9,7 +9,7 @@ export interface Order {
   _id: string;
   user: User;
   status: string;
-  discount?: number;
+  discount: number | 0;
   total_price: number;
   method?: string;
   address: Address;

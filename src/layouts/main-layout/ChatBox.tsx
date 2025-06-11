@@ -278,7 +278,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-lg overflow-hidden border">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b bg-blue-600 text-white">
+      <div className="flex items-center gap-3 p-4 border-b bg-gradient-to-r from-sky-400 to-indigo-700 text-white shadow-md">
         <img
           src={user.avatar || "/default-avatar.png"}
           alt={user.name}
@@ -299,35 +299,37 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
           messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`text-sm p-2 rounded-md max-w-[70%] break-words ${
-                msg.sender === currentUserId
-                  ? "bg-blue-100 ml-auto self-end"
-                  : "bg-white self-start"
-              }`}
+              className={`text-sm p-2 rounded-md max-w-[70%] break-words ${msg.sender === currentUserId
+                ? "bg-blue-100 ml-auto self-end"
+                : "bg-white self-start"
+                }`}
             >
               {/* Hiển thị hiệu ứng loading */}
               {msg.content === "__LOADING__" ? (
                 <LoadingDots />
               ) : msg.content === "__RECOMMEND__" && msg.recommendProducts ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
+                  <p className="font-medium mb-2">I recommend these products:</p>
                   {msg.recommendProducts.map((product) => (
                     <div
                       key={product.productId}
-                      className="p-3 border border-gray-300 rounded-md shadow-sm hover:shadow-md transition bg-slate-50"
+                      className="p-3 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 flex"
                     >
-                      <a
-                        href={product.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block"
-                      >
-                        <h3 className="font-semibold text-blue-600 hover:underline">
-                          {product.name}
-                        </h3>
-                        {/* <p className="text-gray-700 text-sm">
-                          {product.description}
-                        </p> */}
-                      </a>
+                      <div className="flex-1 min-w-0">
+                        <a
+                          href={product.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block"
+                        >
+                          <h3 className="font-semibold text-blue-600 hover:underline line-clamp-2">
+                            {product.name}
+                          </h3>
+                          <button className="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded-md transition-colors">
+                            View Details
+                          </button>
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -356,17 +358,22 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
 
       {/* Input */}
       <div className="p-3 border-t flex items-center gap-2 bg-white">
-        <input
-          type="text"
-          placeholder="Enter message..."
+        <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="flex-1 border rounded-md px-3 py-2 text-sm outline-none"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+          placeholder="Type your message..."
+          rows={1}
+          className="w-full py-2 px-1 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         />
         <button
           onClick={handleSend}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm"
+          className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm"
         >
           Send
         </button>
