@@ -37,8 +37,15 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
 
       {/* Tổng tiền - căn phải */}
       <div className="order-total flex justify-end pt-4">
+        <span className="text-base font-normal mr-2">Discount:</span>
+        <span className="text-base font-bold text-gray-700">
+          - {formatCurrency(order?.discount)}
+        </span>
+         
+      </div>
+      <div className="order-total flex justify-end pt-4">
         <span className="text-lg font-medium mr-2">Total:</span>
-        <span className="text-lg font-bold text-red-500">
+        <span className="text-lg font-semibold text-gray-700">
           {formatCurrency(order.total_price)}
         </span>
       </div>
