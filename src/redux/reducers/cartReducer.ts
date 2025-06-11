@@ -115,10 +115,11 @@ const cartSlice = createSlice({
         productId: string;
         oldAttributes: OrderAttribute[];
         newAttributes: OrderAttribute[];
+        newPrice: number;
       }>
     ) => {
       // Tìm sản phẩm trong giỏ hàng
-      const { userId, productId, oldAttributes, newAttributes } = action.payload;
+      const { userId, productId, oldAttributes, newAttributes, newPrice } = action.payload;
       const product = state[userId].items.find(
         (item) => item._id === productId && 
             areAttributesEqual(item.cart_attributes, oldAttributes)
@@ -127,6 +128,7 @@ const cartSlice = createSlice({
       if (product) {
         // Cập nhật thuộc tính của sản phẩm
         product.cart_attributes = newAttributes;
+        product.price = newPrice;
       }
     },
   },

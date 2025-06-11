@@ -28,8 +28,6 @@ export interface CartItemProps {
 const arraysEqual = (a: any[], b: any[]) =>
   a.length === b.length && a.every((val, index) => val === b[index]);
 
-// Hàm để lấy hình ảnh sản phẩm dựa trên ID
-
 const CartItem: React.FC<CartItemProps> = ({
   product,
   onUpdateQuantity,
@@ -37,6 +35,18 @@ const CartItem: React.FC<CartItemProps> = ({
   onSelect,
   quantity,
 }) => {
+  // Hàm để lấy hình ảnh sản phẩm dựa trên ID
+  const findVariant = (
+    attributes: OrderAttribute[]
+  ): ProductVariant | undefined => {
+    return product.variants?.find((variant) =>
+      variant.attributes.every((attr) => {
+        const selectedValue = attributes.find((a) => a.key === attr.key)?.value;
+        return selectedValue === attr.value;
+      })
+    );
+  };
+
   const [selectedAttributes, setSelectedAttributes] = useState<
     OrderAttribute[]
   >(product.cart_attributes);
@@ -45,6 +55,9 @@ const CartItem: React.FC<CartItemProps> = ({
   const cart = useSelector(
     (state: RootState) => state.persist.cart[userId!]?.items || []
   );
+  const [currentVariant, setCurrentVariant] = useState<
+    ProductVariant | undefined
+  >(findVariant(product.cart_attributes));
   const [isSelected, setIsSelected] = useState(false);
   const dispatch = useDispatch();
 
@@ -73,14 +86,48 @@ const CartItem: React.FC<CartItemProps> = ({
     });
   };
 
+  // useEffect(() => {
+  //   if (!selectedAttributes || selectedAttributes.length === 0) return;
+
+  //   const newVariant = findVariant(selectedAttributes);
+  //   setCurrentVariant(newVariant);
+
+  //   if (newVariant) {
+  //     dispatch(
+  //       updateCartAttributes({
+  //         userId,
+  //         productId: product._id as string,
+  //         oldAttributes: product.cart_attributes,
+  //         newAttributes: selectedAttributes,
+  //         newPrice: newVariant.price,
+  //       })
+  //     );
+  //   }
+  // }, [selectedAttributes]);
+
   useEffect(() => {
-    if (selectedAttributes) {
+    // if (selectedAttributes) {
+    //   dispatch(
+    //     updateCartAttributes({
+    //       userId: userId,
+    //       productId: product._id as string,
+    //       oldAttributes: product.cart_attributes,
+    //       newAttributes: selectedAttributes!,
+    //       newPrice: currentVariant ? currentVariant.price : product.price,
+    //     })
+    //   );
+    // }
+    const newVariant = findVariant(selectedAttributes);
+    setCurrentVariant(newVariant);
+
+    if (newVariant) {
       dispatch(
         updateCartAttributes({
-          userId: userId,
+          userId,
           productId: product._id as string,
           oldAttributes: product.cart_attributes,
-          newAttributes: selectedAttributes!,
+          newAttributes: selectedAttributes,
+          newPrice: newVariant.price,
         })
       );
     }
@@ -117,6 +164,8 @@ const CartItem: React.FC<CartItemProps> = ({
   };
 
   const productAttributes = getAttributesFromVariants(product.variants);
+  // Sử dụng giá từ variant
+  const displayPrice = currentVariant ? currentVariant.price : product.price;
 
   return (
     <div className="flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
@@ -146,7 +195,8 @@ const CartItem: React.FC<CartItemProps> = ({
           {/* <span className="text-gray-500 line-through">
             {formatCurrency(product.price)}
           </span> */}
-          <span className="text-red-500">{formatCurrency(product.price)}</span>
+          {/* <span className="text-red-500">{formatCurrency(product.price)}</span> */}
+          <span className="text-red-500">{formatCurrency(displayPrice)}</span>
         </div>
         <div className="flex items-center mb-2 flex-wrap">
           {productAttributes.map((attr) => (
