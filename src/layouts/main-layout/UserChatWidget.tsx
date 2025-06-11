@@ -71,7 +71,7 @@ const UserChatWidget: React.FC = () => {
           className=" rounded-full"
         >
           <img
-          src={ "./src/public/assets/images/chat-bot.png"}
+          src={ "../src/public/assets/images/chat-bot.png"}
           alt={"chat bot"}
           className=" w-16 h-16"
         />

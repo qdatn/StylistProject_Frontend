@@ -147,21 +147,31 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                 <div>
                     <label className="block font-medium mb-2">Order ID</label>
                     <Select
-                        placeholder="Select Order ID"
+                        placeholder="Select an order"
                         value={notice.order || undefined}
                         onChange={value => setNotification(prev => ({ ...prev, order: value }))}
-                        className="w-full"
+                        className="w-full rounded-lg"
                         allowClear
                         showSearch
                         filterOption={(input, option) => {
-                            const label = typeof option?.children === 'string' ? option.children : '';
+                            const label = option?.children?.toString() || '';
                             return label.toLowerCase().includes(input.toLowerCase());
                         }}
+                        disabled={!notice.user || notice.user.length === 0}
                     >
                         {orders.map(order => (
-                            <option key={order._id} value={order._id}>
-                                {order._id}
-                            </option>
+                            <Select.Option key={order._id} value={order._id}>
+                                <div className="flex justify-between">
+                                    <span className="font-medium">ID: ...{order._id.slice(-10)}</span>
+                                    <span>{order.user.email}</span>
+                                    <div className="text-right">
+                                        <div className="text-green-600">${order.total_price?.toFixed(2)}</div>
+                                        <div className="text-xs text-gray-500">
+                                            {moment(order.receive_date).format('DD/MM/YYYY')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Select.Option>
                         ))}
                     </Select>
                 </div>
