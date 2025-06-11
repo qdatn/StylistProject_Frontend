@@ -67,7 +67,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                 [field]: undefined, // Nếu không có ngày chọn thì xóa giá trị
             }));
         }
-    };    
+    };
     // Kiểm tra dữ liệu trước khi lưu
     const validate = () => {
         const newErrors: Record<string, string> = {};
@@ -134,8 +134,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                     >
                         <option value="" disabled>Select Status</option>
                         <option value="pending">Pending</option>
+                        <option value="delivering">Delivering</option>
                         <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
                         <option value="canceled">Canceled</option>
                     </Select>
                     {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}

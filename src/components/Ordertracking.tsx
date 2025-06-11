@@ -16,8 +16,6 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-  console.log("ODDEDASD", order);
-  console.log("ODDEDASD ITEM", orderitems);
   return (
     <div className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700">
       {/* Trạng thái đơn hàng */}
@@ -41,7 +39,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
         <span className="text-base font-bold text-gray-700">
           - {formatCurrency(order?.discount)}
         </span>
-         
+
       </div>
       <div className="order-total flex justify-end pt-4">
         <span className="text-lg font-medium mr-2">Total:</span>
