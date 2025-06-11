@@ -43,6 +43,7 @@ import NotificationManagement from "@app/admin/customer/NotificationList";
 import EditNotification from "@app/admin/customer/NotificationEdit";
 import NewNotification from "@app/admin/customer/NewNotification";
 import FashionSurveyPage from "@app/customer/survey";
+import CustomerAnalytics from "@app/admin/customer/CustomerAnalytics";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
 
@@ -124,6 +125,7 @@ function App() {
             />
             <Route path="/admin/order/new" element={<NewOrder />} />
             <Route path="/admin/discount/new" element={<NewDiscount />} />
+            <Route path="/admin/analyze" element={<CustomerAnalytics />} />
             <Route path="/admin/*" element={<NotFound />} />
           </Route>
 
