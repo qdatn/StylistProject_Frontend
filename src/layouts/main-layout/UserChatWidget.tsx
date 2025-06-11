@@ -65,12 +65,16 @@ const UserChatWidget: React.FC = () => {
   return (
     <>
       {/* Icon mở chat */}
-      <div className="fixed bottom-4 right-4 z-40">
+      <div className="fixed bottom-2 right-3 z-40">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-blue-600 p-3 rounded-full shadow-lg hover:bg-blue-700 text-white"
+          className=" rounded-full"
         >
-          <MessageCircle size={24} />
+          <img
+          src={ "./src/public/assets/images/chat-bot.png"}
+          alt={"chat bot"}
+          className=" w-16 h-16"
+        />
         </button>
       </div>
 

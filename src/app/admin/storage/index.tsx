@@ -1,7 +1,6 @@
 // app/admin/product/ProductCategories.tsx
 import React, { useEffect, useState } from "react";
-import { Product, ProductList } from "@src/types/Product";
-import mockProducts from "@src/types/Product"; // Import hàm cập nhật sản phẩm
+import { Product, ProductList } from "@src/types/new/Product";
 import StorageTable from "./StorageTable";
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";
