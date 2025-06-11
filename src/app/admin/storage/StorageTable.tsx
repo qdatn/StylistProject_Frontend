@@ -1,7 +1,7 @@
 import React from 'react';
 import CommonTable from '@components/ui/table'; // Giả sử bạn đã có component CommonTable
 import { message, Tag } from 'antd';
-import { Product, ProductList } from '@src/types/Product';
+import { Product, ProductList, ProductVariant } from '@src/types/new/Product';
 import { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
@@ -27,18 +27,21 @@ const productColumns: ColumnsType<Product> = [
         dataIndex: 'product_name',
     },
     {
-        title: 'Min Quantity',
-        dataIndex: 'min_quantity',
+        title: "Quantity",
+        dataIndex: "variants",
+        render: (variants: ProductVariant[]) => {
+            const totalStock = variants.reduce((sum, v) => sum + v.stock_quantity, 0);
+            return totalStock;
+        },
     },
     {
-        title: 'Sold Quantity',
-        dataIndex: 'sold_quantity',
+        title: "Sold Quantity",
+        dataIndex: "variants",
+        render: (variants: ProductVariant[]) => {
+            const totalSold = variants.reduce((sum, v) => sum + v.sold_quantity, 0);
+            return totalSold;
+        },
     },
-    {
-        title: 'Quantity',
-        dataIndex: 'stock_quantity',
-    },
-
     {
         title: 'Date Created',
         dataIndex: 'createdAt',
@@ -49,7 +52,7 @@ const productColumns: ColumnsType<Product> = [
         dataIndex: 'status',
         render: (status: boolean) => (
             <Tag color={status ? 'green' : 'volcano'}>
-                {status ? 'Available' : 'Out of stock'}
+                {status ? 'Available' : 'Unavailable'}
             </Tag>
         ),
         filters: [

@@ -10,7 +10,7 @@ export interface ProductVariant {
     price: number;
     stock_quantity: number;
     min_quantity: number;
-    sold_quantity?: number;
+    sold_quantity: number | 0;
     stock_update_date?: Date;
 }
 
@@ -31,5 +31,5 @@ export interface ProductList {
     pagination: PaginationType;
 }
 export interface ProductWithFiles extends Product {
-  imageFiles?: File[];
+    imageFiles?: File[];
 }

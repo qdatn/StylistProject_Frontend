@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Product } from '@src/types/Product';
-import { Upload, Button, Input, message, Modal, Checkbox } from 'antd';
+import { Product, ProductVariant } from '@src/types/new/Product';
+import { Button, Input, message, Modal, Checkbox } from 'antd';
+import { Attribute, AttributeList } from '@src/types/Attribute';
+import axiosClient from '@api/axiosClient';
+import ProductAttribute from './new/ProductAttribute';
 
 interface ProductStorageFormProps {
     initialProduct?: Partial<Product>;
@@ -12,6 +15,27 @@ interface ProductStorageFormProps {
 const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct = {}, onSave, onCancel, type }) => {
     const [product, setProduct] = useState<Partial<Product>>(initialProduct);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [attributes, setAttributes] = useState<Attribute[]>([]);
+    const [activeStep, setActiveStep] = useState(0);
+
+    const baseUrl = import.meta.env.VITE_API_URL;
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const attrResponse = await axiosClient.getOne<AttributeList>(`${baseUrl}/api/attribute`);
+                setAttributes(attrResponse.data || []);
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            }
+        };
+
+        fetchData();
+    }, [baseUrl]);
+
+    const handleAttributesChange = (variants: ProductVariant[]) => {
+        setProduct(prev => ({ ...prev, variants }));
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -20,13 +44,12 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
             [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
         }));
     };
+
+
     const validate = () => {
         const newErrors: Record<string, string> = {};
         if (!product._id) newErrors.id = 'Product ID is required.';
         if (!product.product_name) newErrors.name = 'Product name is required.';
-        if (product.stock_quantity !== undefined && product.stock_quantity < 0)
-            newErrors.stock_quantity = 'Stock quantity cannot be negative.';
-        setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
     const handleSave = () => {
@@ -74,54 +97,62 @@ const ProductStorageForm: React.FC<ProductStorageFormProps> = ({ initialProduct 
                     />
                     {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                 </div>
-
-
+            </div>
+            <div className='mt-6'>
+                <ProductAttribute
+                    attributes={attributes}
+                    variants={product.variants || []}
+                    onChange={handleAttributesChange}
+                    onAddKey={async (key) => {
+                        try {
+                            const response = await axiosClient.post<Attribute>(`${baseUrl}/api/attribute`, {
+                                key: key.trim(),
+                                value: [],
+                            });
+                            setAttributes(prev => [...prev, response]);
+                        } catch (error) {
+                            console.error("Error adding attribute key:", error);
+                        }
+                    }}
+                    onDeleteKey={async (key) => {
+                        try {
+                            await axiosClient.delete(`${baseUrl}/api/attribute/${key}`);
+                            setAttributes(prev => prev.filter(attr => attr.key !== key));
+                        } catch (error) {
+                            console.error("Error deleting attribute key:", error);
+                        }
+                    }}
+                    onAddValue={async (key, value) => {
+                        try {
+                            await axiosClient.put(`${baseUrl}/api/attribute/${key}/addValues`, {
+                                values: [value],
+                            });
+                            setAttributes(prev =>
+                                prev.map(attr =>
+                                    attr.key === key ? { ...attr, value: [...attr.value, value] } : attr
+                                )
+                            );
+                        } catch (error) {
+                            console.error("Error adding attribute value:", error);
+                        }
+                    }}
+                    onDeleteValue={async (key, value) => {
+                        try {
+                            await axiosClient.put(`${baseUrl}/api/attribute/${key}/deleteValues`, {
+                                values: [value],
+                            });
+                            setAttributes(prev =>
+                                prev.map(attr =>
+                                    attr.key === key ? { ...attr, value: attr.value.filter(v => v !== value) } : attr
+                                )
+                            );
+                        } catch (error) {
+                            console.error("Error deleting attribute value:", error);
+                        }
+                    }}
+                />
             </div>
 
-            <div className="mt-6 flex flex-row">
-                <div className='w-1/2 justify-center space-y-4'>
-                    <div>
-                        <label className="block font-medium">Stock Quantity</label>
-                        <input
-                            type="number"
-                            name="stock_quantity"
-                            value={product.stock_quantity || 0}
-                            onChange={handleChange}
-                            min="0"
-                            required
-                            placeholder="Enter stock quantity"
-                            className={`w-full mt-1 p-2 border rounded-md ${errors.stock_quantity ? 'border-red-500' : ''}`}
-                        />
-                        {errors.stock_quantity && <p className="text-red-500 text-sm">{errors.stock_quantity}</p>}
-                    </div>
-                    <div>
-                        <label className="block font-medium">Min Quantity</label>
-                        <input
-                            type="number"
-                            name="min_quantity"
-                            value={product.min_quantity || 0}
-                            onChange={handleChange}
-                            min="0"
-                            placeholder="Enter stock quantity"
-                            className={`w-full mt-1 p-2 border rounded-md ${errors.min_quantity ? 'border-red-500' : ''}`}
-                        />
-                        {errors.min_quantity && <p className="text-red-500 text-sm">{errors.min_quantity}</p>}
-                    </div>
-                    <div>
-                        <label className="block font-medium">Sold Quantity</label>
-                        <input
-                            type="number"
-                            name="sold_quantity"
-                            value={product.sold_quantity || 0}
-                            onChange={handleChange}
-                            min="0"
-                            placeholder="Enter stock quantity"
-                            className={`w-full mt-1 p-2 border rounded-md ${errors.sold_quantity ? 'border-red-500' : ''}`}
-                        />
-                        {errors.sold_quantity && <p className="text-red-500 text-sm">{errors.stock_quantity}</p>}
-                    </div>
-                </div>
-            </div>
             <div className='flex items-center space-x-4 mt-4'>
                 <label className="block font-medium">Status</label>
                 <Checkbox
