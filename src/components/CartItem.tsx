@@ -167,6 +167,35 @@ const CartItem: React.FC<CartItemProps> = ({
   // Sử dụng giá từ variant
   const displayPrice = currentVariant ? currentVariant.price : product.price;
 
+  // Check if number input > stock quantity
+  const getCurrentStockQuantity = (): number => {
+    // Nếu có variant hiện tại thì lấy stock từ variant
+    if (currentVariant) {
+      return currentVariant.stock_quantity;
+    }
+
+    return 0;
+  };
+
+  const handleQuantityChange = (newQuantity: number) => {
+    const maxQuantity = getCurrentStockQuantity();
+
+    // Giới hạn số lượng trong khoảng 1 đến maxQuantity
+    const clampedQuantity = Math.max(1, Math.min(newQuantity, maxQuantity));
+
+    if (onUpdateQuantity) {
+      onUpdateQuantity(clampedQuantity);
+    }
+  };
+
+  // Auto change quantity if it exceeds stock
+  useEffect(() => {
+    const maxQuantity = getCurrentStockQuantity();
+    if (quantity > maxQuantity) {
+      handleQuantityChange(maxQuantity);
+    }
+  }, [currentVariant]);
+
   return (
     <div className="flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
       <Link to={`/product/${product._id}`}>
@@ -230,7 +259,8 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
         <div className="flex items-center">
           <button
-            onClick={() => onUpdateQuantity && onUpdateQuantity(quantity - 1)}
+            // onClick={() => onUpdateQuantity && onUpdateQuantity(quantity - 1)}
+            onClick={() => handleQuantityChange(quantity - 1)}
             disabled={quantity <= 1}
             className="p-1 rounded-l text-gray-600 hover:bg-gray-200"
           >
@@ -239,25 +269,10 @@ const CartItem: React.FC<CartItemProps> = ({
           <Input
             type="text"
             min="1"
-            max={
-              product.variants?.find((variant) =>
-                arraysEqual(variant.attributes, product.cart_attributes)
-              )?.stock_quantity
-            }
+            max={getCurrentStockQuantity()}
+            onFocus={(e) => e.target.select()}
             value={quantity}
             onChange={(e) =>
-              //   onUpdateQuantity &&
-              //   onUpdateQuantity(
-              //     Math.max(
-              //       1,
-              //       Math.min(
-              //         Number(e.target.value),
-              //         product.variants?.find((variant) =>
-              //           arraysEqual(variant.attributes, product.cart_attributes)
-              //         )?.stock_quantity as number
-              //       )
-              //     )
-              //   )
               {
                 const val = e.target.value;
 
@@ -269,19 +284,21 @@ const CartItem: React.FC<CartItemProps> = ({
                 const num = Number(val);
 
                 if (!isNaN(num) && num >= 1) {
-                  const maxQty =
-                    product.variants?.find((variant) =>
-                      arraysEqual(variant.attributes, product.cart_attributes)
-                    )?.stock_quantity ?? Infinity;
+                  // const maxQty =
+                  //   product.variants?.find((variant) =>
+                  //     arraysEqual(variant.attributes, product.cart_attributes)
+                  //   )?.stock_quantity ?? Infinity;
 
-                  onUpdateQuantity && onUpdateQuantity(Math.min(num, maxQty));
+                  // onUpdateQuantity && onUpdateQuantity(Math.min(num, maxQty));
+                  handleQuantityChange(num);
                 }
               }
             }
             className="text-center w-14 border"
           />
           <button
-            onClick={() => onUpdateQuantity && onUpdateQuantity(quantity + 1)}
+            // onClick={() => onUpdateQuantity && onUpdateQuantity(quantity + 1)}
+            onClick={() => handleQuantityChange(quantity + 1)}
             disabled={
               quantity >=
               (product.variants?.find((variant) =>
@@ -292,6 +309,10 @@ const CartItem: React.FC<CartItemProps> = ({
           >
             <AiOutlinePlus />
           </button>
+          {/* Hiển thị số lượng tồn kho */}
+          <div className="text-sm text-gray-500 ml-10 mt-1">
+            Number left: {getCurrentStockQuantity()}
+          </div>
         </div>
       </div>
       <button onClick={toggleSelect} className="ml-4">
