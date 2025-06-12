@@ -176,6 +176,36 @@ const cartSlice = createSlice({
         userCart[itemIndex] = updatedItem;
       }
     },
+    updateCartProducts: (
+      state,
+      action: PayloadAction<{
+        userId: string;
+        updatedProducts: Product[];
+      }>
+    ) => {
+      const { userId, updatedProducts } = action.payload;
+      const userCart = state[userId];
+
+      if (!userCart) return;
+
+      // Tạo map cho sản phẩm mới
+      const productMap = new Map(updatedProducts.map((p) => [p._id, p]));
+
+      // Cập nhật thông tin sản phẩm trong giỏ hàng
+      userCart.items = userCart.items.map((item) => {
+        const updatedProduct = productMap.get(item._id);
+        if (updatedProduct) {
+          // Giữ nguyên số lượng và thuộc tính
+          return {
+            ...updatedProduct,
+            quantity: item.quantity,
+            cart_attributes: item.cart_attributes,
+            price: item.price,
+          };
+        }
+        return item;
+      });
+    },
   },
 });
 
@@ -191,5 +221,6 @@ export const {
   deleteItemFromCart,
   updateProductQuantity,
   updateCartAttributes,
+  updateCartProducts
 } = cartSlice.actions;
 export default cartSlice.reducer;

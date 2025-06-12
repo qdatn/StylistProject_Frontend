@@ -196,8 +196,23 @@ const CartItem: React.FC<CartItemProps> = ({
     }
   }, [currentVariant]);
 
+  // Kiểm tra variant hiện tại còn hàng không
+  const isOutOfStock = getCurrentStockQuantity() === 0;
+
+  // Tự động bỏ chọn nếu hết hàng
+  useEffect(() => {
+    if (isOutOfStock && isSelected) {
+      onSelect(false);
+      setIsSelected(false);
+    }
+  }, [isOutOfStock, isSelected, onSelect]);
+
   return (
-    <div className="flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4">
+    <div
+      className={`flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4 ${
+        isOutOfStock ? "opacity-50 border border-red-500" : ""
+      }`}
+    >
       <Link to={`/product/${product._id}`}>
         <img
           src={
@@ -227,6 +242,7 @@ const CartItem: React.FC<CartItemProps> = ({
           {/* <span className="text-red-500">{formatCurrency(product.price)}</span> */}
           <span className="text-red-500">{formatCurrency(displayPrice)}</span>
         </div>
+
         <div className="flex items-center mb-2 flex-wrap">
           {productAttributes.map((attr) => (
             <div key={attr.key} className="flex items-center mr-4 mb-2">
@@ -246,11 +262,31 @@ const CartItem: React.FC<CartItemProps> = ({
                   }
                   className="text-[15px] appearance-none px-4 py-2 text-gray-700 focus:outline-none bg-white pr-6"
                 >
-                  {attr.value.map((option: any) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
+                  {attr.value.map((option: any) => 
+                  {
+                    // Kiểm tra option này có khả dụng không
+                    const optionVariant = findVariant([
+                      ...selectedAttributes.filter(a => a.key !== attr.key),
+                      { key: attr.key, value: option }
+                    ]);
+                    
+                    const isOptionAvailable = optionVariant && optionVariant.stock_quantity > 0;
+                    
+                    return (
+                      <option 
+                        key={option} 
+                        value={option}
+                        disabled={!isOptionAvailable}
+                      >
+                        {option} {!isOptionAvailable && "(Out of stock)"}
+                      </option>
+                    );
+                  })}
+                  {/* // (
+                  //   <option key={option} value={option}>
+                  //     {option}
+                  //   </option>
+                  // ))} */}
                 </select>
                 <AiOutlineDown className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500" />
               </div>
@@ -272,28 +308,26 @@ const CartItem: React.FC<CartItemProps> = ({
             max={getCurrentStockQuantity()}
             onFocus={(e) => e.target.select()}
             value={quantity}
-            onChange={(e) =>
-              {
-                const val = e.target.value;
+            onChange={(e) => {
+              const val = e.target.value;
 
-                if (val === "") {
-                  // Nếu input bị xoá hết thì không cập nhật quantity để tránh NaN
-                  return;
-                }
-
-                const num = Number(val);
-
-                if (!isNaN(num) && num >= 1) {
-                  // const maxQty =
-                  //   product.variants?.find((variant) =>
-                  //     arraysEqual(variant.attributes, product.cart_attributes)
-                  //   )?.stock_quantity ?? Infinity;
-
-                  // onUpdateQuantity && onUpdateQuantity(Math.min(num, maxQty));
-                  handleQuantityChange(num);
-                }
+              if (val === "") {
+                // Nếu input bị xoá hết thì không cập nhật quantity để tránh NaN
+                return;
               }
-            }
+
+              const num = Number(val);
+
+              if (!isNaN(num) && num >= 1) {
+                // const maxQty =
+                //   product.variants?.find((variant) =>
+                //     arraysEqual(variant.attributes, product.cart_attributes)
+                //   )?.stock_quantity ?? Infinity;
+
+                // onUpdateQuantity && onUpdateQuantity(Math.min(num, maxQty));
+                handleQuantityChange(num);
+              }
+            }}
             className="text-center w-14 border"
           />
           <button
@@ -313,6 +347,13 @@ const CartItem: React.FC<CartItemProps> = ({
           <div className="text-sm text-gray-500 ml-10 mt-1">
             Number left: {getCurrentStockQuantity()}
           </div>
+
+          {/* Nếu hết hàng thì hiện chữ này */}
+          {isOutOfStock && (
+          <div className="text-red-500 font-semibold ml-10 mt-1">
+            This product is out of stock. Please change attributes.
+          </div>
+        )}
         </div>
       </div>
       <button onClick={toggleSelect} className="ml-4">
