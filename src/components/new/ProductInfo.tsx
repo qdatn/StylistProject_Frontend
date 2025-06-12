@@ -261,7 +261,19 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
             required
           />
         </div>
-
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Product ID *
+          </label>
+          <input
+            type="text"
+            name="_id"
+            value={product._id|| ""}
+            onChange={handleChange}
+            disabled
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium mb-1">Brand</label>
           <input
