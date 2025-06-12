@@ -59,7 +59,9 @@ const cartSlice = createSlice({
       const userCart = state[userId].items;
 
       const existingProduct = state[userId].items.find(
-        (item) => item._id === product._id && areAttributesEqual(item.cart_attributes, cart_attributes!)
+        (item) =>
+          item._id === product._id &&
+          areAttributesEqual(item.cart_attributes, cart_attributes!)
       );
 
       if (existingProduct) {
@@ -78,14 +80,21 @@ const cartSlice = createSlice({
     },
     deleteItemFromCart: (
       state,
-      action: PayloadAction<{ userId: string; productId: string, cart_attributes: OrderAttribute[] }>
+      action: PayloadAction<{
+        userId: string;
+        productId: string;
+        cart_attributes: OrderAttribute[];
+      }>
     ) => {
       // Lọc bỏ sản phẩm có _id tương ứng với productId
       const { userId, productId, cart_attributes } = action.payload;
       state[userId].items = state[userId].items.filter(
-        (item) => !(item._id === productId && 
-          areAttributesEqual(item.cart_attributes, cart_attributes))
-          // item._id !== productId
+        (item) =>
+          !(
+            item._id === productId &&
+            areAttributesEqual(item.cart_attributes, cart_attributes)
+          )
+        // item._id !== productId
       );
     },
     updateProductQuantity: (
@@ -100,8 +109,9 @@ const cartSlice = createSlice({
       // Tìm sản phẩm
       const { userId, productId, quantity, cart_attributes } = action.payload;
       const product = state[userId].items.find(
-        (item) => item._id === productId && 
-        areAttributesEqual(item.cart_attributes, cart_attributes)
+        (item) =>
+          item._id === productId &&
+          areAttributesEqual(item.cart_attributes, cart_attributes)
       );
 
       if (product) {
@@ -115,19 +125,86 @@ const cartSlice = createSlice({
         productId: string;
         oldAttributes: OrderAttribute[];
         newAttributes: OrderAttribute[];
+        newPrice: number;
       }>
     ) => {
       // Tìm sản phẩm trong giỏ hàng
-      const { userId, productId, oldAttributes, newAttributes } = action.payload;
-      const product = state[userId].items.find(
-        (item) => item._id === productId && 
-            areAttributesEqual(item.cart_attributes, oldAttributes)
+      const { userId, productId, oldAttributes, newAttributes, newPrice } =
+        action.payload;
+      // const product = state[userId].items.find(
+      //   (item) => item._id === productId &&
+      //       areAttributesEqual(item.cart_attributes, oldAttributes)
+      // );
+
+      // if (product) {
+      //   // Cập nhật thuộc tính của sản phẩm
+      //   product.cart_attributes = newAttributes;
+      //   product.price = newPrice;
+      // }
+      const userCart = state[userId].items;
+      const itemIndex = userCart.findIndex(
+        (item) =>
+          item._id === productId &&
+          areAttributesEqual(item.cart_attributes, oldAttributes)
       );
 
-      if (product) {
-        // Cập nhật thuộc tính của sản phẩm
-        product.cart_attributes = newAttributes;
+      if (itemIndex === -1) return;
+
+      // Tạo bản sao mới của item với thuộc tính mới
+      const updatedItem = {
+        ...userCart[itemIndex],
+        cart_attributes: newAttributes,
+        price: newPrice,
+      };
+
+      // Tìm xem có item nào trùng với item mới không
+      const duplicateIndex = userCart.findIndex(
+        (item, index) =>
+          index !== itemIndex &&
+          item._id === productId &&
+          areAttributesEqual(item.cart_attributes, newAttributes)
+      );
+
+      if (duplicateIndex !== -1) {
+        // Gộp số lượng vào item trùng
+        userCart[duplicateIndex].quantity += updatedItem.quantity;
+
+        // Xóa item cũ
+        userCart.splice(itemIndex, 1);
+      } else {
+        // Nếu không có item trùng, cập nhật item hiện tại
+        userCart[itemIndex] = updatedItem;
       }
+    },
+    updateCartProducts: (
+      state,
+      action: PayloadAction<{
+        userId: string;
+        updatedProducts: Product[];
+      }>
+    ) => {
+      const { userId, updatedProducts } = action.payload;
+      const userCart = state[userId];
+
+      if (!userCart) return;
+
+      // Tạo map cho sản phẩm mới
+      const productMap = new Map(updatedProducts.map((p) => [p._id, p]));
+
+      // Cập nhật thông tin sản phẩm trong giỏ hàng
+      userCart.items = userCart.items.map((item) => {
+        const updatedProduct = productMap.get(item._id);
+        if (updatedProduct) {
+          // Giữ nguyên số lượng và thuộc tính
+          return {
+            ...updatedProduct,
+            quantity: item.quantity,
+            cart_attributes: item.cart_attributes,
+            price: item.price,
+          };
+        }
+        return item;
+      });
     },
   },
 });
@@ -144,5 +221,6 @@ export const {
   deleteItemFromCart,
   updateProductQuantity,
   updateCartAttributes,
+  updateCartProducts
 } = cartSlice.actions;
 export default cartSlice.reducer;

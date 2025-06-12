@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import CartItem from "@components/CartItem";
-import { Product } from "@src/types/new/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
+import { Product, ProductList } from "@src/types/new/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
 import {
   Discount,
   DiscountAvailable,
@@ -14,6 +14,7 @@ import { Input, notification } from "antd";
 import {
   CartProduct,
   deleteItemFromCart,
+  updateCartProducts,
   updateProductQuantity,
 } from "@redux/reducers/cartReducer";
 import * as Yup from "yup";
@@ -29,14 +30,12 @@ export const createAttributeId = (attributes: OrderAttribute[]): string => {
   if (!attributes || attributes.length === 0) return "default";
 
   // Sắp xếp thuộc tính theo key để đảm bảo thứ tự không ảnh hưởng
-  const sortedAttributes = [...attributes].sort((a, b) => 
+  const sortedAttributes = [...attributes].sort((a, b) =>
     a.key.localeCompare(b.key)
   );
 
   // Tạo chuỗi định danh từ các thuộc tính
-  return sortedAttributes.map(attr => 
-    `${attr.key}-${attr.value}`
-  ).join('_');
+  return sortedAttributes.map((attr) => `${attr.key}-${attr.value}`).join("_");
 };
 
 const CartPage = () => {
@@ -93,12 +92,46 @@ const CartPage = () => {
   };
 
   useEffect(() => {
-    setSelectedProductIds(selectedItems.map((uniqueId) => uniqueId.split("-")[0]));
+    setSelectedProductIds(
+      selectedItems.map((uniqueId) => uniqueId.split("-")[0])
+    );
   }, [selectedItems]);
 
   useEffect(() => {
     fetchCartItem();
   }, []);
+
+  useEffect(() => {
+    const fetchUpdatedCart = async () => {
+      try {
+        // Lấy danh sách ID sản phẩm trong giỏ hàng
+        const productIds = [...new Set(cart.map((item) => item._id))];
+
+        // Gọi API lấy thông tin mới nhất
+        const response = await axiosClient.post<ProductList>(
+          `${baseUrl}/api/product/by-style?page=1&limit=1000`,
+          { productIds: productIds }
+        );
+
+        const updatedProducts = response.data;
+
+        // Cập nhật Redux store với dữ liệu mới
+        dispatch(
+          updateCartProducts({
+            userId: userId!,
+            updatedProducts: updatedProducts,
+          })
+        );
+      } catch (error) {
+        console.error("Failed to update cart data", error);
+      }
+    };
+
+    if (cart.length > 0) {
+      fetchUpdatedCart();
+    }
+  }, [userId, dispatch]);
+
   // Tính tổng tiền chưa giảm giá
   // const subtotal = useMemo(
   //   () =>
@@ -182,14 +215,18 @@ const CartPage = () => {
   };
 
   //update quantity
-  const updateQuantity = (itemId: string, newQuantity: number, cart_attributes: OrderAttribute[]) => {
+  const updateQuantity = (
+    itemId: string,
+    newQuantity: number,
+    cart_attributes: OrderAttribute[]
+  ) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [itemId]: newQuantity,
     }));
 
     // Tách productId từ uniqueId
-    const productId = itemId.split('-')[0];
+    const productId = itemId.split("-")[0];
 
     //Cập nhật lại sl vào redux
     dispatch(
@@ -198,7 +235,7 @@ const CartPage = () => {
         // productId: itemId,
         productId: productId,
         quantity: newQuantity,
-        cart_attributes
+        cart_attributes,
       })
     );
   };
@@ -220,7 +257,7 @@ const CartPage = () => {
   };
   const removeItem = (itemId: string, cart_attributes: OrderAttribute[]) => {
     try {
-      const productId = itemId.split('-')[0];
+      const productId = itemId.split("-")[0];
       // deleteProductInCart(itemId);
       deleteProductInCart(productId);
       dispatch(
@@ -234,7 +271,9 @@ const CartPage = () => {
       // setCartItems((prevItems) =>
       //   prevItems.filter((item) => item._id !== itemId)
       // );
-      setCartItems(prev => prev.filter(item => getUniqueId(item) !== itemId));
+      setCartItems((prev) =>
+        prev.filter((item) => getUniqueId(item) !== itemId)
+      );
       setSelectedItems((prevSelected) =>
         prevSelected.filter((_id) => _id !== itemId)
       );
@@ -454,11 +493,16 @@ const CartPage = () => {
             quantity={item.quantity}
             onUpdateQuantity={(newQuantity) =>
               // updateQuantity(item._id, newQuantity, item.cart_attributes)
-              updateQuantity(getUniqueId(item), newQuantity, item.cart_attributes)
+              updateQuantity(
+                getUniqueId(item),
+                newQuantity,
+                item.cart_attributes
+              )
             }
-            onRemove={() => 
+            onRemove={() =>
               // removeItem(item._id, item.cart_attributes)
-              removeItem(getUniqueId(item), item.cart_attributes)}
+              removeItem(getUniqueId(item), item.cart_attributes)
+            }
             onSelect={(selected) => {
               // toggleSelectItem(item._id, selected), console.log(item);
               toggleSelectItem(getUniqueId(item), selected);
