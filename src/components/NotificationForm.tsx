@@ -57,7 +57,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
     useEffect(() => {
         const fetchCustomers = async () => {
             try {
-                const response = await axiosClient.getOne<CustomerList>(`${baseUrl}/api/userinfo/`, {});
+                const response = await axiosClient.getOne<CustomerList>(`${baseUrl}/api/userinfo/?limit=10000`, {});
                 setCustomers(response.data);
             } catch (error) {
                 console.error('Error fetching customers:', error);
