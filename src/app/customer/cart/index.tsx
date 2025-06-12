@@ -368,8 +368,12 @@ const CartPage = () => {
     }
   };
 
+  useEffect(() => {
+    setCartItems(cart);
+  }, [cart]);// Cập nhật khi cart thay đổi
+
   const handleSubmit = async (values: any) => {
-    await setCartItems(cart);
+    // await setCartItems(cart);
     const addressData: Address = {
       name: values.name,
       user: userId as string,
@@ -389,12 +393,12 @@ const CartPage = () => {
     };
 
     const order_items = cartItems
-      .filter((item) => selectedItems.includes(item._id!))
+      .filter((item) => selectedItems.includes(getUniqueId(item)))
       .map((item) => ({
         // _id: "",
         order: "",
         product: item._id,
-        quantity: /*item.quantity*/ quantities[item._id!] || 1,
+        quantity: /*item.quantity*/ quantities[getUniqueId(item)] || 1,
         price: item.price,
         note: "",
         attributes: item.cart_attributes,
