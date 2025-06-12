@@ -31,7 +31,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const catResponse = await axiosClient.getOne<CategoryList>(`${baseUrl}/api/category`);
+                const catResponse = await axiosClient.getOne<CategoryList>(
+                    `${baseUrl}/api/category?page=${1}&limit=30`
+                );
                 setCategories(catResponse.data || []);
 
                 const attrResponse = await axiosClient.getOne<AttributeList>(`${baseUrl}/api/attribute`);

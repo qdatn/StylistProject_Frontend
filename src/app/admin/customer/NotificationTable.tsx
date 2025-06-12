@@ -21,10 +21,6 @@ interface NotificationTableProps {
 
 const notificationColumns: ColumnsType<Notification> = [
   {
-    title: 'ID',
-    dataIndex: '_id',
-  },
-  {
     title: 'Title',
     dataIndex: 'title',
   },

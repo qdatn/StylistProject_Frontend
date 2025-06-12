@@ -20,10 +20,6 @@ interface CustomerTableProps {
 }
 const customerColumns: ColumnsType<UserAccount> = [
     {
-        title: 'ID',
-        dataIndex: '_id',
-    },
-    {
         title: 'User Email',
         dataIndex: 'user',
         render: (user: User) => user?.email || 'N/A', // Hiển thị email nếu tồn tại
