@@ -38,17 +38,19 @@ const orderColumns: ColumnsType<Order> = [
     dataIndex: 'status',
     render: (status: string) => {
       let color =
-        status === 'pending' ? 'orange' :
-          status === 'shipped' ? 'blue' :
-            status === 'delivered' ? 'green' :
-              status === 'canceled' ? 'red' : 'gray';
+        status === 'Waiting for payment!' ? 'gray' :
+          status === 'pending' ? 'orange' :
+            status === 'delivering' ? 'blue' :
+              status === 'shipped' ? 'green' :
+                status === 'canceled' ? 'red' : 'gray';
 
       return <Tag color={color}>{status.toUpperCase()}</Tag>;
     },
     filters: [
+      { text: 'Waiting for payment!', value: 'Waiting for payment!' },
       { text: 'Pending', value: 'pending' },
+      { text: 'Delivering', value: 'delivering' },
       { text: 'Shipped', value: 'shipped' },
-      { text: 'Delivered', value: 'delivered' },
       { text: 'Canceled', value: 'canceled' },
     ],
     onFilter: (value, record) => record.status === value,
@@ -92,8 +94,8 @@ const OrderTable: React.FC<OrderTableProps> = ({
       message.error("Failed to delete Orders");
     }
   };
-  
-console.log(orderColumns)
+
+  console.log(orderColumns)
   return (
     <div>
       <CommonTable

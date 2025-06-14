@@ -20,11 +20,11 @@ const OrderPage = () => {
     totalPages: 0,
   });
 
-  const fetchOrderList = async (page: number, pageSize: number) => {
+  const fetchOrderList = async () => {
     try {
       const ordersList = await axiosClient.getOne<OrderList>(
-        `${baseUrl}/api/order/user/${user?.user._id}`,
-        { params: { page, limit: pageSize } }
+        `${baseUrl}/api/order/user/${user?.user._id}/?limit=10000`,
+        
       );
       console.log("ORDERLL", ordersList);
 
@@ -35,7 +35,7 @@ const OrderPage = () => {
   };
 
   useEffect(() => {
-    fetchOrderList(pagination.currentPage! ?? 1, pagination.pageSize!);
+    fetchOrderList();
   }, []);
 
   useEffect(() => {

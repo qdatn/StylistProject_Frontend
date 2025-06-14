@@ -28,6 +28,27 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
     const [orders, setOrders] = useState<Order[]>([]);
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]); // Thêm state mới
 
+    const fetchCustomers = async () => {
+        try {
+            const response = await axiosClient.getOne<CustomerList>(`${baseUrl}/api/userinfo/?limit=10000`, {});
+            setCustomers(response.data);
+        } catch (error) {
+            console.error('Error fetching customers:', error);
+        }
+    };
+
+    const fetchOrders = async () => {
+        try {
+            const response = await axiosClient.getOne<OrderListAdmin>(`${baseUrl}/api/order/?limit=10000`, {});
+            setOrders(response.data);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    };
+    useEffect(() => {
+        fetchCustomers();
+        fetchOrders();
+    }, []);
     useEffect(() => {
         setNotification(initialNotification);
         if (initialNotification.user) {
@@ -36,47 +57,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
             );
             setSelectedUserIds(userIds);
         }
-    }, [initialNotification]);
-
-    useEffect(() => {
-        if (selectedUserIds.length > 0 && customers.length > 0) {
-            const selectedUsers = customers.filter(customer =>
-                selectedUserIds.includes(customer._id)
-            );
-
-            if (selectedUsers.length > 0) {
-                setNotification(prev => ({
-                    ...prev,
-                    user: selectedUsers
-                }));
-            }
-        }
-    }, [customers, selectedUserIds]);
-
-    // Fetch customers and orders (giữ nguyên)
-    useEffect(() => {
-        const fetchCustomers = async () => {
-            try {
-                const response = await axiosClient.getOne<CustomerList>(`${baseUrl}/api/userinfo/`, {});
-                setCustomers(response.data);
-            } catch (error) {
-                console.error('Error fetching customers:', error);
-            }
-        };
-
-        const fetchOrders = async () => {
-            try {
-                const response = await axiosClient.getOne<OrderListAdmin>(`${baseUrl}/api/order/?limit=10000`, {});
-                setOrders(response.data);
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-            }
-        };
-
-        fetchCustomers();
-        fetchOrders();
     }, []);
-
     const renderSelectedOrderLabel = (order: Order | undefined) => {
         if (!order) return "";
         return (
@@ -96,7 +77,6 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
     // Kiểm tra dữ liệu trước khi lưu
     const validate = () => {
         const newErrors: Record<string, string> = {};
-        if (!notice.user?.length) newErrors.id = 'Notification email is required.';
         if (!notice.title) newErrors.title = 'Notification title is required.';
         if (!notice.type) newErrors.type = 'Notification type is required.';
         if (!notice.content) newErrors.content = 'Notification content is required.';
@@ -106,7 +86,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
 
     const handleSave = () => {
         if (validate()) {
-            onSave(notice)
+            onSave(notice);
         }
     };
 
@@ -181,17 +161,20 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                     <Select
                         placeholder="Select an order"
                         value={
-                            notice.order
+                            notice?.order
                                 ? {
                                     value: notice.order,
                                     label: renderSelectedOrderLabel(
                                         orders.find((o) => o._id === notice.order)
                                     ),
                                 }
-                                : undefined
+                                : null
                         }
                         onChange={(value) => {
-                            setNotification((prev) => ({ ...prev, order: value.value }));
+                            setNotification((prev) => ({
+                                ...prev,
+                                order: value ? value.value : null,
+                            }));
                         }}
                         labelInValue
                         className="w-full rounded-lg"

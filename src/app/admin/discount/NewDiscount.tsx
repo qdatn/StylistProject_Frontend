@@ -1,9 +1,9 @@
 // app/admin/Discount/NewDiscount.tsx
 import DiscountForm from "@components/DiscountForm"; // Import form cho Discount
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import mockDiscounts, { Discount } from "@src/types/Discount"; // Import dữ liệu mẫu và type
 import { useNavigate } from "react-router-dom";
-import mockProducts, { Product, ProductList } from "@src/types/Product";
+import { Product, ProductList } from "@src/types/new/Product";
 import { Category, CategoryList, mockCategories } from "@src/types/Category";
 import axiosClient from "@api/axiosClient";
 import { notification } from "antd";
@@ -14,6 +14,7 @@ const NewDiscount: React.FC = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([]); // State lưu danh sách sản phẩm
     const [categories, setCategories] = useState<Category[]>([]); // State lưu danh sách danh mục
+    const initialDiscount = useMemo(() => ({}), []);
     // Gọi API để lấy danh sách sản phẩm
     const fetchProducts = async () => {
         try {
@@ -68,8 +69,8 @@ const NewDiscount: React.FC = () => {
             description: "",
             placement: "topRight",
             duration: 2,
-          });
-        navigate("/admin/discount"); // Chuyển hướng về danh sách đơn hàng
+        });
+        navigate("/admin/discount", { state: { refresh: true } }); // Chuyển hướng về danh sách đơn hàng
     };
 
     // Xử lý khi người dùng hủy thao tác
@@ -83,6 +84,7 @@ const NewDiscount: React.FC = () => {
             {/* Discount Form */}
             <div className="w-full">
                 <DiscountForm
+                    initialDiscount={initialDiscount}
                     onSave={handleAddDiscount}
                     onCancel={handleCancel}
                     products={products}
