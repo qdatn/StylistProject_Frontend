@@ -25,7 +25,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const [activeStep, setActiveStep] = useState(0);
     const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
     const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
-
+    const [errors, setErrors] = useState<Record<string, string | null>>({});
     const baseUrl = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
@@ -58,7 +58,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
         setImagesToDelete(images);
     };
 
+    const validateBasicInfo = (product: Partial<Product>) => {
+        const newErrors: Record<string, string> = {};
+        if (!product.product_name) newErrors.product_name = "Product name is required.";
+        if (!product.description) newErrors.description = "Product description is required.";
+        return newErrors;
+    };
     const handleSubmit = () => {
+        const validationErrors = validateBasicInfo(product);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
         onSave(product, filesToUpload, imagesToDelete);
     };
 
@@ -72,6 +83,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     onChange={handleProductInfoChange}
                     onFilesChange={setFilesToUpload}
                     onImagesToDeleteChange={handleImagesToDeleteChange}
+                    errors={errors}
                 />
             )
         },
@@ -129,6 +141,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             console.error("Error deleting attribute value:", error);
                         }
                     }}
+                    errors={errors}
                 />
             )
         }
@@ -161,7 +174,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             onClick={handleSubmit}
                             className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                         >
-                            {type === 'create' ? 'Create Product' : 'Update'}
+                            {type === 'add' ? 'Create Product' : 'Update'}
                         </button>
                     )}
                     <button

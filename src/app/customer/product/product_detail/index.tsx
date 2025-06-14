@@ -50,12 +50,12 @@ const ProductDetail: React.FC = () => {
   };
 
   useEffect(() => {
-  if (id) {
-    window.scrollTo(0, 0); // ✅ Scroll lên đầu trang
-    fetchProductDetail();
-    fetchComment();
-  }
-}, [id]);
+    if (id) {
+      window.scrollTo(0, 0); // ✅ Scroll lên đầu trang
+      fetchProductDetail();
+      fetchComment();
+    }
+  }, [id]);
 
   // Get product detail
   const fetchProductDetail = async () => {
@@ -295,9 +295,8 @@ const ProductDetail: React.FC = () => {
       )}
 
       <div
-        className={`${
-          product.status === false ? "opacity-60 pointer-events-none" : ""
-        }`}
+        className={`${product.status === false ? "opacity-60 pointer-events-none" : ""
+          }`}
       >
         {/* Product Main Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20">
@@ -356,11 +355,10 @@ const ProductDetail: React.FC = () => {
                 {product.images.map((img, index) => (
                   <button
                     key={index}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${
-                      currentImageIndex === index
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${currentImageIndex === index
                         ? "border-blue-500"
                         : "border-gray-200"
-                    }`}
+                      }`}
                     onClick={() => setCurrentImageIndex(index)}
                   >
                     <img
@@ -426,13 +424,12 @@ const ProductDetail: React.FC = () => {
                           title={!isAvailable ? "Out of stock" : undefined}
                           onClick={() => handleAttributeChange(key, value)}
                           disabled={!isAvailable}
-                          className={`px-4 py-2 rounded-full text-sm border ${
-                            !isAvailable
+                          className={`px-4 py-2 rounded-full text-sm border ${!isAvailable
                               ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
                               : isSelected
-                              ? "border-blue-500 bg-blue-50 text-blue-700"
-                              : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-                          }`}
+                                ? "border-blue-500 bg-blue-50 text-blue-700"
+                                : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                            }`}
                         >
                           {value}
                         </button>
@@ -491,13 +488,12 @@ const ProductDetail: React.FC = () => {
                 ))}
             </div>
             <button
-              className={`w-3/5 gap-2 flex-1 flex items-center justify-center py-3 font-semibold text-white rounded-lg transition-colors ${
-                selectedVariant
+              className={`w-3/5 gap-2 flex-1 flex items-center justify-center py-3 font-semibold text-white rounded-lg transition-colors ${selectedVariant
                   ? selectedVariant.stock_quantity > 0
                     ? "bg-gray-700 hover:bg-blue-500"
                     : "bg-gray-400 cursor-not-allowed"
                   : "bg-gray-500 cursor-not-allowed"
-              }`}
+                }`}
               onClick={handleAddToCart}
               disabled={!selectedVariant || selectedVariant.stock_quantity <= 0}
             >
@@ -537,7 +533,9 @@ const ProductDetail: React.FC = () => {
             <div>
               <span className="font-medium">Brand:</span> {product.brand}
             </div>
-            {product.description}
+            <div className="whitespace-pre-line"> {/* Thêm class này */}
+              {product.description}
+            </div>
           </div>
 
           {/* Reviews Section */}

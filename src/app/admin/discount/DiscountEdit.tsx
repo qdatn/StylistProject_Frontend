@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import DiscountForm from "@components/DiscountForm"; // Form chỉnh sửa discount
 import mockDiscounts, { Discount } from "@src/types/Discount"; // Dữ liệu giả lập discounts
-import mockProducts, { Product, ProductList } from "@src/types/Product";
+import { Product, ProductList } from "@src/types/new/Product";
 import { Category, CategoryList, mockCategories } from "@src/types/Category";
 import axiosClient from "@api/axiosClient";
 import { notification } from "antd";
@@ -22,7 +22,7 @@ const EditDiscount: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const response = await axiosClient.getOne<ProductList>(
-        `${baseUrl}/api/product`,
+        `${baseUrl}/api/product/?limit=10000`,
       );
       setProducts(response.data);
     } catch (error) {
@@ -34,7 +34,7 @@ const EditDiscount: React.FC = () => {
   const fetchCategories = async () => {
     try {
       const response = await axiosClient.getOne<CategoryList>(
-        `${baseUrl}/api/category`,
+        `${baseUrl}/api/category/?limit=10000`,
       );
       setCategories(response.data);
     } catch (error) {

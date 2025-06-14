@@ -339,7 +339,7 @@ export default function CustomerHeader() {
                 to="#"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
-                NEW TODAY
+                SALE OFF
               </Link>
             </li>
             <li>

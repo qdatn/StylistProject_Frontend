@@ -19,7 +19,7 @@ const NewDiscount: React.FC = () => {
     const fetchProducts = async () => {
         try {
             const response = await axiosClient.getOne<ProductList>(
-                `${baseUrl}/api/product`,
+                `${baseUrl}/api/product/?limit=10000`,
             );
             setProducts(response.data);
         } catch (error) {
@@ -31,7 +31,7 @@ const NewDiscount: React.FC = () => {
     const fetchCategories = async () => {
         try {
             const response = await axiosClient.getOne<CategoryList>(
-                `${baseUrl}/api/category`,
+                `${baseUrl}/api/category/?limit=10000`,
             );
             setCategories(response.data);
         } catch (error) {
