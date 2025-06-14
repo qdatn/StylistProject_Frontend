@@ -293,7 +293,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
           value={product.description || ""}
           onChange={handleChange}
           rows={4}
-          className="w-full px-3 py-2 border rounded-md"
+          className="w-full px-3 py-2 border rounded-md whitespace-pre-wrap" // Thêm class này
         />
       </div>
 
