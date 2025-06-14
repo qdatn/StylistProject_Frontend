@@ -17,6 +17,8 @@ interface ProductInfoProps {
   onChange: (updatedInfo: Partial<Product>) => void;
   onFilesChange: (files: File[]) => void;
   onImagesToDeleteChange: (images: string[]) => void;
+  errors: Record<string, string | null>; // Thêm lỗi từ ProductForm
+
 }
 
 const baseUrl = import.meta.env.VITE_API_URL;
@@ -27,6 +29,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
   onChange,
   onFilesChange,
   onImagesToDeleteChange,
+  errors
 }) => {
   const [newImage, setNewImage] = useState("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -257,9 +260,15 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
             name="product_name"
             value={product.product_name || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md"
+            className={`w-full px-3 py-2 border rounded-md ${errors.product_name ? "border-red-500" : ""}`}
             required
           />
+          {errors.product_name && (
+            <p className="font-medium text-sm text-red-500 mt-1">
+              {errors.product_name}
+            </p>
+          )}
+
         </div>
         {/* <div>
           <label className="block text-sm font-medium mb-1">
@@ -293,8 +302,13 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
           value={product.description || ""}
           onChange={handleChange}
           rows={4}
-          className="w-full px-3 py-2 border rounded-md whitespace-pre-wrap" // Thêm class này
+          className={`whitespace-pre-wrap w-full px-3 py-2 border rounded-md ${errors.description ? "border-red-500" : ""}`} // Thêm class này
         />
+        {errors.description && (
+            <p className="font-medium text-sm text-red-500 mt-1">
+              {errors.description}
+            </p>
+          )}
       </div>
 
       <div>

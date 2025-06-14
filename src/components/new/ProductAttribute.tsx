@@ -11,6 +11,8 @@ interface ProductAttributeProps {
     onDeleteKey: (key: string) => void;
     onAddValue: (key: string, value: string) => void;
     onDeleteValue: (key: string, value: string) => void;
+    errors: Record<string, string | null>; 
+
 }
 
 const ProductAttribute: React.FC<ProductAttributeProps> = ({
