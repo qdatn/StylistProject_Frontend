@@ -133,6 +133,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         className={`w-full mt-1 h-10 rounded-md ${errors.status ? 'border-red-500' : ''}`}
                     >
                         <option value="" disabled>Select Status</option>
+                        <option value="Waiting for payment!">Waiting for payment!</option>
                         <option value="pending">Pending</option>
                         <option value="delivering">Delivering</option>
                         <option value="shipped">Shipped</option>
