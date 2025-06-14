@@ -3,10 +3,18 @@ import CategoryTable from "./CategoriesTable";
 import { Category, CategoryList, mockCategories } from "@src/types/Category";
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";
+import { useLocation } from "react-router-dom";
 
 const urlPath = import.meta.env.VITE_API_URL;
 
 const Categories: React.FC = () => {
+    const location = useLocation(); 
+      const [refreshFlag, setRefreshFlag] = useState(0); 
+      useEffect(() => {
+        if (location.state?.refresh) {
+          fetchCategoryItem(1, pageSize);
+        }
+      }, [location.state]);
     const [categories, setCategories] = useState<CategoryList>({
         data: [],
         pagination: {},

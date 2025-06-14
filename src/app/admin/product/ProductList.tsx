@@ -4,12 +4,19 @@ import { Product, ProductList } from "@src/types/new/Product";
 import mockProducts from "@src/types/Product"; // Import hàm cập nhật sản phẩm
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";
+import { useLocation } from "react-router-dom";
 
 const urlPath = import.meta.env.VITE_API_URL;
 
 const ProductListAdminPage: React.FC = () => {
   // const [products, setProducts] = useState<Product[]>(mockProducts);
-
+  const location = useLocation();
+  const [refreshFlag, setRefreshFlag] = useState(0);
+  useEffect(() => {
+    if (location.state?.refresh) {
+      fetchProductItem(1, pageSize);
+    }
+  }, [location.state]);
   const [products, setProducts] = useState<ProductList>({
     data: [],
     pagination: {},
@@ -20,7 +27,7 @@ const ProductListAdminPage: React.FC = () => {
     totalItems: 0,
     totalPages: 0,
   });
-const pageSize =8 
+  const pageSize = 8
   const fetchProductItem = async (page: number, pageSize: number) => {
     try {
       const response = await axiosClient.getOne<ProductList>(
@@ -37,7 +44,7 @@ const pageSize =8
       alert(error);
     }
   };
-  
+
   const handlePageChange = (page: number) => {
     if (page <= pagination?.totalPages!) {
       setPagination({
@@ -65,11 +72,11 @@ const pageSize =8
     <div>
       <div className="font-semibold text-xl p-6">Product List</div>
       <div>
-        <ProductTable 
-        products={products} 
-        onDeleteSuccess={refreshData} 
-        pagination={pagination}
-        onPageChange={handlePageChange}
+        <ProductTable
+          products={products}
+          onDeleteSuccess={refreshData}
+          pagination={pagination}
+          onPageChange={handlePageChange}
         />
       </div>
     </div>

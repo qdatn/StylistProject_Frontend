@@ -79,7 +79,7 @@ const NewProduct: React.FC = () => {
       placement: "topRight",
       duration: 2,
     });
-    navigate("/admin/product/list"); // Chuyển hướng về danh sách sản phẩm
+    navigate("/admin/product/list", { state: { refresh: true } }); // Chuyển hướng về danh sách sản phẩm
   };
   const handelCancel = () => {
     navigate("/admin/product/list");

@@ -15,7 +15,7 @@ export interface ProductVariant {
 }
 
 export interface Product {
-    _id?: string;
+    _id: string;
     product_name: string;
     description: string;
     brand: string;

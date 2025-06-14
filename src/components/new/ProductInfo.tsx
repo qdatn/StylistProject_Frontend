@@ -261,7 +261,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
             required
           />
         </div>
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium mb-1">
             Product ID *
           </label>
@@ -273,7 +273,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
             disabled
             className="w-full px-3 py-2 border rounded-md"
           />
-        </div>
+        </div> */}
         <div>
           <label className="block text-sm font-medium mb-1">Brand</label>
           <input
