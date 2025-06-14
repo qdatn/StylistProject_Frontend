@@ -78,7 +78,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [finalPrice, setFinalPrice] = useState<number>(0);
-  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  //const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
     setCartItems(cart);
@@ -91,11 +91,14 @@ const CartPage = () => {
     });
   };
 
-  useEffect(() => {
-    setSelectedProductIds(
-      selectedItems.map((uniqueId) => uniqueId.split("-")[0])
-    );
-  }, [selectedItems]);
+  // useEffect(() => {
+  //   setSelectedProductIds(
+  //     selectedItems.map((uniqueId) => uniqueId.split("-")[0])
+
+  //   );
+  //   console.log(selectedItems.map((uniqueId) => uniqueId.split("-")[0]))
+  //   console.log(selectedProductIds)
+  // }, [selectedItems]);
 
   useEffect(() => {
     fetchCartItem();
@@ -153,47 +156,67 @@ const CartPage = () => {
     }, 0);
   }, [cartItems, selectedItems, quantities]);
 
+  const selectedProducts = useMemo(() => {
+    return cartItems
+      .filter(item => selectedItems.includes(getUniqueId(item)))
+      .map(item => {
+        const uniqueId = getUniqueId(item);
+        return {
+          productId: uniqueId.split("-")[0],
+          attribute: item.cart_attributes,
+          quantity: quantities[uniqueId] || 1
+        };
+      });
+  }, [cartItems, selectedItems, quantities]);
+
   // Fetch available discounts khi có thay đổi
-  useEffect(() => {
-    const fetchAvailableDiscounts = async () => {
-      try {
-        const discountList = await axiosClient.post<DiscountAvailable>(
-          `${baseUrl}/api/discount/available-discounts`,
-          {
-            // productIds: selectedItems,
-            productIds: selectedProductIds,
-            totalPrice: subtotal,
-          }
-        );
-        setDiscounts(discountList.data);
-      } catch (error) {
-        notification.error({
-          message: "Error loading discounts",
-          description: "Failed to fetch available discounts",
-        });
-      }
-    };
+  // Xóa dòng khai báo state này
+  // const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
 
-    if (selectedItems.length > 0 && subtotal > 0) {
-      fetchAvailableDiscounts();
+  // Xóa luôn useEffect này
+  // useEffect(() => {
+  //   setSelectedProductIds(
+  //     selectedItems.map((uniqueId) => uniqueId.split("-")[0])
+  //   );
+  // }, [selectedItems]);
+
+  useEffect(() => {
+  const fetchAvailableDiscounts = async () => {
+    // Tính toán productIds trực tiếp từ selectedItems
+    const productIds = selectedItems.map((uniqueId) => uniqueId.split("-")[0]);
+    
+    console.log("Sending productIds to API:", productIds);
+    
+    try {
+      const discountList = await axiosClient.post<DiscountAvailable>(
+        `${baseUrl}/api/discount/available-discounts/?limit=10000`,
+        {
+          productIds: productIds, // Sử dụng biến vừa tính toán
+          totalPrice: subtotal,
+        }
+      );
+      setDiscounts(discountList.data);
+    } catch (error) {
+      notification.error({
+        message: "Error loading discounts",
+        description: "Failed to fetch available discounts",
+      });
     }
-  }, [selectedItems, subtotal]);
+  };
 
-  // Reset discount khi subtotal thay đổi
-  useEffect(() => {
-    setFinalPrice(subtotal);
-    setDiscountAmount(0);
-    setSelectedDiscountCode("");
-  }, [subtotal]);
+  if (selectedItems.length > 0 && subtotal > 0) {
+    fetchAvailableDiscounts();
+  }
+}, [selectedItems, subtotal]); // Phụ thuộc vào selectedProducts
 
-  //apply discount
+  // Sửa hàm apply discount
   const handleApplyDiscount = async (code: string) => {
     try {
       const response = await axiosClient.post<PriceWithDiscount>(
         `${baseUrl}/api/discount/apply-discount`,
         {
           code,
-          productIds: selectedProductIds,
+          cartItems: selectedProducts, // Sử dụng mảng sản phẩm đã chọn
           totalPrice: subtotal,
         }
       );
@@ -212,7 +235,17 @@ const CartPage = () => {
       setFinalPrice(subtotal);
       setDiscountAmount(0);
     }
-  };
+  }; // Chỉ cần phụ thuộc vào selectedItems và subtotal
+
+  // Reset discount khi subtotal thay đổi
+  useEffect(() => {
+    setFinalPrice(subtotal);
+    setDiscountAmount(0);
+    setSelectedDiscountCode("");
+  }, [subtotal]);
+
+  //apply discount
+
 
   //update quantity
   const updateQuantity = (
@@ -560,7 +593,7 @@ const CartPage = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({}) => (
+        {({ }) => (
           <Form className="md:w-1/3 p-4 text-gray-700">
             <h2 className="text-lg font-semibold mb-4">Information</h2>
             <div>
@@ -632,7 +665,7 @@ const CartPage = () => {
               // onClick={handleSubmit}
               type="submit"
               className="bg-yellow-500 text-white py-2 px-4 rounded w-full"
-              // disabled={!isValid || !Object.keys(touched).length}
+            // disabled={!isValid || !Object.keys(touched).length}
             >
               Place Order
             </button>
@@ -647,7 +680,7 @@ const CartPage = () => {
                 // onClick={handleSubmit}
                 type="submit"
                 className="bg-yellow-500 text-lg font-medium text-white py-2 px-4 rounded w-[400px] h-full"
-                // disabled={!isValid || !Object.keys(touched).length}
+              // disabled={!isValid || !Object.keys(touched).length}
               >
                 Place Order
               </button>

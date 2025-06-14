@@ -102,7 +102,10 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
     // Validate required fields
     if (!discount.code) newErrors.code = 'Discount code is required.';
     if (!discount.type) newErrors.type = 'Discount type is required.';
+    if (!discount.max_discount) newErrors.max_discount = 'Max Discount is required.';
     if (!discount.value) newErrors.value = 'Discount value is required.';
+    if (!discount.start_date) newErrors.startDate = 'Discount start date is required.';
+    if (!discount.start_date) newErrors.endDate = 'Discount start end date is required.';
 
     // If type is "product" or "category", at least one item must be selected
     if ((discount.type === 'product' || discount.type === 'category') && appliesToItems.length === 0) {
@@ -147,11 +150,11 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
   };
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md p-6">
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-extrabold text-blue-800">
-                    {type === 'add' ? 'New Discount' : 'Update Discount'}
-                </h2>
-            </div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-extrabold text-blue-800">
+          {type === 'add' ? 'New Discount' : 'Update Discount'}
+        </h2>
+      </div>
       <div className="grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-2 pb-5">
         <div>
           <label className="block font-medium">Discount Code</label>
@@ -223,7 +226,7 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
         <div className="pb-5">
           <label className="block font-medium">Discount Type</label>
           <Select
-            value={discount.type as DiscountType || 'all'}
+            value={discount.type as DiscountType}
             onChange={handleTypeChange}
             className="w-full mt-1"
           >
