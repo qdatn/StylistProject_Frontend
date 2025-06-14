@@ -1,12 +1,20 @@
-// app/admin/discount/DiscountCategories.tsx
+// app/admin/discount/DiscountManagement.tsx
 import mockDiscounts, { Discount, DiscountList } from "@src/types/Discount";
 import React, { useEffect, useState } from "react";
 import DiscountTable from "./DiscountTable";
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";
+import { useLocation } from "react-router-dom";
 
 const urlPath = import.meta.env.VITE_API_URL;
 const DiscountManagement: React.FC = () => {
+  const location = useLocation(); 
+  const [refreshFlag, setRefreshFlag] = useState(0); 
+  useEffect(() => {
+    if (location.state?.refresh) {
+      fetchDiscountItem(1, pageSize);
+    }
+  }, [location.state]);
   const [discounts, setDiscounts] = useState<DiscountList>({
     data: [],
     pagination: {},
@@ -44,7 +52,7 @@ const DiscountManagement: React.FC = () => {
     console.log("pagination", pagination);
   }, [discounts]);
 
-  const pageSize =8
+  const pageSize = 8
   const refreshData = () => {
     // Fetch the updated data and set it to the state that controls `dataSource`
     fetchDiscountItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data

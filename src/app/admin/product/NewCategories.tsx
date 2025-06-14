@@ -31,7 +31,7 @@ const NewCategory: React.FC = () => {
       placement: "topRight",
       duration: 2,
     });
-    navigate("/admin/product/categories"); // Chuyển hướng về danh sách sản phẩm
+    navigate("/admin/product/categories", { state: { refresh: true } }); // Chuyển hướng về danh sách sản phẩm
   };
   const handelCancel = () => {
     navigate("/admin/product/categories"); //

@@ -30,7 +30,7 @@ const NewNotification: React.FC = () => {
       placement: "topRight",
       duration: 2,
     });
-    navigate("/admin/notification/list"); // Chuyển hướng về danh sách sản phẩm
+    navigate("/admin/notification/list", { state: { refresh: true } }); // Chuyển hướng về danh sách sản phẩm
   };
   const handelCancel = () => {
     navigate("/admin/notification/list"); //

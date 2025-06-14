@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import CartItem from "@components/CartItem";
-import { Product } from "@src/types/new/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
+import { Product, ProductList } from "@src/types/new/Product"; // Giả định bạn đã có định nghĩa Product trong mô hình
 import {
   Discount,
   DiscountAvailable,
@@ -14,6 +14,7 @@ import { Input, notification } from "antd";
 import {
   CartProduct,
   deleteItemFromCart,
+  updateCartProducts,
   updateProductQuantity,
 } from "@redux/reducers/cartReducer";
 import * as Yup from "yup";
@@ -24,12 +25,31 @@ import AddressAutocomplete from "@components/AddressAutocomplete";
 import { OrderAttribute } from "@src/types/Attribute";
 const baseUrl = import.meta.env.VITE_API_URL;
 
+// Tạo ID duy nhất từ các thuộc tính
+export const createAttributeId = (attributes: OrderAttribute[]): string => {
+  if (!attributes || attributes.length === 0) return "default";
+
+  // Sắp xếp thuộc tính theo key để đảm bảo thứ tự không ảnh hưởng
+  const sortedAttributes = [...attributes].sort((a, b) =>
+    a.key.localeCompare(b.key)
+  );
+
+  // Tạo chuỗi định danh từ các thuộc tính
+  return sortedAttributes.map((attr) => `${attr.key}-${attr.value}`).join("_");
+};
+
 const CartPage = () => {
   const user = useSelector((state: RootState) => state.persist.auth);
   const userId = user.user?.user._id;
   const cart = useSelector(
     (state: RootState) => state.persist.cart[userId!]?.items || []
   );
+
+  // Tạo uniqueId cho mỗi item (kết hợp productId + attributeId)
+  const getUniqueId = (item: CartProduct): string => {
+    const attributeId = createAttributeId(item.cart_attributes);
+    return `${item._id}-${attributeId}`;
+  };
 
   const dispatch = useDispatch();
 
@@ -58,6 +78,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [finalPrice, setFinalPrice] = useState<number>(0);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
     setCartItems(cart);
@@ -71,19 +92,66 @@ const CartPage = () => {
   };
 
   useEffect(() => {
+    setSelectedProductIds(
+      selectedItems.map((uniqueId) => uniqueId.split("-")[0])
+    );
+  }, [selectedItems]);
+
+  useEffect(() => {
     fetchCartItem();
   }, []);
+
+  useEffect(() => {
+    const fetchUpdatedCart = async () => {
+      try {
+        // Lấy danh sách ID sản phẩm trong giỏ hàng
+        const productIds = [...new Set(cart.map((item) => item._id))];
+
+        // Gọi API lấy thông tin mới nhất
+        const response = await axiosClient.post<ProductList>(
+          `${baseUrl}/api/product/by-style?page=1&limit=1000`,
+          { productIds: productIds }
+        );
+
+        const updatedProducts = response.data;
+
+        // Cập nhật Redux store với dữ liệu mới
+        dispatch(
+          updateCartProducts({
+            userId: userId!,
+            updatedProducts: updatedProducts,
+          })
+        );
+      } catch (error) {
+        console.error("Failed to update cart data", error);
+      }
+    };
+
+    if (cart.length > 0) {
+      fetchUpdatedCart();
+    }
+  }, [userId, dispatch]);
+
   // Tính tổng tiền chưa giảm giá
-  const subtotal = useMemo(
-    () =>
-      cartItems.reduce((total, item) => {
-        if (selectedItems.includes(item._id!)) {
-          return total + item.price * (quantities[item._id!] || 1);
-        }
-        return total;
-      }, 0),
-    [cartItems, selectedItems, quantities]
-  );
+  // const subtotal = useMemo(
+  //   () =>
+  //     cartItems.reduce((total, item) => {
+  //       if (selectedItems.includes(item._id!)) {
+  //         return total + item.price * (quantities[item._id!] || 1);
+  //       }
+  //       return total;
+  //     }, 0),
+  //   [cartItems, selectedItems, quantities]
+  // );
+  const subtotal = useMemo(() => {
+    return cartItems.reduce((total, item) => {
+      const uniqueId = getUniqueId(item);
+      if (selectedItems.includes(uniqueId)) {
+        return total + item.price * (quantities[uniqueId] || 1);
+      }
+      return total;
+    }, 0);
+  }, [cartItems, selectedItems, quantities]);
 
   // Fetch available discounts khi có thay đổi
   useEffect(() => {
@@ -92,7 +160,8 @@ const CartPage = () => {
         const discountList = await axiosClient.post<DiscountAvailable>(
           `${baseUrl}/api/discount/available-discounts`,
           {
-            productIds: selectedItems,
+            // productIds: selectedItems,
+            productIds: selectedProductIds,
             totalPrice: subtotal,
           }
         );
@@ -124,7 +193,7 @@ const CartPage = () => {
         `${baseUrl}/api/discount/apply-discount`,
         {
           code,
-          productIds: selectedItems,
+          productIds: selectedProductIds,
           totalPrice: subtotal,
         }
       );
@@ -146,19 +215,27 @@ const CartPage = () => {
   };
 
   //update quantity
-  const updateQuantity = (itemId: string, newQuantity: number, cart_attributes: OrderAttribute[]) => {
+  const updateQuantity = (
+    itemId: string,
+    newQuantity: number,
+    cart_attributes: OrderAttribute[]
+  ) => {
     setQuantities((prevQuantities) => ({
       ...prevQuantities,
       [itemId]: newQuantity,
     }));
 
+    // Tách productId từ uniqueId
+    const productId = itemId.split("-")[0];
+
     //Cập nhật lại sl vào redux
     dispatch(
       updateProductQuantity({
         userId: userId!,
-        productId: itemId,
+        // productId: itemId,
+        productId: productId,
         quantity: newQuantity,
-        cart_attributes
+        cart_attributes,
       })
     );
   };
@@ -180,17 +257,22 @@ const CartPage = () => {
   };
   const removeItem = (itemId: string, cart_attributes: OrderAttribute[]) => {
     try {
-      console.log(itemId);
-      deleteProductInCart(itemId);
+      const productId = itemId.split("-")[0];
+      // deleteProductInCart(itemId);
+      deleteProductInCart(productId);
       dispatch(
         deleteItemFromCart({
           userId: userId!,
-          productId: itemId,
+          // productId: itemId,
+          productId: productId,
           cart_attributes,
         })
       );
-      setCartItems((prevItems) =>
-        prevItems.filter((item) => item._id !== itemId)
+      // setCartItems((prevItems) =>
+      //   prevItems.filter((item) => item._id !== itemId)
+      // );
+      setCartItems((prev) =>
+        prev.filter((item) => getUniqueId(item) !== itemId)
       );
       setSelectedItems((prevSelected) =>
         prevSelected.filter((_id) => _id !== itemId)
@@ -286,8 +368,12 @@ const CartPage = () => {
     }
   };
 
+  useEffect(() => {
+    setCartItems(cart);
+  }, [cart]);// Cập nhật khi cart thay đổi
+
   const handleSubmit = async (values: any) => {
-    await setCartItems(cart);
+    // await setCartItems(cart);
     const addressData: Address = {
       name: values.name,
       user: userId as string,
@@ -307,12 +393,12 @@ const CartPage = () => {
     };
 
     const order_items = cartItems
-      .filter((item) => selectedItems.includes(item._id!))
+      .filter((item) => selectedItems.includes(getUniqueId(item)))
       .map((item) => ({
         // _id: "",
         order: "",
         product: item._id,
-        quantity: /*item.quantity*/ quantities[item._id!] || 1,
+        quantity: /*item.quantity*/ quantities[getUniqueId(item)] || 1,
         price: item.price,
         note: "",
         attributes: item.cart_attributes,
@@ -406,15 +492,24 @@ const CartPage = () => {
         {/* {cartItems.map((item) => ( */}
         {cart.map((item: any) => (
           <CartItem
-            key={item._id}
+            key={getUniqueId(item)}
             product={item}
             quantity={item.quantity}
             onUpdateQuantity={(newQuantity) =>
-              updateQuantity(item._id, newQuantity, item.cart_attributes)
+              // updateQuantity(item._id, newQuantity, item.cart_attributes)
+              updateQuantity(
+                getUniqueId(item),
+                newQuantity,
+                item.cart_attributes
+              )
             }
-            onRemove={() => removeItem(item._id, item.cart_attributes)}
+            onRemove={() =>
+              // removeItem(item._id, item.cart_attributes)
+              removeItem(getUniqueId(item), item.cart_attributes)
+            }
             onSelect={(selected) => {
-              toggleSelectItem(item._id, selected), console.log(item);
+              // toggleSelectItem(item._id, selected), console.log(item);
+              toggleSelectItem(getUniqueId(item), selected);
             }}
           />
         ))}

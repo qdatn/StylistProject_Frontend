@@ -40,6 +40,14 @@ const productColumns: ColumnsType<Product> = [
     },
   },
   {
+    title: "Sold Quantity",
+    dataIndex: "variants",
+    render: (variants: ProductVariant[]) => {
+      const totalSold = variants.reduce((sum, v) => sum + v.sold_quantity, 0);
+      return totalSold;
+    },
+  },
+  {
     title: "Original Price",
     dataIndex: "variants",
     render: (variants: ProductVariant[]) => {

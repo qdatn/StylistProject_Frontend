@@ -4,9 +4,17 @@ import React, { useEffect, useState } from "react";
 import NotificationTable from "./NotificationTable";
 import { PaginationType } from "@src/types/Pagination";
 import axiosClient from "@api/axiosClient";
+import { useLocation } from "react-router-dom";
 
 const urlPath = import.meta.env.VITE_API_URL;
 const NotificationManagement: React.FC = () => {
+  const location = useLocation(); 
+    const [refreshFlag, setRefreshFlag] = useState(0); 
+    useEffect(() => {
+      if (location.state?.refresh) {
+        fetchNotificationItem(1, pageSize);
+      }
+    }, [location.state]);
   const [notices, setNotifications] = useState<NotificationList>({
     data: [],
     pagination: {},

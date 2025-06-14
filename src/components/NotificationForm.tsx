@@ -5,6 +5,7 @@ import { CustomerList, UserAccount } from '@src/types/UserAccount';
 import { Order, OrderListAdmin } from '@src/types/Order';
 import axiosClient from '@api/axiosClient';
 import { Notification } from '@src/types/Notification';
+import { formatCurrency } from '@utils/format';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -25,35 +26,48 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [customers, setCustomers] = useState<UserAccount[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
-    const [customerPagination, setCustomerPagination] = useState({ page: 1, pageSize: 10, total: 0 });
-    const [orderPagination, setOrderPagination] = useState({ page: 1, pageSize: 10, total: 0 });
+    const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]); // Thêm state mới
 
-    // Fetch customers and orders
+    const fetchCustomers = async () => {
+        try {
+            const response = await axiosClient.getOne<CustomerList>(`${baseUrl}/api/userinfo/?limit=10000`, {});
+            setCustomers(response.data);
+        } catch (error) {
+            console.error('Error fetching customers:', error);
+        }
+    };
+
+    const fetchOrders = async () => {
+        try {
+            const response = await axiosClient.getOne<OrderListAdmin>(`${baseUrl}/api/order/?limit=10000`, {});
+            setOrders(response.data);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    };
     useEffect(() => {
-
-        const fetchCustomers = async () => {
-            try {
-                const response = await axiosClient.getOne<CustomerList>(`${baseUrl}/api/userinfo/`, {
-                });
-                setCustomers(prev => [...prev, ...response.data]);
-            } catch (error) {
-                console.error('Error fetching customers:', error);
-            }
-        };
-
-        const fetchOrders = async () => {
-            try {
-                const response = await axiosClient.getOne<OrderListAdmin>(`${baseUrl}/api/order/`, {
-                });
-                setOrders(prev => [...prev, ...response.data]);
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-            }
-        };
-
         fetchCustomers();
         fetchOrders();
-    }, [customerPagination.page, orderPagination.page]);
+    }, []);
+    useEffect(() => {
+        setNotification(initialNotification);
+        if (initialNotification.user) {
+            const userIds = initialNotification.user.map(u =>
+                typeof u === 'string' ? u : u._id
+            );
+            setSelectedUserIds(userIds);
+        }
+    }, []);
+    const renderSelectedOrderLabel = (order: Order | undefined) => {
+        if (!order) return "";
+        return (
+            <div className="flex justify-between items-center gap-4">
+                <span className="font-medium">ID: ...{order._id.slice(-6)}</span>
+                <span>{order?.user?.email}</span>
+                <span className="text-green-600">{formatCurrency(order.total_price)}</span>
+            </div>
+        );
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -63,7 +77,6 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
     // Kiểm tra dữ liệu trước khi lưu
     const validate = () => {
         const newErrors: Record<string, string> = {};
-        if (!notice.user?.length) newErrors.id = 'Notification email is required.';
         if (!notice.title) newErrors.title = 'Notification title is required.';
         if (!notice.type) newErrors.type = 'Notification type is required.';
         if (!notice.content) newErrors.content = 'Notification content is required.';
@@ -73,7 +86,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
 
     const handleSave = () => {
         if (validate()) {
-            onSave(notice)
+            onSave(notice);
         }
     };
 
@@ -103,9 +116,10 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                     <Select
                         mode="multiple"
                         placeholder="Select user"
-                        value={notice.user?.map(user => user._id) || []}
+                        value={selectedUserIds} // Sử dụng state mới
                         onChange={(userIds) => {
-                            // Lọc ra các user có ID nằm trong danh sách đã chọn
+                            setSelectedUserIds(userIds);
+
                             const selectedUsers = customers.filter(customer =>
                                 userIds.includes(customer._id)
                             );
@@ -113,14 +127,12 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                             setNotification(prev => ({
                                 ...prev,
                                 user: selectedUsers,
-                                // Tự động tạo title từ emails nếu chưa có
                                 title: prev.title || selectedUsers
                                     .map(u => u.user.email)
                                     .join(', ')
                             }));
                         }}
                         className="w-full"
-                        //optionLabelProp="label"
                         showSearch
                         filterOption={(input, option) => {
                             const label = typeof option?.children === 'string' ? option.children : '';
@@ -131,11 +143,11 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                             <Select.Option
                                 key={customer._id}
                                 value={customer._id}
-                                label={customer.user.email} // Hiển thị email khi đã chọn
+                                label={customer?.user?.email}
                             >
                                 <div className="flex justify-between">
                                     <span>{customer.name}</span>
-                                    <span className="text-gray-500 ml-2">{customer.user.email}</span>
+                                    <span className="text-gray-500 ml-2">{customer?.user?.email}</span>
                                 </div>
                             </Select.Option>
                         ))}
@@ -147,23 +159,49 @@ const NotificationForm: React.FC<NotificationFormProps> = ({
                 <div>
                     <label className="block font-medium mb-2">Order ID</label>
                     <Select
-                        placeholder="Select Order ID"
-                        value={notice.order || undefined}
-                        onChange={value => setNotification(prev => ({ ...prev, order: value }))}
-                        className="w-full"
+                        placeholder="Select an order"
+                        value={
+                            notice?.order
+                                ? {
+                                    value: notice.order,
+                                    label: renderSelectedOrderLabel(
+                                        orders.find((o) => o._id === notice.order)
+                                    ),
+                                }
+                                : null
+                        }
+                        onChange={(value) => {
+                            setNotification((prev) => ({
+                                ...prev,
+                                order: value ? value.value : null,
+                            }));
+                        }}
+                        labelInValue
+                        className="w-full rounded-lg"
                         allowClear
                         showSearch
                         filterOption={(input, option) => {
                             const label = typeof option?.children === 'string' ? option.children : '';
                             return label.toLowerCase().includes(input.toLowerCase());
                         }}
+
                     >
                         {orders.map(order => (
-                            <option key={order._id} value={order._id}>
-                                {order._id}
-                            </option>
+                            <Select.Option key={order._id} value={order._id}>
+                                <div className="flex justify-between">
+                                    <span className="font-medium">ID: ...{order._id.slice(-10)}</span>
+                                    <span>{order.user?.email}</span>
+                                    <div className="text-right">
+                                        <div className="text-green-600">${order.total_price?.toFixed(2)}</div>
+                                        <div className="text-xs text-gray-500">
+                                            {moment(order.receive_date).format('DD/MM/YYYY')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Select.Option>
                         ))}
                     </Select>
+
                 </div>
 
                 {/* Priority Select */}

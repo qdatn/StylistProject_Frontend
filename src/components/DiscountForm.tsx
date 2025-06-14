@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Button, Select, Input, Checkbox, message, DatePicker } from 'antd';
 import { Discount } from '@src/types/Discount';
-import { Product } from '@src/types/Product';
+import { Product } from '@src/types/new/Product';
 import { Category } from '@src/types/Category';
 import { formatCurrency } from '@utils/format';
 import moment from 'moment';
@@ -56,7 +56,7 @@ const DiscountForm: React.FC<DiscountFormProps> = ({
         end_date: initialDiscount.end_date ? moment(initialDiscount.end_date) : null,
       });
     }
-  }, [initialDiscount, products, categories, form]);
+  }, [initialDiscount, products, categories]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

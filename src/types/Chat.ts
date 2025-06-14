@@ -8,6 +8,7 @@ export interface MessageChat {
 }
 
 export interface ProductRecommend {
+  images: string
   name: string;
   description: string;
   productId: string;

@@ -1,7 +1,7 @@
 // app/admin/product/EditProduct.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import mockProducts, { Product } from "@src/types/Product";
+import { Product } from "@src/types/new/Product";
 import ProductStorageForm from "@components/ProductStorageForm";
 import axiosClient from "@api/axiosClient";
 import { notification } from "antd";

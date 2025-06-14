@@ -32,6 +32,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
   const [isUserOnline, setIsUserOnline] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isBotChatActive, setIsBotChatActive] = useState(false);
+  const [productLink, setProductLink] = useState(""); // Thêm state cho link sản phẩm
+  const [productId, setProductId] = useState(""); // Thêm state cho productId
   const api = import.meta.env.VITE_API_URL;
 
   const currentUserId = currentUser.user._id;
@@ -103,6 +106,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
 
     socketRef.current.emit("send_message", msgData);
     setMessage(""); // Chỉ reset input
+    if (isBotChatActive) {
+      handleChatWithBotAssistant(message);
+    }
   };
 
   // Tự động scroll xuống cuối mỗi khi có tin nhắn mới
@@ -275,10 +281,134 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
     }
   };
 
+  const handleChatWithBotAssistant = async (question: string) => {
+    // if (!currentUser?.body_shape || currentUser.body_shape === "No Provided") {
+    //   navigate("/body-shape");
+    //   return;
+    // } else {
+    try {
+      setIsLoading(true);
+
+      // Create loading message
+      const loadingMessage: MessageChat = {
+        sender: BOT_ID,
+        receiver: currentUserId,
+        content: "__LOADING__",
+      };
+      setMessages((prev) => [...prev, loadingMessage]);
+
+      // // Get the product id
+      // const productId = "";
+
+      // Call the recommendation API directly
+      const response = await axiosClient.post<{ answer: string }>(
+        `${api}/api/chat/ask`,
+        {
+          productId: productId,
+          userId: currentUserId,
+          question: question,
+        }
+      );
+
+      // Create bot response message
+      const notificationMessage: MessageChat = {
+        sender: BOT_ID,
+        receiver: currentUserId,
+        content: response.answer,
+      };
+
+      // const botMessage: MessageChat = {
+      //   sender: BOT_ID,
+      //   receiver: currentUserId,
+      //   content: "__RECOMMEND__",
+      //   recommendProducts: products,
+      // };
+
+      // Replace loading message with actual response
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        const loadingIndex = newMessages.findIndex(
+          (msg) => msg.content === "__LOADING__"
+        );
+        if (loadingIndex !== -1) {
+          newMessages.splice(loadingIndex, 1);
+        }
+        return [...newMessages, notificationMessage];
+      });
+
+      // Emit messages to socket
+      socketRef.current?.emit("send_message", notificationMessage);
+      // socketRef.current?.emit("send_message", botMessage);
+    } catch (err) {
+      console.error("Error getting recommendations:", err);
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        const loadingIndex = newMessages.findIndex(
+          (msg) => msg.content === "__LOADING__"
+        );
+        if (loadingIndex !== -1) {
+          newMessages.splice(loadingIndex, 1);
+        }
+        return [
+          ...newMessages,
+          {
+            sender: BOT_ID,
+            receiver: currentUserId,
+            content:
+              "Sorry, I couldn't find recommendations. Please try again later.",
+          },
+        ];
+      });
+    } finally {
+      setIsLoading(false);
+    }
+    // }
+  };
+
+  const toggleBotChat = () => {
+    setIsBotChatActive(!isBotChatActive);
+    setProductLink(""); // Reset link khi chuyển chế độ
+    setProductId(""); // Reset productId khi chuyển chế độ
+  };
+
+  // Hàm trích xuất productId từ URL
+  const extractProductId = (url: string) => {
+    try {
+      const pathParts = new URL(url).pathname.split("/");
+      return pathParts[pathParts.length - 1];
+    } catch (e) {
+      console.error("Invalid URL format");
+      return "";
+    }
+  };
+
+  // Xử lý khi người dùng thay đổi link sản phẩm
+  const handleProductLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const link = e.target.value;
+    setProductLink(link);
+
+    // Trích xuất productId khi link thay đổi
+    if (link) {
+      const id = extractProductId(link);
+      setProductId(id);
+    } else {
+      setProductId("");
+    }
+  };
+
+  const formattedContent = (msg: string) => {
+    return msg
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // **bold**
+      .replace(/\*(.*?)\*/g, "<em>$1</em>") // *italic*
+      .replace(/(?:^|\n)[-•] (.*)/g, "<li>$1</li>") // - list item
+      .replace(/\n{2,}/g, "<br/><br/>") // 2+ \n = 2 dòng
+      .replace(/\n/g, "<br/>"); // còn lại là 1 dòng
+  };
+
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-lg overflow-hidden border">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b bg-blue-600 text-white">
+      <div className="flex items-center gap-3 p-4 border-b bg-gradient-to-r from-sky-400 to-indigo-700 text-white shadow-md">
         <img
           src={user.avatar || "/default-avatar.png"}
           alt={user.name}
@@ -309,30 +439,48 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
               {msg.content === "__LOADING__" ? (
                 <LoadingDots />
               ) : msg.content === "__RECOMMEND__" && msg.recommendProducts ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
+                  <p className="font-medium mb-2">
+                    I recommend these products:
+                  </p>
                   {msg.recommendProducts.map((product) => (
                     <div
                       key={product.productId}
-                      className="p-3 border border-gray-300 rounded-md shadow-sm hover:shadow-md transition bg-slate-50"
+                      className="p-3 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 flex"
                     >
-                      <a
-                        href={product.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block"
-                      >
-                        <h3 className="font-semibold text-blue-600 hover:underline">
-                          {product.name}
-                        </h3>
-                        {/* <p className="text-gray-700 text-sm">
-                          {product.description}
-                        </p> */}
-                      </a>
+                      {/* Hình ảnh sản phẩm */}
+                      <div className="w-5 h-5 flex-shrink-0">
+                        <img
+                          src={product.images?.[0]}
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <a
+                          href={product.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block"
+                        >
+                          <h3 className="font-semibold text-blue-600 hover:underline line-clamp-2">
+                            {product.name}
+                          </h3>
+                          <button className="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded-md transition-colors">
+                            View Details
+                          </button>
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p>{msg.content}</p>
+                // <p>{msg.content}</p>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: formattedContent(msg.content),
+                  }}
+                />
               )}
             </div>
           ))
@@ -343,30 +491,70 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
       </div>
       {/* Suggested Prompts */}
       <div className="p-3 border-t bg-white flex flex-wrap gap-2">
-        {["Which cloth suitable with my bodyshape?"].map((prompt, index) => (
-          <button
-            key={index}
-            onClick={() => handleSuggestedPrompt(prompt)}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-xs"
-          >
-            {prompt}
-          </button>
-        ))}
+        {/* NEW BUTTON */}
+        {!isBotChatActive ? (
+          <>
+            <button
+              onClick={() =>
+                handleSuggestedPrompt("Which cloth suitable with my bodyshape?")
+              }
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-full text-xs"
+            >
+              Which cloth suitable with my bodyshape?
+            </button>
+            <button
+              onClick={toggleBotChat}
+              className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-full text-xs font-medium"
+            >
+              Chat with bot Assistant
+            </button>
+          </>
+        ) : (
+          <div className="w-full flex flex-col gap-2">
+            <button
+              onClick={toggleBotChat}
+              className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-full text-xs font-medium"
+            >
+              Stop Chat with bot Assistant
+            </button>
+
+            {/* Thêm ô nhập link sản phẩm */}
+            <div className="flex items-center gap-2 w-full">
+              <input
+                type="text"
+                value={productLink}
+                onChange={handleProductLinkChange}
+                placeholder="Paste product link here..."
+                className="flex-1 p-2 border rounded text-sm"
+              />
+              {/* {productId && (
+                <span className="text-xs text-green-600">
+                  Product ID: {productId}
+                </span>
+              )} */}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input */}
       <div className="p-3 border-t flex items-center gap-2 bg-white">
-        <input
-          type="text"
-          placeholder="Enter message..."
+        <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="flex-1 border rounded-md px-3 py-2 text-sm outline-none"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+          placeholder="Type your message..."
+          rows={1}
+          className="w-full py-2 px-1 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         />
         <button
           onClick={handleSend}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm"
+          className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm"
         >
           Send
         </button>
