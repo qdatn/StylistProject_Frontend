@@ -19,6 +19,7 @@ import { Cart } from "@src/types/Cart";
 import { OrderAttribute } from "@src/types/Attribute";
 import { formatCurrency } from "@utils/format";
 import { Product, ProductVariant } from "@src/types/new/Product";
+import LoadingSpinner from "@components/loading";
 
 const DEFAULT_IMAGE = "../src/public/assets/images/default-product-image.png";
 
@@ -240,9 +241,10 @@ const ProductDetail: React.FC = () => {
 
   if (!product)
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      // <div className="flex justify-center items-center h-screen">
+      //   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      // </div>
+      <LoadingSpinner/>
     );
 
   // Find available options for each attribute
@@ -400,7 +402,7 @@ const ProductDetail: React.FC = () => {
                   </span>
                 ) : (
                   <span className="text-lg text-gray-500">
-                    Select options to see price
+                    Select other options to see price
                   </span>
                 )}
               </div>

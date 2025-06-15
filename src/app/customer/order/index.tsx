@@ -52,14 +52,27 @@ const OrderPage = () => {
         {/* {mockOrders.map((order) => (
           <Ordertracking key={order._id} order={order} />
         ))} */}
-        {orders.data &&
+        {orders.data && orders.data.length > 0 ? (
           orders.data.map((order) => (
             <Ordertracking
               key={order.order._id}
               order={order.order}
               orderitems={order.order_items}
             />
-          ))}
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+              alt="No orders"
+              className="w-40 h-40 object-contain mb-6"
+            />
+            <h2 className="text-lg font-medium">You don't have any orders.</h2>
+            <p className="text-sm mt-2">
+              Shopping now and experience more products.
+            </p>
+          </div>
+        )}
       </div>
     </>
   );
