@@ -138,6 +138,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         <option value="delivering">Delivering</option>
                         <option value="shipped">Shipped</option>
                         <option value="canceled">Canceled</option>
+                        <option value="pending">Pending</option>
+                        <option value="refuned">Refuned</option>
                     </Select>
                     {errors.status && <p className="text-red-500 text-sm">{errors.status}</p>}
                 </div>
