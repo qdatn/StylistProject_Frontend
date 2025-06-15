@@ -13,6 +13,8 @@ import { debounce, set } from "lodash";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { UserAccount } from "@src/types/UserAccount";
+import LoadingSpinner from "@components/loading";
+import LoadingData from "@components/LoadingData";
 
 interface ProductListPageProps {
   name?: string;
@@ -208,7 +210,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
           const ids = await axiosClient.getOne<string[]>(
             `${urlPath}/api/product/user/${currentUserId}`
           );
-          
+
           // Lưu vào session storage
           sessionStorage.setItem(storageKey, JSON.stringify(ids));
           setStyleProductIds(ids);
@@ -314,9 +316,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
   const updateProducts = (response: ProductList, page: number) => {
     setProducts((prev) => ({
       data:
-        page === 1
-          ? response.data
-          : [...(prev?.data || []), ...response.data],
+        page === 1 ? response.data : [...(prev?.data || []), ...response.data],
       pagination: response.pagination,
     }));
 
@@ -363,12 +363,15 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
         next={fetchMoreData}
         hasMore={hasMore}
         loader={
-          <Spin tip="Loading" size="large" className=" flex justify-center" />
+          // <Spin tip="Loading" size="large" className=" flex justify-center" />
+          <LoadingData />
         }
         endMessage={
-          <p className="mb-6 flex items-center justify-center font-light text-gray-600">
-            <b>All products have been loaded</b>
-          </p>
+          <div className="mt-10 mb-6 flex flex-col items-center justify-center text-gray-500">
+            <p className="text-sm font-medium">
+              You’ve reached the end of the product list
+            </p>
+          </div>
         }
       >
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10 py-6 px-4 sm:px-6 md:px-8 lg:px-16">
