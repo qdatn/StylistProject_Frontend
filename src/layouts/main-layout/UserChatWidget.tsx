@@ -6,6 +6,7 @@ import axiosClient from "@api/axiosClient";
 import { AppDispatch, RootState } from "@redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Dữ liệu mock cho admin (người nhận tin nhắn)
 // const adminAccount: UserAccount = mockUserAccounts.find(
@@ -63,20 +64,26 @@ const UserChatWidget: React.FC = () => {
   }, [isOpen]);
 
   return (
-    <>
+    <AnimatePresence>
       {/* Icon mở chat */}
-      <div className="fixed bottom-2 right-3 z-40">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className=" rounded-full"
-        >
+      <motion.div
+        className="fixed bottom-2 right-3 z-40"
+        animate={{ y: [0, -5, 0] }} // nhún lên và xuống
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          repeatType: "loop",
+          ease: "easeInOut",
+        }}
+      >
+        <button onClick={() => setIsOpen(!isOpen)} className=" rounded-full">
           <img
-          src={ "../src/public/assets/images/chat-bot.png"}
-          alt={"chat bot"}
-          className=" w-16 h-16"
-        />
+            src={"../src/public/assets/images/chat-bot.png"}
+            alt={"chat bot"}
+            className=" w-16 h-16"
+          />
         </button>
-      </div>
+      </motion.div>
 
       {/* ChatBox */}
       {isOpen && currentUser && adminAccount && (
@@ -84,7 +91,7 @@ const UserChatWidget: React.FC = () => {
           <ChatBox user={adminAccount} currentUser={currentUser} />
         </div>
       )}
-    </>
+    </AnimatePresence>
   );
 };
 
