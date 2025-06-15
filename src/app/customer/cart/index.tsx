@@ -378,7 +378,7 @@ const CartPage = () => {
           // Redirect to the MoMo payment URL
           if (response && response.payUrl) {
             window.location.href = response.payUrl; // Navigate to the payment page
-            localStorage.setItem("momo_order_id", createOrder.order._id); 
+            localStorage.setItem("momo_order_id", createOrder.order._id);
           } else {
             console.error("Failed to retrieve payUrl from response");
           }
@@ -554,8 +554,8 @@ const CartPage = () => {
           <span>{formatCurrency(finalPrice)}</span>
         </div>
         {/* Phần discount */}
-        <div className="mt-2">
-          <label className="block">Choose Discount:</label>
+        <div className="">
+          <label className="mt-5 mb-2 block font-semibold">Choose Discount:</label>
           <select
             value={selectedDiscountCode}
             onChange={(e) => {
@@ -643,26 +643,46 @@ const CartPage = () => {
               />
             </div>
             <div>
-              <Field
-                as="select"
-                name="paymentMethod"
-                placeholder="Select Payment Method"
-                // value={formData.paymentMethod}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              >
-                <option value="COD">COD - Cash On Delivery</option>
-                <option value="Momo">Momo</option>
-                {/* <option value="VNPay">VNPay</option> */}
-              </Field>
+              <p className="mt-5 mb-2 font-semibold">Payment method</p>
+
+              <div className="space-y-4">
+                {/* COD */}
+                <label className="flex items-center border p-3 rounded-lg cursor-pointer hover:shadow transition">
+                  <Field
+                    type="radio"
+                    name="paymentMethod"
+                    value="COD"
+                    className="mr-3"
+                  />
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/891/891419.png"
+                    alt="COD"
+                    className="w-12 h-12 object-contain mr-4"
+                  />
+                  <span>COD</span>
+                </label>
+
+                {/* Momo */}
+                <label className="flex items-center border p-3 rounded-lg cursor-pointer hover:shadow transition">
+                  <Field
+                    type="radio"
+                    name="paymentMethod"
+                    value="Momo"
+                    className="mr-3"
+                  />
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
+                    alt="Momo"
+                    className="w-12 h-12 object-contain mr-4"
+                  />
+                  <span>Momo</span>
+                </label>
+              </div>
               <ErrorMessage
                 name="paymentMethod"
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.paymentMethod && (
-                <p className="text-red-500 text-sm">{errors.paymentMethod}</p>
-              )} */}
             </div>
             <button
               // onClick={handleSubmit}
@@ -692,6 +712,19 @@ const CartPage = () => {
         )}
       </Formik>
     </div>
+    // Field select payment method
+    // <Field
+    //             as="select"
+    //             name="paymentMethod"
+    //             placeholder="Select Payment Method"
+    //             // value={formData.paymentMethod}
+    //             // onChange={handleChange}
+    //             className="border p-2 w-full my-4"
+    //           >
+    //             <option value="COD">COD - Cash On Delivery</option>
+    //             <option value="Momo">Momo</option>
+    //             {/* <option value="VNPay">VNPay</option> */}
+    //           </Field>
   );
 };
 
