@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Home from "./app/page";
 import RootLayout from "./layout";
@@ -44,8 +44,21 @@ import EditNotification from "@app/admin/customer/NotificationEdit";
 import NewNotification from "@app/admin/customer/NewNotification";
 import FashionSurveyPage from "@app/customer/survey";
 import CustomerAnalytics from "@app/admin/customer/CustomerAnalytics";
+import LoadingSpinner from "@components/loading";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Giả lập delay load dữ liệu
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <RootLayout>
@@ -93,10 +106,22 @@ function App() {
             <Route path="/admin/discount" element={<DiscountManagement />} />
             <Route path="/admin/statistic" element={<DashboardPage />} />
             <Route path="/admin/customer/list" element={<CustomerList />} />
-            <Route path="/admin/customer/list/edit/:id" element={<EditCustomer />} />
-            <Route path="/admin/notification/list" element={<NotificationManagement />} />
-            <Route path="/admin/notification/list/edit/:id" element={<EditNotification />} />
-            <Route path="/admin/notification/list/new" element={<NewNotification />} />
+            <Route
+              path="/admin/customer/list/edit/:id"
+              element={<EditCustomer />}
+            />
+            <Route
+              path="/admin/notification/list"
+              element={<NotificationManagement />}
+            />
+            <Route
+              path="/admin/notification/list/edit/:id"
+              element={<EditNotification />}
+            />
+            <Route
+              path="/admin/notification/list/new"
+              element={<NewNotification />}
+            />
             <Route
               path="/admin/product/list/edit/:id"
               element={<EditProduct />}
@@ -119,10 +144,7 @@ function App() {
               path="/admin/product/categories/new"
               element={<NewCategory />}
             />
-            <Route
-              path="/admin/chat"
-              element={<ChatPage />}
-            />
+            <Route path="/admin/chat" element={<ChatPage />} />
             <Route path="/admin/order/new" element={<NewOrder />} />
             <Route path="/admin/discount/new" element={<NewDiscount />} />
             <Route path="/admin/analyze" element={<CustomerAnalytics />} />

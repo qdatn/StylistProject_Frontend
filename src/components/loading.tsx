@@ -33,7 +33,7 @@ export default function LoadingSpinner() {
       >
         <ShoppingCart className="text-orange-500 w-10 h-10" />
         <h1 className="text-3xl font-bold text-gray-800 tracking-wide">
-          E-Shop
+          STYLE
         </h1>
       </motion.div>
 
