@@ -23,6 +23,7 @@ import { Address } from "@src/types/Address";
 import { formatCurrency } from "@utils/format";
 import AddressAutocomplete from "@components/AddressAutocomplete";
 import { OrderAttribute } from "@src/types/Attribute";
+import { Order } from "@src/types/Order";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 // Tạo ID duy nhất từ các thuộc tính
@@ -158,13 +159,13 @@ const CartPage = () => {
 
   const selectedProducts = useMemo(() => {
     return cartItems
-      .filter(item => selectedItems.includes(getUniqueId(item)))
-      .map(item => {
+      .filter((item) => selectedItems.includes(getUniqueId(item)))
+      .map((item) => {
         const uniqueId = getUniqueId(item);
         return {
           productId: uniqueId.split("-")[0],
           attribute: item.cart_attributes,
-          quantity: quantities[uniqueId] || 1
+          quantity: quantities[uniqueId] || 1,
         };
       });
   }, [cartItems, selectedItems, quantities]);
@@ -181,33 +182,35 @@ const CartPage = () => {
   // }, [selectedItems]);
 
   useEffect(() => {
-  const fetchAvailableDiscounts = async () => {
-    // Tính toán productIds trực tiếp từ selectedItems
-    const productIds = selectedItems.map((uniqueId) => uniqueId.split("-")[0]);
-    
-    console.log("Sending productIds to API:", productIds);
-    
-    try {
-      const discountList = await axiosClient.post<DiscountAvailable>(
-        `${baseUrl}/api/discount/available-discounts/?limit=10000`,
-        {
-          productIds: productIds, // Sử dụng biến vừa tính toán
-          totalPrice: subtotal,
-        }
+    const fetchAvailableDiscounts = async () => {
+      // Tính toán productIds trực tiếp từ selectedItems
+      const productIds = selectedItems.map(
+        (uniqueId) => uniqueId.split("-")[0]
       );
-      setDiscounts(discountList.data);
-    } catch (error) {
-      notification.error({
-        message: "Error loading discounts",
-        description: "Failed to fetch available discounts",
-      });
-    }
-  };
 
-  if (selectedItems.length > 0 && subtotal > 0) {
-    fetchAvailableDiscounts();
-  }
-}, [selectedItems, subtotal]); // Phụ thuộc vào selectedProducts
+      console.log("Sending productIds to API:", productIds);
+
+      try {
+        const discountList = await axiosClient.post<DiscountAvailable>(
+          `${baseUrl}/api/discount/available-discounts/?limit=10000`,
+          {
+            productIds: productIds, // Sử dụng biến vừa tính toán
+            totalPrice: subtotal,
+          }
+        );
+        setDiscounts(discountList.data);
+      } catch (error) {
+        notification.error({
+          message: "Error loading discounts",
+          description: "Failed to fetch available discounts",
+        });
+      }
+    };
+
+    if (selectedItems.length > 0 && subtotal > 0) {
+      fetchAvailableDiscounts();
+    }
+  }, [selectedItems, subtotal]); // Phụ thuộc vào selectedProducts
 
   // Sửa hàm apply discount
   const handleApplyDiscount = async (code: string) => {
@@ -245,7 +248,6 @@ const CartPage = () => {
   }, [subtotal]);
 
   //apply discount
-
 
   //update quantity
   const updateQuantity = (
@@ -376,6 +378,7 @@ const CartPage = () => {
           // Redirect to the MoMo payment URL
           if (response && response.payUrl) {
             window.location.href = response.payUrl; // Navigate to the payment page
+            localStorage.setItem("momo_order_id", createOrder.order._id); 
           } else {
             console.error("Failed to retrieve payUrl from response");
           }
@@ -403,7 +406,7 @@ const CartPage = () => {
 
   useEffect(() => {
     setCartItems(cart);
-  }, [cart]);// Cập nhật khi cart thay đổi
+  }, [cart]); // Cập nhật khi cart thay đổi
 
   const handleSubmit = async (values: any) => {
     // await setCartItems(cart);
@@ -593,7 +596,7 @@ const CartPage = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ }) => (
+        {({}) => (
           <Form className="md:w-1/3 p-4 text-gray-700">
             <h2 className="text-lg font-semibold mb-4">Information</h2>
             <div>
@@ -665,7 +668,7 @@ const CartPage = () => {
               // onClick={handleSubmit}
               type="submit"
               className="bg-yellow-500 text-white py-2 px-4 rounded w-full"
-            // disabled={!isValid || !Object.keys(touched).length}
+              // disabled={!isValid || !Object.keys(touched).length}
             >
               Place Order
             </button>
@@ -680,7 +683,7 @@ const CartPage = () => {
                 // onClick={handleSubmit}
                 type="submit"
                 className="bg-yellow-500 text-lg font-medium text-white py-2 px-4 rounded w-[400px] h-full"
-              // disabled={!isValid || !Object.keys(touched).length}
+                // disabled={!isValid || !Object.keys(touched).length}
               >
                 Place Order
               </button>
