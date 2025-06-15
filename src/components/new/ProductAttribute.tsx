@@ -11,7 +11,7 @@ interface ProductAttributeProps {
     onDeleteKey: (key: string) => void;
     onAddValue: (key: string, value: string) => void;
     onDeleteValue: (key: string, value: string) => void;
-    errors: Record<string, string | null>; 
+
 
 }
 
@@ -144,10 +144,26 @@ const ProductAttribute: React.FC<ProductAttributeProps> = ({
 
     const handleAddValueSubmit = (key: string) => {
         const valueToAdd = newValues[key]?.trim();
-        if (valueToAdd) {
-            onAddValue(key, valueToAdd);
-            setNewValues(prev => ({ ...prev, [key]: '' }));
+        if (!valueToAdd) return;
+
+        // Kiểm tra trùng lặp giá trị
+        const isValueDuplicate = attributes.some((attr) =>
+            attr.key.toLowerCase() === key.toLowerCase() &&
+            attr.value.some(value => value.toLowerCase() === valueToAdd.toLowerCase())
+        );
+
+        if (isValueDuplicate) {
+            setErrors((prev) => ({
+                ...prev,
+                newValues: "This value already exists for this key.",
+            }));
+            return;
         }
+
+        // Thêm giá trị nếu không trùng lặp
+        onAddValue(key, valueToAdd);
+        setNewValues((prev) => ({ ...prev, [key]: '' }));
+        setErrors((prev) => ({ ...prev, newValues: '' })); // Clear error
     };
 
     return (
