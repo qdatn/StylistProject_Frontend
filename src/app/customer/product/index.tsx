@@ -13,7 +13,6 @@ import { debounce, set } from "lodash";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { UserAccount } from "@src/types/UserAccount";
-import LoadingSpinner from "@components/loading";
 import LoadingData from "@components/LoadingData";
 
 interface ProductListPageProps {

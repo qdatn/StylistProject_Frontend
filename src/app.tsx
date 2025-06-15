@@ -45,116 +45,125 @@ import NewNotification from "@app/admin/customer/NewNotification";
 import FashionSurveyPage from "@app/customer/survey";
 import CustomerAnalytics from "@app/admin/customer/CustomerAnalytics";
 import LoadingSpinner from "@components/loading";
+import RouteLoadingWrapper from "./routeLoadingMapper";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Giả lập delay load dữ liệu
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
+  // useEffect(() => {
+  //   // Giả lập delay load dữ liệu
+  //   const timeout = setTimeout(() => {
+  //     setLoading(false);
+  //   }, 1500);
 
-    return () => clearTimeout(timeout);
-  }, []);
+  //   return () => clearTimeout(timeout);
+  // }, []);
 
-  if (loading) return <LoadingSpinner />;
+  // if (loading) return <LoadingSpinner />;
 
   return (
     <RootLayout>
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
-          <Route path="/resetpassword" element={<ResetPasswordForm />} />
-          <Route path="/OTP" element={<OTPForm />} />
+        <RouteLoadingWrapper>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgotpassword" element={<ForgotPasswordForm />} />
+            <Route path="/resetpassword" element={<ResetPasswordForm />} />
+            <Route path="/OTP" element={<OTPForm />} />
 
-          {/* Public layout - guest */}
-          <Route element={<RequireAuth role="guest" />}>
-            <Route path="/" element={<Home />} />
-            <Route
-              path="/product/search/query"
-              element={<ProductSearchPage />}
-            />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
+            {/* Public layout - guest */}
+            <Route element={<RequireAuth role="guest" />}>
+              <Route path="/" element={<Home />} />
+              <Route
+                path="/product/search/query"
+                element={<ProductSearchPage />}
+              />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
 
-          {/* Protected layout - customer */}
-          <Route element={<RequireAuth role="customer" />}>
-            <Route path="/account" element={<AccountPage />} />
-            <Route path="/order" element={<OrderPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/payment/success" element={<PaymentSuccessPage />} />
-            <Route path="/body-shape" element={<BodyShapePage />} />
-            <Route path="/survey" element={<FashionSurveyPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
+            {/* Protected layout - customer */}
+            <Route element={<RequireAuth role="customer" />}>
+              <Route path="/account" element={<AccountPage />} />
+              <Route path="/order" element={<OrderPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/payment/success" element={<PaymentSuccessPage />} />
+              <Route path="/body-shape" element={<BodyShapePage />} />
+              <Route path="/survey" element={<FashionSurveyPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
 
-          {/* Protected layout - admin */}
-          <Route element={<RequireAuth role="admin" />}>
-            <Route path="/admin/" element={<AdminHome />} />
-            <Route path="/admin/storage" element={<StoragePage />} />
-            <Route
-              path="/admin/product/list"
-              element={<ProductListAdminPage />}
-            />
-            <Route path="/admin/product/categories" element={<Categories />} />
-            <Route path="admin/product/list/new" element={<NewProduct />} />
-            <Route path="/admin/order" element={<OrderManagement />} />
-            <Route path="/admin/discount" element={<DiscountManagement />} />
-            <Route path="/admin/statistic" element={<DashboardPage />} />
-            <Route path="/admin/customer/list" element={<CustomerList />} />
-            <Route
-              path="/admin/customer/list/edit/:id"
-              element={<EditCustomer />}
-            />
-            <Route
-              path="/admin/notification/list"
-              element={<NotificationManagement />}
-            />
-            <Route
-              path="/admin/notification/list/edit/:id"
-              element={<EditNotification />}
-            />
-            <Route
-              path="/admin/notification/list/new"
-              element={<NewNotification />}
-            />
-            <Route
-              path="/admin/product/list/edit/:id"
-              element={<EditProduct />}
-            />
-            <Route
-              path="/admin/storage/edit/:id"
-              element={<EditProductStorage />}
-            />
-            <Route
-              path="/admin/product/categories/edit/:id"
-              element={<EditCategory />}
-            />
-            <Route path="/admin/order/edit/:id" element={<EditOrder />} />
-            <Route
-              path="/admin/product/categories/new"
-              element={<NewCategory />}
-            />
-            <Route path="/admin/discount/edit/:id" element={<EditDiscount />} />
-            <Route
-              path="/admin/product/categories/new"
-              element={<NewCategory />}
-            />
-            <Route path="/admin/chat" element={<ChatPage />} />
-            <Route path="/admin/order/new" element={<NewOrder />} />
-            <Route path="/admin/discount/new" element={<NewDiscount />} />
-            <Route path="/admin/analyze" element={<CustomerAnalytics />} />
-            <Route path="/admin/*" element={<NotFound />} />
-          </Route>
+            {/* Protected layout - admin */}
+            <Route element={<RequireAuth role="admin" />}>
+              <Route path="/admin/" element={<AdminHome />} />
+              <Route path="/admin/storage" element={<StoragePage />} />
+              <Route
+                path="/admin/product/list"
+                element={<ProductListAdminPage />}
+              />
+              <Route
+                path="/admin/product/categories"
+                element={<Categories />}
+              />
+              <Route path="admin/product/list/new" element={<NewProduct />} />
+              <Route path="/admin/order" element={<OrderManagement />} />
+              <Route path="/admin/discount" element={<DiscountManagement />} />
+              <Route path="/admin/statistic" element={<DashboardPage />} />
+              <Route path="/admin/customer/list" element={<CustomerList />} />
+              <Route
+                path="/admin/customer/list/edit/:id"
+                element={<EditCustomer />}
+              />
+              <Route
+                path="/admin/notification/list"
+                element={<NotificationManagement />}
+              />
+              <Route
+                path="/admin/notification/list/edit/:id"
+                element={<EditNotification />}
+              />
+              <Route
+                path="/admin/notification/list/new"
+                element={<NewNotification />}
+              />
+              <Route
+                path="/admin/product/list/edit/:id"
+                element={<EditProduct />}
+              />
+              <Route
+                path="/admin/storage/edit/:id"
+                element={<EditProductStorage />}
+              />
+              <Route
+                path="/admin/product/categories/edit/:id"
+                element={<EditCategory />}
+              />
+              <Route path="/admin/order/edit/:id" element={<EditOrder />} />
+              <Route
+                path="/admin/product/categories/new"
+                element={<NewCategory />}
+              />
+              <Route
+                path="/admin/discount/edit/:id"
+                element={<EditDiscount />}
+              />
+              <Route
+                path="/admin/product/categories/new"
+                element={<NewCategory />}
+              />
+              <Route path="/admin/chat" element={<ChatPage />} />
+              <Route path="/admin/order/new" element={<NewOrder />} />
+              <Route path="/admin/discount/new" element={<NewDiscount />} />
+              <Route path="/admin/analyze" element={<CustomerAnalytics />} />
+              <Route path="/admin/*" element={<NotFound />} />
+            </Route>
 
-          {/* Public layout - guest */}
-          <Route element={<MainLayout />}></Route>
-          <Route element={<AdminLayout />}></Route>
-        </Routes>
+            {/* Public layout - guest */}
+            <Route element={<MainLayout />}></Route>
+            <Route element={<AdminLayout />}></Route>
+          </Routes>
+        </RouteLoadingWrapper>
       </BrowserRouter>
     </RootLayout>
   );
