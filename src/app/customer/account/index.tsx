@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import axiosClient from "@api/axiosClient";
 import { notification } from "antd";
+import LoadingSpinner from "@components/loading";
 
 const AccountPage = () => {
   const urlPath = import.meta.env.VITE_API_URL;
@@ -52,7 +53,7 @@ const AccountPage = () => {
     }
   };
   if (!user) {
-    return <div>Loading...</div>; // Có thể thay thế bằng spinner hoặc message loading khác
+    return <LoadingSpinner />; // Có thể thay thế bằng spinner hoặc message loading khác
   }
 
   // Render component

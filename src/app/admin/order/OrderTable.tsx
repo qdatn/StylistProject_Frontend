@@ -53,7 +53,7 @@ const orderColumns: ColumnsType<Order> = [
       { text: 'Shipped', value: 'shipped' },
       { text: 'Canceled', value: 'canceled' },
       { text: 'Pending', value: 'pending'},
-      { text: 'Refuned', value: 'refuned'}
+      { text: 'Refunded', value: 'refunded'}
     ],
     onFilter: (value, record) => record.status === value,
   },
