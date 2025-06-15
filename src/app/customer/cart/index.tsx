@@ -79,6 +79,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [finalPrice, setFinalPrice] = useState<number>(0);
+  const [selectedDiscountId, setSelectedDiscountId] = useState<string>("");
   //const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
@@ -347,6 +348,12 @@ const CartPage = () => {
         order,
         order_items,
       });
+
+      // Update discount used count
+      const updateDiscountUse = await axiosClient.put(
+        `${baseUrl}/api/discount/${selectedDiscountId}/increase-used`,
+        {}
+      );
 
       notification.success({
         message: "Create order success",
@@ -626,6 +633,7 @@ const CartPage = () => {
                     onClick={() => {
                       setSelectedDiscountCode(discount.code);
                       handleApplyDiscount(discount.code);
+                      setSelectedDiscountId(discount._id);
                     }}
                     className={`cursor-pointer border rounded-lg px-4 py-3 transition-all relative
             ${
