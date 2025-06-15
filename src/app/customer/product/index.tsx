@@ -35,7 +35,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
   });
   const [pagination, setPagination] = useState<PaginationType>({
     currentPage: 1,
-    pageSize: 8,
+    pageSize: 10,
     totalItems: 0,
     totalPages: 0,
   });
@@ -236,7 +236,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
       setTrackingLoaded(false);
 
       const initialPage = 1;
-      const pageSize = pagination.pageSize || 8;
+      const pageSize = pagination.pageSize || 10;
 
       try {
         // Sử dụng API style-based khi:
@@ -359,7 +359,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
     <>
       <InfiniteScroll
         className=""
-        dataLength={products?.data.length ?? 8}
+        dataLength={products?.data.length ?? 10}
         next={fetchMoreData}
         hasMore={hasMore}
         loader={
@@ -374,7 +374,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
           </div>
         }
       >
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10 py-6 px-4 sm:px-6 md:px-8 lg:px-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5 lg:gap-6 py-6 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           {/* Hiển thị danh sách sản phẩm */}
 
           {products &&

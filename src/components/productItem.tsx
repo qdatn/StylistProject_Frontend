@@ -16,12 +16,14 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
   };
 
   // Tìm giá thấp nhất và cao nhất trong variants
-  const minPrice = variants && variants.length > 0
-    ? Math.min(...variants.map((v) => v.price))
-    : 0;
-  const maxPrice = variants && variants.length > 0
-    ? Math.max(...variants.map((v) => v.price))
-    : 0;
+  const minPrice =
+    variants && variants.length > 0
+      ? Math.min(...variants.map((v) => v.price))
+      : 0;
+  const maxPrice =
+    variants && variants.length > 0
+      ? Math.max(...variants.map((v) => v.price))
+      : 0;
   return (
     <div
       onClick={handleClick}
@@ -53,17 +55,17 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
                   ? formatCurrency(minPrice)
                   : `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`
                 : "Contact"}
-
             </p>
           </div>
 
-          <div className="flex flex-row gap-2.5 self-start">
-            <div className="px-5 py-1.5 rounded-sm border border-solid bg-white border-zinc-300 text-zinc-600 text-xs font-semibold">
-              MORE COLORS
-            </div>
-            <div className="px-5 py-1.5 rounded-sm border border-solid bg-stone-500 border-zinc-600 text-white text-xs font-semibold">
-              NEW
-            </div>
+          <div className="flex gap-2 mt-1">
+            <span className="px-3 py-1 text-xs border border-gray-300 text-gray-600 rounded-full">
+              More Colors
+            </span>
+            {/* Có thể thêm điều kiện để hiện tag này chỉ khi cần */}
+            <span className="px-3 py-1 text-xs bg-orange-500 text-white rounded-full">
+              New
+            </span>
           </div>
         </div>
       </div>
