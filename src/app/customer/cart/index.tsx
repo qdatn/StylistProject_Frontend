@@ -421,7 +421,7 @@ const CartPage = () => {
       // _id: "",
       user: userId ?? "",
       status:
-        values.paymentMethod == "COD" ? "Pending" : "Waiting for payment!",
+        values.paymentMethod == "COD" ? "in progress" : "Waiting for payment!",
       discount: discountAmount,
       total_price: finalPrice,
       method: values.paymentMethod,

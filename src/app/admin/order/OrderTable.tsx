@@ -39,7 +39,7 @@ const orderColumns: ColumnsType<Order> = [
     render: (status: string) => {
       let color =
         status === 'Waiting for payment!' ? 'gray' :
-          status === 'pending' ? 'orange' :
+          status === 'in progress' ? 'orange' :
             status === 'delivering' ? 'blue' :
               status === 'shipped' ? 'green' :
                 status === 'canceled' ? 'red' : 'gray';
@@ -48,7 +48,7 @@ const orderColumns: ColumnsType<Order> = [
     },
     filters: [
       { text: 'Waiting for payment!', value: 'Waiting for payment!' },
-      { text: 'Pending', value: 'pending' },
+      { text: 'In progress', value: 'in progress' },
       { text: 'Delivering', value: 'delivering' },
       { text: 'Shipped', value: 'shipped' },
       { text: 'Canceled', value: 'canceled' },

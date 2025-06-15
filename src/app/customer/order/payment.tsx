@@ -14,8 +14,8 @@ const PaymentSuccessPage = () => {
   const location = useLocation();
   const baseUrl = import.meta.env.VITE_API_URL;
 
-  const [status, setStatus] = useState<"success" | "failed" | "pending">(
-    "pending"
+  const [status, setStatus] = useState<"success" | "failed" | "in progress">(
+    "in progress"
   );
   const [message, setMessage] = useState("");
 
