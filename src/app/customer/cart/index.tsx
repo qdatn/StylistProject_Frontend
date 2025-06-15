@@ -526,36 +526,54 @@ const CartPage = () => {
       <div className="md:w-2/3 p-4 border-r text-gray-700">
         <h1 className="text-lg font-semibold mb-4">Shopping Cart</h1>
         {/* {cartItems.map((item) => ( */}
-        {cart.map((item: any) => (
-          <CartItem
-            key={getUniqueId(item)}
-            product={item}
-            quantity={item.quantity}
-            onUpdateQuantity={(newQuantity) =>
-              // updateQuantity(item._id, newQuantity, item.cart_attributes)
-              updateQuantity(
-                getUniqueId(item),
-                newQuantity,
-                item.cart_attributes
-              )
-            }
-            onRemove={() =>
-              // removeItem(item._id, item.cart_attributes)
-              removeItem(getUniqueId(item), item.cart_attributes)
-            }
-            onSelect={(selected) => {
-              // toggleSelectItem(item._id, selected), console.log(item);
-              toggleSelectItem(getUniqueId(item), selected);
-            }}
-          />
-        ))}
+        {cart.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+              alt="Empty Cart"
+              className="mx-auto w-24 h-24 mb-4 opacity-70"
+            />
+            <p className="text-lg font-medium">Your cart is empty!</p>
+            <p className="text-sm text-gray-400">
+              Add some products to get started.
+            </p>
+          </div>
+        ) : (
+          <>
+            {cart.map((item: any) => (
+              <CartItem
+                key={getUniqueId(item)}
+                product={item}
+                quantity={item.quantity}
+                onUpdateQuantity={(newQuantity) =>
+                  // updateQuantity(item._id, newQuantity, item.cart_attributes)
+                  updateQuantity(
+                    getUniqueId(item),
+                    newQuantity,
+                    item.cart_attributes
+                  )
+                }
+                onRemove={() =>
+                  // removeItem(item._id, item.cart_attributes)
+                  removeItem(getUniqueId(item), item.cart_attributes)
+                }
+                onSelect={(selected) => {
+                  // toggleSelectItem(item._id, selected), console.log(item);
+                  toggleSelectItem(getUniqueId(item), selected);
+                }}
+              />
+            ))}
+          </>
+        )}
         <div className="flex justify-between font-semibold mt-4">
           <span>Total Amount:</span>
           <span>{formatCurrency(finalPrice)}</span>
         </div>
         {/* Phần discount */}
-        <div className="">
-          <label className="mt-5 mb-2 block font-semibold">Choose Discount:</label>
+        {/* <div className="">
+          <label className="mt-5 mb-2 block font-semibold">
+            Choose Discount:
+          </label>
           <select
             value={selectedDiscountCode}
             onChange={(e) => {
@@ -571,7 +589,73 @@ const CartPage = () => {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
+        {discounts.length === 0 ? (
+          <div className="mt-5 flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 text-gray-400 mb-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 10l7-7 7 7M12 3v18"
+              />
+            </svg>
+            <p className="text-gray-600 font-medium">
+              Please choose a product first
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              No discount available yet.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5">
+            <label className="block font-semibold mb-3">Choose discount:</label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {discounts.map((discount) => {
+                const isSelected = selectedDiscountCode === discount.code;
+                return (
+                  <div
+                    key={discount._id}
+                    onClick={() => {
+                      setSelectedDiscountCode(discount.code);
+                      handleApplyDiscount(discount.code);
+                    }}
+                    className={`cursor-pointer border rounded-lg px-4 py-3 transition-all relative
+            ${
+              isSelected
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300 bg-white hover:border-orange-400"
+            }
+          `}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-sm text-orange-600">
+                          {discount.code}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Discount {discount.value}% on {discount.type}
+                        </p>
+                      </div>
+                      {isSelected && (
+                        <div className="text-orange-500 text-xl font-bold">
+                          ✓
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Phần hiển thị tổng tiền */}
         <div className="flex justify-between font-semibold mt-4">
