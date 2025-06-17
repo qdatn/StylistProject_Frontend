@@ -10,6 +10,7 @@ import { Popconfirm } from "antd";
 import axiosClient from "@api/axiosClient";
 import { OrderAttribute } from "@src/types/Attribute";
 import { Product, ProductVariant } from "@src/types/new/Product";
+import { motion } from "framer-motion";
 
 interface OrdertrackingProps {
   order: Order;
@@ -97,7 +98,13 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
   };
 
   return (
-    <div className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700">
+    // <div className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700">
+    <motion.div
+      className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       {/* Trạng thái đơn hàng */}
       <div className="order-status mb-4 flex justify-end items-center border-b pb-2">
         <span className="text-lg font-semibold text-gray-600">
@@ -195,7 +202,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
           onClose={() => setIsDetailModalOpen(false)}
         />
       )}
-    </div>
+    </motion.div>
   );
 };
 
