@@ -384,6 +384,21 @@ const CartPage = () => {
             paymentBody
           );
           console.log("momo:", response);
+
+          // Save data for cancel or refund
+          const order_id = createOrder.order._id;
+          const localOrderData = {
+            createOrder,
+            paymentBody,
+            createdAt: new Date().toISOString(),
+            paymentMethod,
+            payment_status: true,
+            tranId: ""
+          };
+
+          if (order_id) {
+            localStorage.setItem(order_id, JSON.stringify(localOrderData));
+          }
           // Redirect to the MoMo payment URL
           if (response && response.payUrl) {
             window.location.href = response.payUrl; // Navigate to the payment page

@@ -42,7 +42,7 @@ const orderColumns: ColumnsType<Order> = [
           status === 'in progress' ? 'orange' :
             status === 'delivering' ? 'blue' :
               status === 'shipped' ? 'green' :
-                status === 'canceled' ? 'red' : 'gray';
+                status === 'cancelled' ? 'red' : 'gray';
 
       return <Tag color={color}>{status.toUpperCase()}</Tag>;
     },
@@ -51,7 +51,7 @@ const orderColumns: ColumnsType<Order> = [
       { text: 'In progress', value: 'in progress' },
       { text: 'Delivering', value: 'delivering' },
       { text: 'Shipped', value: 'shipped' },
-      { text: 'Canceled', value: 'canceled' },
+      { text: 'Cancelled', value: 'cancelled' },
       { text: 'Pending', value: 'pending'},
       { text: 'Refunded', value: 'refunded'}
     ],

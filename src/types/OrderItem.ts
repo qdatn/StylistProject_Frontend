@@ -1,5 +1,5 @@
 // src/types/OrderItem.ts
-import { Product } from "@src/types/Product";
+import { Product } from "@src/types/new/Product";
 import { OrderAttribute } from "./Attribute";
 //import { PaginationType } from "./Pagination";
 

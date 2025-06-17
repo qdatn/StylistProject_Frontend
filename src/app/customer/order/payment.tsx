@@ -30,10 +30,38 @@ const PaymentSuccessPage = () => {
         { status: "in progress" }
       );
       console.log("Updated order:", updateStatus);
-      // Optionally clear localStorage
+      // Update store
+      const stored = localStorage.getItem(orderId);
+      if (stored) {
+        const orderData = JSON.parse(stored);
+        console.log("Full order data:", orderData);
+
+        // Thêm tranId nếu có
+        const tranId = new URLSearchParams(window.location.search).get(
+          "tranId"
+        );
+        if (tranId) {
+          orderData.tranId = tranId;
+          localStorage.setItem(orderId, JSON.stringify(orderData));
+        }
+      }
+
       localStorage.removeItem("momo_order_id");
     } catch (err) {
       console.error("Failed to update order status:", err);
+    }
+  };
+
+  const updateStoreStatus = async (status: boolean) => {
+    const orderId = localStorage.getItem("momo_order_id");
+    if (orderId) {
+      const stored = localStorage.getItem(orderId);
+      if (stored) {
+        const orderData = JSON.parse(stored);
+        console.log("Full order data:", orderData);
+        orderData.payment_status = status;
+        localStorage.setItem(orderId, JSON.stringify(orderData));
+      }
     }
   };
 
@@ -52,6 +80,7 @@ const PaymentSuccessPage = () => {
     } else {
       setStatus("failed");
       setMessage(`Payment fail! Reason: ${decodeURIComponent(msg)}`);
+      updateStoreStatus(false);
       setTimeout(() => {
         navigate("/cart"); // trở lại giỏ hàng
       }, 6000);
