@@ -17,7 +17,7 @@ const tabs = [
   { key: "shipped", label: "Shipped" },
   { key: "cancelled", label: "Cancelled" },
   { key: "pending", label: "Pending" },
-  { key: "refunded", label: "Refunded" },
+  // { key: "refunded", label: "Refunded" },
 ];
 
 const baseUrl = import.meta.env.VITE_API_URL;
@@ -58,6 +58,10 @@ const OrderPage = () => {
   const filteredOrders =
     selectedTab === "all"
       ? orders.data
+      : selectedTab === "cancelled"
+      ? orders.data.filter(
+          (o) => o.order.status === selectedTab || o.order.status === "refunded"
+        )
       : orders.data.filter((o) => o.order.status === selectedTab);
 
   return (

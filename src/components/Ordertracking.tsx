@@ -158,7 +158,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
             cancelText="No"
             placement="topLeft"
           >
-            <button className="bg-red-500 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
+            <button className="bg-gray-400 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
               Cancel Order
             </button>
           </Popconfirm>
