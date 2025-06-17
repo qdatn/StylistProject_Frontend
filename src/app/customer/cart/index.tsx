@@ -231,11 +231,11 @@ const CartPage = () => {
         message: "Discount applied successfully",
       });
     } catch (error: any) {
-      notification.error({
-        message: "Discount error",
-        description:
-          error.response?.data?.message || "Failed to apply discount",
-      });
+      // notification.error({
+      //   message: "Discount error",
+      //   description:
+      //     error.response?.data?.message || "Failed to apply discount",
+      // });
       setFinalPrice(subtotal);
       setDiscountAmount(0);
     }
@@ -350,10 +350,12 @@ const CartPage = () => {
       });
 
       // Update discount used count
-      const updateDiscountUse = await axiosClient.put(
-        `${baseUrl}/api/discount/${selectedDiscountId}/increase-used`,
-        {}
-      );
+      if (selectedDiscountCode) {
+        const updateDiscountUse = await axiosClient.put(
+          `${baseUrl}/api/discount/${selectedDiscountId}/increase-used`,
+          {}
+        );
+      }
 
       notification.success({
         message: "Create order success",
@@ -631,9 +633,16 @@ const CartPage = () => {
                   <div
                     key={discount._id}
                     onClick={() => {
-                      setSelectedDiscountCode(discount.code);
-                      handleApplyDiscount(discount.code);
-                      setSelectedDiscountId(discount._id);
+                      if (isSelected) {
+                        // Nếu đang chọn thì bỏ chọn
+                        setSelectedDiscountCode("");
+                        handleApplyDiscount("");
+                        setSelectedDiscountId("");
+                      } else {
+                        setSelectedDiscountCode(discount.code);
+                        handleApplyDiscount(discount.code);
+                        setSelectedDiscountId(discount._id);
+                      }
                     }}
                     className={`cursor-pointer border rounded-lg px-4 py-3 transition-all relative
             ${
