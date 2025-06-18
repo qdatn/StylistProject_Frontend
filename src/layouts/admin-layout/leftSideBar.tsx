@@ -63,7 +63,17 @@ const Sidebar: React.FC = () => {
     {
       key: "7",
       icon: <BarChartOutlined />,
-      label: <Link to="/admin/statistic">Statistic</Link>,
+      label: "Statistic",
+      children: [
+        {
+          key: "12",
+          label: <Link to="/admin/statistic/revenue">Revenue Statistics</Link>,
+        },
+        {
+          key: "13",
+          label: <Link to="/admin/statistic/fashion-trend">Fashion Trends</Link>,
+        },
+      ],
     },
     {
       key: "8",

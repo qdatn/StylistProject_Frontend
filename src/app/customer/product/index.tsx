@@ -34,7 +34,7 @@ const ProductListPage: React.FC<ProductListPageProps> = ({
   });
   const [pagination, setPagination] = useState<PaginationType>({
     currentPage: 1,
-    pageSize: 10,
+    pageSize: 30,
     totalItems: 0,
     totalPages: 0,
   });

@@ -28,7 +28,7 @@ import EditOrder from "@app/admin/order/OrderEdit";
 import DiscountManagement from "@app/admin/discount";
 import NewDiscount from "@app/admin/discount/NewDiscount";
 import EditDiscount from "@app/admin/discount/DiscountEdit";
-import DashboardPage from "@app/admin/statistics";
+import DashboardPage from "@app/admin/statistics/Revenue";
 
 import RequireAuth from "@components/auth/auth_require";
 import ProductListAdminPage from "@app/admin/product/ProductList";
@@ -43,7 +43,7 @@ import NotificationManagement from "@app/admin/customer/NotificationList";
 import EditNotification from "@app/admin/customer/NotificationEdit";
 import NewNotification from "@app/admin/customer/NewNotification";
 import FashionSurveyPage from "@app/customer/survey";
-import CustomerAnalytics from "@app/admin/customer/CustomerAnalytics";
+import CustomerAnalytics from "@app/admin/statistics/CustomerAnalytics";
 import LoadingSpinner from "@components/loading";
 import RouteLoadingWrapper from "./routeLoadingMapper";
 function App() {
@@ -109,7 +109,7 @@ function App() {
               <Route path="admin/product/list/new" element={<NewProduct />} />
               <Route path="/admin/order" element={<OrderManagement />} />
               <Route path="/admin/discount" element={<DiscountManagement />} />
-              <Route path="/admin/statistic" element={<DashboardPage />} />
+              <Route path="/admin/statistic/revenue" element={<DashboardPage />} />
               <Route path="/admin/customer/list" element={<CustomerList />} />
               <Route
                 path="/admin/customer/list/edit/:id"
@@ -155,7 +155,7 @@ function App() {
               <Route path="/admin/chat" element={<ChatPage />} />
               <Route path="/admin/order/new" element={<NewOrder />} />
               <Route path="/admin/discount/new" element={<NewDiscount />} />
-              <Route path="/admin/analyze" element={<CustomerAnalytics />} />
+              <Route path="/admin/statistic/fashion-trend" element={<CustomerAnalytics />} />
               <Route path="/admin/*" element={<NotFound />} />
             </Route>
 

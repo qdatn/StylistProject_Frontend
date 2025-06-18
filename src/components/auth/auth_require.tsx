@@ -40,7 +40,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ role }) => {
   }
   if (user.isLogin && user.user?.user.role === role && role === "admin") {
     return <AdminLayout />;
-  } 
+  }
   // else if (
   //   user.isLogin &&
   //   user.user?.user.role === role &&
@@ -48,7 +48,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ role }) => {
   // ) {
   //   return <MainLayout />;
   // } 
-  
+
   else {
     return <MainLayout />;
   }

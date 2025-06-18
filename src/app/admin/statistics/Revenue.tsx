@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Statistic Page</h1>
+      <h1 className="text-2xl font-bold mb-6">Revenue Statistics</h1>
       <DateRangePicker
         startDate={startDate}
         endDate={endDate}
