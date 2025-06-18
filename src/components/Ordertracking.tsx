@@ -45,56 +45,69 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
       `${apiUrl}/api/orderitem/order/${orderId}`
     );
 
-    for (const item of order_items) {
-      const product = item.product;
-      const attributes = item.attributes;
+    if (order.method == "COD") {
+      for (const item of order_items) {
+        const product = item.product;
+        const attributes = item.attributes;
 
-      // 2. Tìm variant tương ứng với attributes
-      const matchedVariant = findMatchingVariant(product.variants!, attributes);
+        // 2. Tìm variant tương ứng với attributes
+        const matchedVariant = findMatchingVariant(
+          product.variants!,
+          attributes
+        );
 
-      console.log(matchedVariant);
-      if (!matchedVariant) {
-        console.warn("Không tìm thấy variant phù hợp:", attributes);
-        continue;
-      }
-
-      // 3. Cập nhật stock_quantity: + thêm lại số lượng đã mua
-      // const updatedStock = matchedVariant.stock_quantity + item.quantity;
-      const updatedStock = item.quantity;
-
-      const updatedVariants = product.variants!.map((variant) => {
-        const isMatch = variant.attributes.every((attr) => {
-          return attributes.some(
-            (tAttr) => tAttr.key === attr.key && tAttr.value === attr.value
-          );
-        });
-
-        if (isMatch) {
-          return {
-            ...variant,
-            stock_quantity: variant.stock_quantity + updatedStock,
-            sold_quantity: variant.sold_quantity - updatedStock,
-            stock_update_date: new Date().toISOString(),
-          };
+        console.log(matchedVariant);
+        if (!matchedVariant) {
+          console.warn("Not found suitable variants", attributes);
+          continue;
         }
 
-        return variant;
+        // 3. Cập nhật stock_quantity: + thêm lại số lượng đã mua
+        // const updatedStock = matchedVariant.stock_quantity + item.quantity;
+        const updatedStock = item.quantity;
+
+        const updatedVariants = product.variants!.map((variant) => {
+          const isMatch = variant.attributes.every((attr) => {
+            return attributes.some(
+              (tAttr) => tAttr.key === attr.key && tAttr.value === attr.value
+            );
+          });
+
+          if (isMatch) {
+            return {
+              ...variant,
+              stock_quantity: variant.stock_quantity + updatedStock,
+              sold_quantity: variant.sold_quantity - updatedStock,
+              stock_update_date: new Date().toISOString(),
+            };
+          }
+
+          return variant;
+        });
+
+        // 4. Gửi API cập nhật variant
+        await axiosClient.put<Product>(`${apiUrl}/api/product/${product._id}`, {
+          ...product,
+          variants: updatedVariants,
+        });
+      }
+
+      // 5. Cập nhật trạng thái đơn hàng là "cancelled"
+      await axiosClient.put(`${apiUrl}/api/order/${orderId}`, {
+        status: "cancelled",
       });
 
-      // 4. Gửi API cập nhật variant (giả định có endpoint update theo id)
-      await axiosClient.put<Product>(`${apiUrl}/api/product/${product._id}`, {
-        ...product,
-        variants: updatedVariants,
+      // Reload lại trang
+      window.location.reload();
+    } else {
+      // 5. Cập nhật trạng thái đơn hàng là "cancelled"
+      await axiosClient.put(`${apiUrl}/api/order/${orderId}`, {
+        status: "pending",
       });
+
+      // Reload lại trang
+      window.location.reload();
     }
-
-    // 5. Cập nhật trạng thái đơn hàng là "cancelled"
-    await axiosClient.put(`${apiUrl}/api/order/${orderId}`, {
-      status: "cancelled",
-    });
-
-    // Reload lại trang
-    window.location.reload();
   };
 
   return (
@@ -147,22 +160,22 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
 
         {(order.status === "in progress" ||
           order.status === "Waiting for payment!") && (
-            <Popconfirm
-              title="Are you sure to cancel this order?"
-              description="This action cannot be undone."
-              onConfirm={() => {
-                CancelOrder(order);
-                console.log(order._id);
-              }}
-              okText="Yes"
-              cancelText="No"
-              placement="topLeft"
-            >
-              <button className="bg-gray-400 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
-                Cancel Order
-              </button>
-            </Popconfirm>
-          )}
+          <Popconfirm
+            title="Are you sure to cancel this order?"
+            description="This action cannot be undone."
+            onConfirm={() => {
+              CancelOrder(order);
+              console.log(order._id);
+            }}
+            okText="Yes"
+            cancelText="No"
+            placement="topLeft"
+          >
+            <button className="bg-gray-400 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
+              Cancel Order
+            </button>
+          </Popconfirm>
+        )}
 
         {order.status === "delivered" && (
           <button
