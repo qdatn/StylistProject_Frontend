@@ -104,7 +104,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
       `${apiUrl}/api/orderitem/order/${orderId}`
     );
 
-    if (order.status == "refunded") {
+    if (order.status == "refunded" || order.status == "cancelled") {
       for (const item of order_items) {
         const product = item.product;
         const attributes = item.attributes;
