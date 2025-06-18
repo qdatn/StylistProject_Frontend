@@ -6,6 +6,11 @@ import OrderReviewForm from "./OrderReview";
 import { OrderItem } from "@src/types/OrderItem";
 import { formatCurrency } from "@utils/format";
 import OrderDetailModal from "./OrderDetailModal";
+import { Popconfirm } from "antd";
+import axiosClient from "@api/axiosClient";
+import { OrderAttribute } from "@src/types/Attribute";
+import { Product, ProductVariant } from "@src/types/new/Product";
+import { motion } from "framer-motion";
 
 interface OrdertrackingProps {
   order: Order;
@@ -15,9 +20,91 @@ interface OrdertrackingProps {
 const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const findMatchingVariant = (
+    variants: ProductVariant[],
+    attributes: OrderAttribute[]
+  ) => {
+    return variants.find((variant: ProductVariant) => {
+      return (
+        attributes.every((attr) =>
+          variant.attributes.some(
+            (vAttr: any) => vAttr.key === attr.key && vAttr.value === attr.value
+          )
+        ) && variant.attributes.length === attributes.length
+      );
+    });
+  };
+
+  const CancelOrder = async (order: Order) => {
+    const orderId = order._id;
+
+    // 1. Lấy danh sách order_items từ order
+    const order_items: OrderItem[] = await axiosClient.getOne(
+      `${apiUrl}/api/orderitem/order/${orderId}`
+    );
+
+    for (const item of order_items) {
+      const product = item.product;
+      const attributes = item.attributes;
+
+      // 2. Tìm variant tương ứng với attributes
+      const matchedVariant = findMatchingVariant(product.variants!, attributes);
+
+      console.log(matchedVariant);
+      if (!matchedVariant) {
+        console.warn("Không tìm thấy variant phù hợp:", attributes);
+        continue;
+      }
+
+      // 3. Cập nhật stock_quantity: + thêm lại số lượng đã mua
+      // const updatedStock = matchedVariant.stock_quantity + item.quantity;
+      const updatedStock = item.quantity;
+
+      const updatedVariants = product.variants!.map((variant) => {
+        const isMatch = variant.attributes.every((attr) => {
+          return attributes.some(
+            (tAttr) => tAttr.key === attr.key && tAttr.value === attr.value
+          );
+        });
+
+        if (isMatch) {
+          return {
+            ...variant,
+            stock_quantity: variant.stock_quantity + updatedStock,
+            sold_quantity: variant.sold_quantity - updatedStock,
+            stock_update_date: new Date().toISOString(),
+          };
+        }
+
+        return variant;
+      });
+
+      // 4. Gửi API cập nhật variant (giả định có endpoint update theo id)
+      await axiosClient.put<Product>(`${apiUrl}/api/product/${product._id}`, {
+        ...product,
+        variants: updatedVariants,
+      });
+    }
+
+    // 5. Cập nhật trạng thái đơn hàng là "cancelled"
+    await axiosClient.put(`${apiUrl}/api/order/${orderId}`, {
+      status: "cancelled",
+    });
+
+    // Reload lại trang
+    window.location.reload();
+  };
 
   return (
-    <div className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700">
+    // <div className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700">
+    <motion.div
+      className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       {/* Trạng thái đơn hàng */}
       <div className="order-status mb-4 flex justify-end items-center border-b pb-2">
         <span className="text-lg font-semibold text-gray-600">
@@ -39,7 +126,6 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
         <span className="text-base font-bold text-gray-700">
           - {formatCurrency(order?.discount)}
         </span>
-
       </div>
       <div className="order-total flex justify-end pt-4">
         <span className="text-lg font-medium mr-2">Total:</span>
@@ -58,6 +144,38 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
             Review
           </button>
         )}
+
+        {(order.status === "in progress" ||
+          order.status === "Waiting for payment!") && (
+          <Popconfirm
+            title="Are you sure to cancel this order?"
+            description="This action cannot be undone."
+            onConfirm={() => {
+              CancelOrder(order);
+              console.log(order._id);
+            }}
+            okText="Yes"
+            cancelText="No"
+            placement="topLeft"
+          >
+            <button className="bg-gray-400 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
+              Cancel Order
+            </button>
+          </Popconfirm>
+        )}
+
+        {order.status === "delivered" && (
+          <button
+            className="bg-yellow-500 text-white px-6 py-2 rounded font-semibold hover:bg-yellow-600"
+            onClick={() => {
+              // TODO: gọi API hoàn tiền
+              console.log("Request Refund:", order._id);
+            }}
+          >
+            Refund
+          </button>
+        )}
+
         <button
           className="bg-gray-800 text-white px-10 py-2 rounded font-semibold"
           onClick={() => setIsDetailModalOpen(true)}
@@ -84,7 +202,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
           onClose={() => setIsDetailModalOpen(false)}
         />
       )}
-    </div>
+    </motion.div>
   );
 };
 

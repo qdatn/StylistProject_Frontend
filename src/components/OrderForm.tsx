@@ -137,7 +137,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialOrder = {}, onSave, onCanc
                         <option value="in progress">In progress</option>
                         <option value="delivering">Delivering</option>
                         <option value="shipped">Shipped</option>
-                        <option value="canceled">Canceled</option>
+                        <option value="cancelled">Cancelled</option>
                         <option value="pending">Pending</option>
                         <option value="refunded">Refunded</option>
                     </Select>
