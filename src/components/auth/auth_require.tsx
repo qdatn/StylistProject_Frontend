@@ -9,9 +9,10 @@ import { clearUser } from "@redux/reducers/authReducer";
 
 interface RequireAuthProps {
   role: string;
+  children?: React.ReactNode;
 }
 
-const RequireAuth: React.FC<RequireAuthProps> = ({ role }) => {
+const RequireAuth: React.FC<RequireAuthProps> = ({ role, children }) => {
   const user = useSelector((state: RootState) => state.persist.auth);
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ role }) => {
     return <Navigate to="/" replace />; // Hoặc trang /access-denied
   }
   if (user.isLogin && user.user?.user.role === role && role === "admin") {
-    return <AdminLayout />;
+    return children ? children : <AdminLayout />;
   }
   // else if (
   //   user.isLogin &&
@@ -50,7 +51,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ role }) => {
   // } 
 
   else {
-    return <MainLayout />;
+    return children ? children : <MainLayout />;
   }
 };
 export default RequireAuth;

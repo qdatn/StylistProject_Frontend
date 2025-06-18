@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import LoadingSpinner from "@components/loading";
+import { MainLayout } from "@layouts/main-layout/customer-layout";
 
-const RouteLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
+const RouteLoadingWrapper = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +16,7 @@ const RouteLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  return <>{loading ? <LoadingSpinner /> : children}</>;
+  return <>{loading ? <LoadingSpinner /> : <MainLayout />}</>;
 };
 
 export default RouteLoadingWrapper;
