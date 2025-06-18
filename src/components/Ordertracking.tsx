@@ -136,7 +136,7 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
 
       {/* Nút hành động */}
       <div className="order-actions mt-4 flex justify-end gap-4">
-        {order.status === "delivered" && (
+        {order.status === "shipped" && (
           <button
             className="bg-gray-300 px-10 py-2 rounded font-semibold"
             onClick={() => setIsReviewFormOpen(true)}
@@ -147,22 +147,22 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
 
         {(order.status === "in progress" ||
           order.status === "Waiting for payment!") && (
-          <Popconfirm
-            title="Are you sure to cancel this order?"
-            description="This action cannot be undone."
-            onConfirm={() => {
-              CancelOrder(order);
-              console.log(order._id);
-            }}
-            okText="Yes"
-            cancelText="No"
-            placement="topLeft"
-          >
-            <button className="bg-gray-400 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
-              Cancel Order
-            </button>
-          </Popconfirm>
-        )}
+            <Popconfirm
+              title="Are you sure to cancel this order?"
+              description="This action cannot be undone."
+              onConfirm={() => {
+                CancelOrder(order);
+                console.log(order._id);
+              }}
+              okText="Yes"
+              cancelText="No"
+              placement="topLeft"
+            >
+              <button className="bg-gray-400 text-white px-6 py-2 rounded font-semibold hover:bg-red-600">
+                Cancel Order
+              </button>
+            </Popconfirm>
+          )}
 
         {order.status === "delivered" && (
           <button

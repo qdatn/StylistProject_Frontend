@@ -23,14 +23,14 @@ const DashboardPage: React.FC<StatsSummaryProps> = ({ startDate, endDate }) => {
       {/* Thông tin kinh doanh */}
       <div className="col-span-1 bg-white p-6 rounded-lg shadow">
         <div className="mt-6">
-          <StatsSummary startDate={new Date('2023-01-01')} endDate={new Date('2025-01-01')} />
+          <StatsSummary startDate={new Date('2023-01-01')} endDate={new Date('2026-01-01')} />
         </div>
       </div>
 
       {/* Biểu đồ doanh thu */}
       <div className="mt-6 col-span-2 bg-white p-6 rounded-lg shadow">
         <div className="">
-          <DashboardCharts startDate={new Date('2023-01-01')} endDate={new Date('2025-01-01')} filterType={'custom'} />
+          <DashboardCharts startDate={new Date('2023-01-01')} endDate={new Date('2026-01-01')} filterType={'custom'} />
         </div>
       </div>
     </div>
