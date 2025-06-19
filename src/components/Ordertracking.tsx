@@ -11,6 +11,7 @@ import axiosClient from "@api/axiosClient";
 import { OrderAttribute } from "@src/types/Attribute";
 import { Product, ProductVariant } from "@src/types/new/Product";
 import { motion } from "framer-motion";
+import moment from "moment";
 
 interface OrdertrackingProps {
   order: Order;
@@ -110,6 +111,54 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
     }
   };
 
+  const ContinuePayment = async (order: Order) => {
+    const orderId = order._id;
+    localStorage.setItem("momo_order_id", order._id);
+
+    if (orderId) {
+      const rawOrderData: any = localStorage.getItem(orderId);
+
+      if (rawOrderData) {
+        const orderData = JSON.parse(rawOrderData);
+
+        const paymentBody = orderData.paymentBody;
+
+        if (paymentBody) {
+          try {
+            // Make the POST request to the MoMo API
+            const response: any = await axiosClient.post(
+              `${apiUrl}/api/payment/momo`,
+              paymentBody
+            );
+            console.log("momo:", response);
+
+            if (response && response.payUrl) {
+              window.location.href = response.payUrl; // Navigate to the payment page
+              // localStorage.setItem("momo_order_id", createOrder.order._id);
+            } else {
+              console.error("Failed to retrieve payUrl from response");
+            }
+          } catch (error) {
+            console.error("Error during payment request:", error);
+          }
+        }
+      }
+    }
+  };
+
+  const isExpired = (order: Order) => {
+    return moment().diff(moment(order.createdAt), "hours") >= 12;
+  };
+
+  const paymentDataExist = (order: Order) => {
+    const orderId = order._id;
+
+    const rawOrderData: any = localStorage.getItem(orderId);
+    if (rawOrderData) return true;
+
+    return false;
+  };
+
   return (
     // <div className="order-tracking border p-4 mb-4 rounded-lg shadow text-gray-700">
     <motion.div
@@ -177,17 +226,20 @@ const Ordertracking: React.FC<OrdertrackingProps> = ({ order, orderitems }) => {
           </Popconfirm>
         )}
 
-        {order.status === "delivered" && (
-          <button
-            className="bg-yellow-500 text-white px-6 py-2 rounded font-semibold hover:bg-yellow-600"
-            onClick={() => {
-              // TODO: gọi API hoàn tiền
-              console.log("Request Refund:", order._id);
-            }}
-          >
-            Refund
-          </button>
-        )}
+        {order.status === "Waiting for payment!" &&
+          !isExpired(order) &&
+          paymentDataExist(order) && (
+            <button
+              className="bg-yellow-500 text-white px-6 py-2 rounded font-semibold hover:bg-yellow-600"
+              onClick={() => {
+                // TODO: gọi API hoàn tiền
+                ContinuePayment(order);
+                console.log("Continue payment:", order._id);
+              }}
+            >
+              Continue Payment
+            </button>
+          )}
 
         <button
           className="bg-gray-800 text-white px-10 py-2 rounded font-semibold"

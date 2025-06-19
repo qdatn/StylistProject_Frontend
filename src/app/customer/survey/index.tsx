@@ -191,8 +191,8 @@ const FashionSurveyPage = () => {
                     isSubmitting={submitting}
                 />
             ) : (
-                <div className="text-center py-10">
-                    <p>No style preferences found. Creating new profile...</p>
+                <div className="py-10">
+                    <p className='text-center'>No style preferences found. Creating new profile...</p>
                     <FashionSurveyForm
                         onSubmit={handleSubmit}
                         isSubmitting={submitting}
