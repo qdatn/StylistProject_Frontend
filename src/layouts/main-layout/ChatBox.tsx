@@ -4,6 +4,7 @@ import { useSocket } from "@api/useSocket";
 import { MessageChat, ProductRecommend } from "@src/types/Chat";
 import axiosClient from "@api/axiosClient";
 import { useNavigate } from "react-router-dom";
+import { ProductList, Product } from "@src/types/new/Product";
 
 // Tạo component cho hiệu ứng loading
 const LoadingDots = () => {
@@ -35,6 +36,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
   const [isBotChatActive, setIsBotChatActive] = useState(false);
   const [productLink, setProductLink] = useState(""); // Thêm state cho link sản phẩm
   const [productId, setProductId] = useState(""); // Thêm state cho productId
+  const [productSearchKeyword, setProductSearchKeyword] = useState("");
+  const [suggestedProducts, setSuggestedProducts] = useState<ProductList>();
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const api = import.meta.env.VITE_API_URL;
 
   const currentUserId = currentUser.user._id;
@@ -405,6 +409,43 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
       .replace(/\n/g, "<br/>"); // còn lại là 1 dòng
   };
 
+  const handleMessageChange = async (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const input = e.target.value;
+    setMessage(input);
+
+    // Nếu đang ở chế độ Chat với Bot và bắt đầu bằng @
+    if (isBotChatActive && input.startsWith("@")) {
+      const keyword = input.substring(1).trim(); // bỏ dấu @
+      setProductSearchKeyword(keyword);
+
+      setShowSuggestions(true);
+
+      try {
+        const response = keyword
+          ? await axiosClient.getOne<ProductList>(
+              `${api}/api/product/search/query?limit=100&name=${encodeURIComponent(
+                keyword
+              )}`
+            )
+          : await axiosClient.getOne<ProductList>(
+              `${api}/api/product?page=1&limit=100`
+            );
+
+        if (response) {
+          setSuggestedProducts(response);
+        }
+      } catch (error) {
+        console.error("Error fetching product suggestions:", error);
+      }
+    } else {
+      setShowSuggestions(false);
+      setProductSearchKeyword("");
+      setSuggestedProducts({ data: [], pagination: {} });
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-lg overflow-hidden border">
       {/* Header */}
@@ -519,7 +560,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
             </button>
 
             {/* Thêm ô nhập link sản phẩm */}
-            <div className="flex items-center gap-2 w-full">
+            {/* <div className="flex items-center gap-2 w-full">
               <input
                 type="text"
                 value={productLink}
@@ -527,12 +568,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
                 placeholder="Paste product link here..."
                 className="flex-1 p-2 border rounded text-sm"
               />
-              {/* {productId && (
+              {productId && (
                 <span className="text-xs text-green-600">
                   Product ID: {productId}
                 </span>
-              )} */}
-            </div>
+              )}
+            </div> */}
           </div>
         )}
       </div>
@@ -541,7 +582,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
       <div className="p-3 border-t flex items-center gap-2 bg-white">
         <textarea
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          // onChange={(e) => setMessage(e.target.value)}
+          onChange={handleMessageChange}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -552,6 +594,32 @@ const ChatBox: React.FC<ChatBoxProps> = ({ user, currentUser }) => {
           rows={1}
           className="w-full py-2 px-1 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         />
+        {showSuggestions && suggestedProducts?.data.length! > 0 && (
+          <div className="absolute bottom-[60px] left-3 right-3 z-50 bg-white border rounded shadow max-h-60 overflow-y-auto">
+            {suggestedProducts?.data.map((product) => (
+              <div
+                key={product._id}
+                className="p-2 hover:bg-gray-100 cursor-pointer flex gap-2 items-center"
+                onClick={() => {
+                  setProductId(product._id);
+                  const shortName = product.product_name.slice(0, 10).trim();
+                  setMessage(`@${shortName} `);
+
+                  // Ẩn gợi ý và reset
+                  setShowSuggestions(false);
+                  setSuggestedProducts({ data: [], pagination: {} });
+                }}
+              >
+                <img
+                  src={product.images?.[0]}
+                  alt={product.product_name}
+                  className="w-8 h-8 rounded object-cover"
+                />
+                <span className="text-sm truncate">{product.product_name}</span>
+              </div>
+            ))}
+          </div>
+        )}
         <button
           onClick={handleSend}
           className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm"
