@@ -46,6 +46,9 @@ import FashionSurveyPage from "@app/customer/survey";
 import CustomerAnalytics from "@app/admin/statistics/CustomerAnalytics";
 import LoadingSpinner from "@components/loading";
 import RouteLoadingWrapper from "./routeLoadingMapper";
+import SalePage from "@app/customer/product/product_header/SaleOff";
+import AccessoriesPage from "@app/customer/product/product_header/Accessories";
+import DressPage from "@app/customer/product/product_header/Dress";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
   // const [loading, setLoading] = useState(true);
@@ -94,6 +97,9 @@ function App() {
             <Route path="/order" element={<OrderPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/sale-off" element={<SalePage />} />
+            <Route path="/accessories" element={<AccessoriesPage />} />
+            <Route path="/dress" element={<DressPage />} />
             <Route path="/body-shape" element={<BodyShapePage />} />
             <Route path="/survey" element={<FashionSurveyPage />} />
             <Route path="*" element={<NotFound />} />
