@@ -11,6 +11,7 @@ import { debounce, set } from "lodash";
 import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 import { UserAccount } from "@src/types/UserAccount";
+import LoadingData from "@components/LoadingData";
 
 interface SalePageProps { }
 
@@ -117,6 +118,10 @@ const SalePage: React.FC<SalePageProps> = ({ }) => {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 },
     };
+
+    if (loading) {
+        return <LoadingData />;
+    }
 
     return (
         <>

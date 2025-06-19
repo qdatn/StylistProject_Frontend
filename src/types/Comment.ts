@@ -2,7 +2,7 @@ import { UserInfo } from "os";
 import { Attribute, OrderAttribute } from "./Attribute";
 import { User } from "./auth/AuthType";
 import { PaginationType } from "./Pagination";
-import mockProducts, { Product } from "./Product";
+import { Product } from "./new/Product";
 import { UserAccount } from "./UserAccount";
 export interface Comment {
   _id?: string;
