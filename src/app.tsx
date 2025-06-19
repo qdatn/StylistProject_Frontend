@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Home from "./app/page";
 import RootLayout from "./layout";
@@ -28,7 +28,7 @@ import EditOrder from "@app/admin/order/OrderEdit";
 import DiscountManagement from "@app/admin/discount";
 import NewDiscount from "@app/admin/discount/NewDiscount";
 import EditDiscount from "@app/admin/discount/DiscountEdit";
-import DashboardPage from "@app/admin/statistics";
+import DashboardPage from "@app/admin/statistics/Revenue";
 
 import RequireAuth from "@components/auth/auth_require";
 import ProductListAdminPage from "@app/admin/product/ProductList";
@@ -43,13 +43,31 @@ import NotificationManagement from "@app/admin/customer/NotificationList";
 import EditNotification from "@app/admin/customer/NotificationEdit";
 import NewNotification from "@app/admin/customer/NewNotification";
 import FashionSurveyPage from "@app/customer/survey";
-import CustomerAnalytics from "@app/admin/customer/CustomerAnalytics";
+import CustomerAnalytics from "@app/admin/statistics/CustomerAnalytics";
+import LoadingSpinner from "@components/loading";
+import RouteLoadingWrapper from "./routeLoadingMapper";
+import SalePage from "@app/customer/product/product_header/SaleOff";
+import AccessoriesPage from "@app/customer/product/product_header/Accessories";
+import DressPage from "@app/customer/product/product_header/Dress";
 function App() {
   const userRole: "admin" | "customer" = "admin"; // Có thể thay đổi trong thực tế
+  // const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   // Giả lập delay load dữ liệu
+  //   const timeout = setTimeout(() => {
+  //     setLoading(false);
+  //   }, 1500);
+
+  //   return () => clearTimeout(timeout);
+  // }, []);
+
+  // if (loading) return <LoadingSpinner />;
 
   return (
     <RootLayout>
       <BrowserRouter>
+
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -68,16 +86,25 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
 
-          {/* Protected layout - customer */}
-          <Route element={<RequireAuth role="customer" />}>
+          <Route
+            element={
+              <RequireAuth role="customer">
+                <RouteLoadingWrapper />
+              </RequireAuth>
+            }
+          >
             <Route path="/account" element={<AccountPage />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/sale-off" element={<SalePage />} />
+            <Route path="/accessories" element={<AccessoriesPage />} />
+            <Route path="/dress" element={<DressPage />} />
             <Route path="/body-shape" element={<BodyShapePage />} />
             <Route path="/survey" element={<FashionSurveyPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
+
 
           {/* Protected layout - admin */}
           <Route element={<RequireAuth role="admin" />}>
@@ -87,16 +114,31 @@ function App() {
               path="/admin/product/list"
               element={<ProductListAdminPage />}
             />
-            <Route path="/admin/product/categories" element={<Categories />} />
+            <Route
+              path="/admin/product/categories"
+              element={<Categories />}
+            />
             <Route path="admin/product/list/new" element={<NewProduct />} />
             <Route path="/admin/order" element={<OrderManagement />} />
             <Route path="/admin/discount" element={<DiscountManagement />} />
-            <Route path="/admin/statistic" element={<DashboardPage />} />
+            <Route path="/admin/statistic/revenue" element={<DashboardPage />} />
             <Route path="/admin/customer/list" element={<CustomerList />} />
-            <Route path="/admin/customer/list/edit/:id" element={<EditCustomer />} />
-            <Route path="/admin/notification/list" element={<NotificationManagement />} />
-            <Route path="/admin/notification/list/edit/:id" element={<EditNotification />} />
-            <Route path="/admin/notification/list/new" element={<NewNotification />} />
+            <Route
+              path="/admin/customer/list/edit/:id"
+              element={<EditCustomer />}
+            />
+            <Route
+              path="/admin/notification/list"
+              element={<NotificationManagement />}
+            />
+            <Route
+              path="/admin/notification/list/edit/:id"
+              element={<EditNotification />}
+            />
+            <Route
+              path="/admin/notification/list/new"
+              element={<NewNotification />}
+            />
             <Route
               path="/admin/product/list/edit/:id"
               element={<EditProduct />}
@@ -114,18 +156,18 @@ function App() {
               path="/admin/product/categories/new"
               element={<NewCategory />}
             />
-            <Route path="/admin/discount/edit/:id" element={<EditDiscount />} />
+            <Route
+              path="/admin/discount/edit/:id"
+              element={<EditDiscount />}
+            />
             <Route
               path="/admin/product/categories/new"
               element={<NewCategory />}
             />
-            <Route
-              path="/admin/chat"
-              element={<ChatPage />}
-            />
+            <Route path="/admin/chat" element={<ChatPage />} />
             <Route path="/admin/order/new" element={<NewOrder />} />
             <Route path="/admin/discount/new" element={<NewDiscount />} />
-            <Route path="/admin/analyze" element={<CustomerAnalytics />} />
+            <Route path="/admin/statistic/fashion-trend" element={<CustomerAnalytics />} />
             <Route path="/admin/*" element={<NotFound />} />
           </Route>
 
@@ -133,6 +175,7 @@ function App() {
           <Route element={<MainLayout />}></Route>
           <Route element={<AdminLayout />}></Route>
         </Routes>
+
       </BrowserRouter>
     </RootLayout>
   );

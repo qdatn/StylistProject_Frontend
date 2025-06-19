@@ -141,7 +141,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             console.error("Error deleting attribute value:", error);
                         }
                     }}
-                    errors={errors}
                 />
             )
         }

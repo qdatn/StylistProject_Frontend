@@ -209,9 +209,8 @@ const CartItem: React.FC<CartItemProps> = ({
 
   return (
     <div
-      className={`flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4 ${
-        isOutOfStock ? "opacity-50 border border-red-500" : ""
-      }`}
+      className={`flex flex-row items-start p-4 border-b rounded-lg bg-white-50 mb-4 ${isOutOfStock ? "opacity-50 border border-red-500" : ""
+        }`}
     >
       <Link to={`/product/${product._id}`}>
         <img
@@ -262,19 +261,18 @@ const CartItem: React.FC<CartItemProps> = ({
                   }
                   className="text-[15px] appearance-none px-4 py-2 text-gray-700 focus:outline-none bg-white pr-6"
                 >
-                  {attr.value.map((option: any) => 
-                  {
+                  {attr.value.map((option: any) => {
                     // Kiểm tra option này có khả dụng không
                     const optionVariant = findVariant([
                       ...selectedAttributes.filter(a => a.key !== attr.key),
                       { key: attr.key, value: option }
                     ]);
-                    
+
                     const isOptionAvailable = optionVariant && optionVariant.stock_quantity > 0;
-                    
+
                     return (
-                      <option 
-                        key={option} 
+                      <option
+                        key={option}
                         value={option}
                         disabled={!isOptionAvailable}
                       >
@@ -350,17 +348,16 @@ const CartItem: React.FC<CartItemProps> = ({
 
           {/* Nếu hết hàng thì hiện chữ này */}
           {isOutOfStock && (
-          <div className="text-red-500 font-semibold ml-10 mt-1">
-            This product is out of stock. Please change attributes.
-          </div>
-        )}
+            <div className="text-red-500 font-semibold ml-10 mt-1">
+              This product is out of stock. Please change attributes.
+            </div>
+          )}
         </div>
       </div>
       <button onClick={toggleSelect} className="ml-4">
         <div
-          className={`w-6 h-6 border rounded ${
-            isSelected ? "bg-gray-400" : "bg-white"
-          } flex items-center justify-center`}
+          className={`w-6 h-6 border rounded ${isSelected ? "bg-gray-400" : "bg-white"
+            } flex items-center justify-center`}
         >
           <AiOutlineCheck
             className={isSelected ? "text-white" : "text-transparent"}

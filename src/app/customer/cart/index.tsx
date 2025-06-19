@@ -23,6 +23,7 @@ import { Address } from "@src/types/Address";
 import { formatCurrency } from "@utils/format";
 import AddressAutocomplete from "@components/AddressAutocomplete";
 import { OrderAttribute } from "@src/types/Attribute";
+import { Order } from "@src/types/Order";
 const baseUrl = import.meta.env.VITE_API_URL;
 
 // Tạo ID duy nhất từ các thuộc tính
@@ -78,6 +79,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [finalPrice, setFinalPrice] = useState<number>(0);
+  const [selectedDiscountId, setSelectedDiscountId] = useState<string>("");
   //const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const fetchCartItem = async () => {
     const userId = user.user?.user._id;
@@ -158,13 +160,13 @@ const CartPage = () => {
 
   const selectedProducts = useMemo(() => {
     return cartItems
-      .filter(item => selectedItems.includes(getUniqueId(item)))
-      .map(item => {
+      .filter((item) => selectedItems.includes(getUniqueId(item)))
+      .map((item) => {
         const uniqueId = getUniqueId(item);
         return {
           productId: uniqueId.split("-")[0],
           attribute: item.cart_attributes,
-          quantity: quantities[uniqueId] || 1
+          quantity: quantities[uniqueId] || 1,
         };
       });
   }, [cartItems, selectedItems, quantities]);
@@ -181,33 +183,35 @@ const CartPage = () => {
   // }, [selectedItems]);
 
   useEffect(() => {
-  const fetchAvailableDiscounts = async () => {
-    // Tính toán productIds trực tiếp từ selectedItems
-    const productIds = selectedItems.map((uniqueId) => uniqueId.split("-")[0]);
-    
-    console.log("Sending productIds to API:", productIds);
-    
-    try {
-      const discountList = await axiosClient.post<DiscountAvailable>(
-        `${baseUrl}/api/discount/available-discounts/?limit=10000`,
-        {
-          productIds: productIds, // Sử dụng biến vừa tính toán
-          totalPrice: subtotal,
-        }
+    const fetchAvailableDiscounts = async () => {
+      // Tính toán productIds trực tiếp từ selectedItems
+      const productIds = selectedItems.map(
+        (uniqueId) => uniqueId.split("-")[0]
       );
-      setDiscounts(discountList.data);
-    } catch (error) {
-      notification.error({
-        message: "Error loading discounts",
-        description: "Failed to fetch available discounts",
-      });
-    }
-  };
 
-  if (selectedItems.length > 0 && subtotal > 0) {
-    fetchAvailableDiscounts();
-  }
-}, [selectedItems, subtotal]); // Phụ thuộc vào selectedProducts
+      console.log("Sending productIds to API:", productIds);
+
+      try {
+        const discountList = await axiosClient.post<DiscountAvailable>(
+          `${baseUrl}/api/discount/available-discounts/?limit=10000`,
+          {
+            productIds: productIds, // Sử dụng biến vừa tính toán
+            totalPrice: subtotal,
+          }
+        );
+        setDiscounts(discountList.data);
+      } catch (error) {
+        notification.error({
+          message: "Error loading discounts",
+          description: "Failed to fetch available discounts",
+        });
+      }
+    };
+
+    if (selectedItems.length > 0 && subtotal > 0) {
+      fetchAvailableDiscounts();
+    }
+  }, [selectedItems, subtotal]); // Phụ thuộc vào selectedProducts
 
   // Sửa hàm apply discount
   const handleApplyDiscount = async (code: string) => {
@@ -227,11 +231,11 @@ const CartPage = () => {
         message: "Discount applied successfully",
       });
     } catch (error: any) {
-      notification.error({
-        message: "Discount error",
-        description:
-          error.response?.data?.message || "Failed to apply discount",
-      });
+      // notification.error({
+      //   message: "Discount error",
+      //   description:
+      //     error.response?.data?.message || "Failed to apply discount",
+      // });
       setFinalPrice(subtotal);
       setDiscountAmount(0);
     }
@@ -245,7 +249,6 @@ const CartPage = () => {
   }, [subtotal]);
 
   //apply discount
-
 
   //update quantity
   const updateQuantity = (
@@ -346,6 +349,14 @@ const CartPage = () => {
         order_items,
       });
 
+      // Update discount used count
+      if (selectedDiscountCode) {
+        const updateDiscountUse = await axiosClient.put(
+          `${baseUrl}/api/discount/${selectedDiscountId}/increase-used`,
+          {}
+        );
+      }
+
       notification.success({
         message: "Create order success",
         description: "",
@@ -373,9 +384,25 @@ const CartPage = () => {
             paymentBody
           );
           console.log("momo:", response);
+
+          // Save data for cancel or refund
+          const order_id = createOrder.order._id;
+          const localOrderData = {
+            createOrder,
+            paymentBody,
+            createdAt: new Date().toISOString(),
+            paymentMethod,
+            payment_status: true,
+            tranId: ""
+          };
+
+          if (order_id) {
+            localStorage.setItem(order_id, JSON.stringify(localOrderData));
+          }
           // Redirect to the MoMo payment URL
           if (response && response.payUrl) {
             window.location.href = response.payUrl; // Navigate to the payment page
+            localStorage.setItem("momo_order_id", createOrder.order._id);
           } else {
             console.error("Failed to retrieve payUrl from response");
           }
@@ -403,7 +430,7 @@ const CartPage = () => {
 
   useEffect(() => {
     setCartItems(cart);
-  }, [cart]);// Cập nhật khi cart thay đổi
+  }, [cart]); // Cập nhật khi cart thay đổi
 
   const handleSubmit = async (values: any) => {
     // await setCartItems(cart);
@@ -418,7 +445,7 @@ const CartPage = () => {
       // _id: "",
       user: userId ?? "",
       status:
-        values.paymentMethod == "COD" ? "Pending" : "Waiting for payment!",
+        values.paymentMethod == "COD" ? "in progress" : "Waiting for payment!",
       discount: discountAmount,
       total_price: finalPrice,
       method: values.paymentMethod,
@@ -523,36 +550,54 @@ const CartPage = () => {
       <div className="md:w-2/3 p-4 border-r text-gray-700">
         <h1 className="text-lg font-semibold mb-4">Shopping Cart</h1>
         {/* {cartItems.map((item) => ( */}
-        {cart.map((item: any) => (
-          <CartItem
-            key={getUniqueId(item)}
-            product={item}
-            quantity={item.quantity}
-            onUpdateQuantity={(newQuantity) =>
-              // updateQuantity(item._id, newQuantity, item.cart_attributes)
-              updateQuantity(
-                getUniqueId(item),
-                newQuantity,
-                item.cart_attributes
-              )
-            }
-            onRemove={() =>
-              // removeItem(item._id, item.cart_attributes)
-              removeItem(getUniqueId(item), item.cart_attributes)
-            }
-            onSelect={(selected) => {
-              // toggleSelectItem(item._id, selected), console.log(item);
-              toggleSelectItem(getUniqueId(item), selected);
-            }}
-          />
-        ))}
+        {cart.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+              alt="Empty Cart"
+              className="mx-auto w-24 h-24 mb-4 opacity-70"
+            />
+            <p className="text-lg font-medium">Your cart is empty!</p>
+            <p className="text-sm text-gray-400">
+              Add some products to get started.
+            </p>
+          </div>
+        ) : (
+          <>
+            {cart.map((item: any) => (
+              <CartItem
+                key={getUniqueId(item)}
+                product={item}
+                quantity={item.quantity}
+                onUpdateQuantity={(newQuantity) =>
+                  // updateQuantity(item._id, newQuantity, item.cart_attributes)
+                  updateQuantity(
+                    getUniqueId(item),
+                    newQuantity,
+                    item.cart_attributes
+                  )
+                }
+                onRemove={() =>
+                  // removeItem(item._id, item.cart_attributes)
+                  removeItem(getUniqueId(item), item.cart_attributes)
+                }
+                onSelect={(selected) => {
+                  // toggleSelectItem(item._id, selected), console.log(item);
+                  toggleSelectItem(getUniqueId(item), selected);
+                }}
+              />
+            ))}
+          </>
+        )}
         <div className="flex justify-between font-semibold mt-4">
           <span>Total Amount:</span>
           <span>{formatCurrency(finalPrice)}</span>
         </div>
         {/* Phần discount */}
-        <div className="mt-2">
-          <label className="block">Choose Discount:</label>
+        {/* <div className="">
+          <label className="mt-5 mb-2 block font-semibold">
+            Choose Discount:
+          </label>
           <select
             value={selectedDiscountCode}
             onChange={(e) => {
@@ -568,7 +613,81 @@ const CartPage = () => {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
+        {discounts.length === 0 ? (
+          <div className="mt-5 flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 text-gray-400 mb-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 10l7-7 7 7M12 3v18"
+              />
+            </svg>
+            <p className="text-gray-600 font-medium">
+              Please choose a product first
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              No discount available yet.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5">
+            <label className="block font-semibold mb-3">Choose discount:</label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {discounts.map((discount) => {
+                const isSelected = selectedDiscountCode === discount.code;
+                return (
+                  <div
+                    key={discount._id}
+                    onClick={() => {
+                      if (isSelected) {
+                        // Nếu đang chọn thì bỏ chọn
+                        setSelectedDiscountCode("");
+                        handleApplyDiscount("");
+                        setSelectedDiscountId("");
+                      } else {
+                        setSelectedDiscountCode(discount.code);
+                        handleApplyDiscount(discount.code);
+                        setSelectedDiscountId(discount._id);
+                      }
+                    }}
+                    className={`cursor-pointer border rounded-lg px-4 py-3 transition-all relative
+            ${
+              isSelected
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300 bg-white hover:border-orange-400"
+            }
+          `}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-sm text-orange-600">
+                          {discount.code}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Discount {discount.value}% on {discount.type}
+                        </p>
+                      </div>
+                      {isSelected && (
+                        <div className="text-orange-500 text-xl font-bold">
+                          ✓
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Phần hiển thị tổng tiền */}
         <div className="flex justify-between font-semibold mt-4">
@@ -593,7 +712,7 @@ const CartPage = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ }) => (
+        {({}) => (
           <Form className="md:w-1/3 p-4 text-gray-700">
             <h2 className="text-lg font-semibold mb-4">Information</h2>
             <div>
@@ -640,32 +759,52 @@ const CartPage = () => {
               />
             </div>
             <div>
-              <Field
-                as="select"
-                name="paymentMethod"
-                placeholder="Select Payment Method"
-                // value={formData.paymentMethod}
-                // onChange={handleChange}
-                className="border p-2 w-full my-4"
-              >
-                <option value="COD">COD - Cash On Delivery</option>
-                <option value="Momo">Momo</option>
-                {/* <option value="VNPay">VNPay</option> */}
-              </Field>
+              <p className="mt-5 mb-2 font-semibold">Payment method</p>
+
+              <div className="space-y-4">
+                {/* COD */}
+                <label className="flex items-center border p-3 rounded-lg cursor-pointer hover:shadow transition">
+                  <Field
+                    type="radio"
+                    name="paymentMethod"
+                    value="COD"
+                    className="mr-3"
+                  />
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/891/891419.png"
+                    alt="COD"
+                    className="w-12 h-12 object-contain mr-4"
+                  />
+                  <span>COD</span>
+                </label>
+
+                {/* Momo */}
+                <label className="flex items-center border p-3 rounded-lg cursor-pointer hover:shadow transition">
+                  <Field
+                    type="radio"
+                    name="paymentMethod"
+                    value="Momo"
+                    className="mr-3"
+                  />
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
+                    alt="Momo"
+                    className="w-12 h-12 object-contain mr-4"
+                  />
+                  <span>Momo</span>
+                </label>
+              </div>
               <ErrorMessage
                 name="paymentMethod"
                 component="p"
                 className="text-red-500 text-sm"
               />
-              {/* {errors.paymentMethod && (
-                <p className="text-red-500 text-sm">{errors.paymentMethod}</p>
-              )} */}
             </div>
             <button
               // onClick={handleSubmit}
               type="submit"
               className="bg-yellow-500 text-white py-2 px-4 rounded w-full"
-            // disabled={!isValid || !Object.keys(touched).length}
+              // disabled={!isValid || !Object.keys(touched).length}
             >
               Place Order
             </button>
@@ -680,7 +819,7 @@ const CartPage = () => {
                 // onClick={handleSubmit}
                 type="submit"
                 className="bg-yellow-500 text-lg font-medium text-white py-2 px-4 rounded w-[400px] h-full"
-              // disabled={!isValid || !Object.keys(touched).length}
+                // disabled={!isValid || !Object.keys(touched).length}
               >
                 Place Order
               </button>
@@ -689,6 +828,19 @@ const CartPage = () => {
         )}
       </Formik>
     </div>
+    // Field select payment method
+    // <Field
+    //             as="select"
+    //             name="paymentMethod"
+    //             placeholder="Select Payment Method"
+    //             // value={formData.paymentMethod}
+    //             // onChange={handleChange}
+    //             className="border p-2 w-full my-4"
+    //           >
+    //             <option value="COD">COD - Cash On Delivery</option>
+    //             <option value="Momo">Momo</option>
+    //             {/* <option value="VNPay">VNPay</option> */}
+    //           </Field>
   );
 };
 

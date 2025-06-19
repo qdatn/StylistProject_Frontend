@@ -336,7 +336,7 @@ export default function CustomerHeader() {
           <ul className="flex space-x-6 justify-center gap-16 flex-wrap">
             <li>
               <Link
-                to="#"
+                to="/sale-off"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 SALE OFF
@@ -344,15 +344,7 @@ export default function CustomerHeader() {
             </li>
             <li>
               <Link
-                to="#"
-                className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
-              >
-                CLOTHING
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="#"
+                to="/dress"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 DRESSES
@@ -360,7 +352,7 @@ export default function CustomerHeader() {
             </li>
             <li>
               <Link
-                to="#"
+                to="/accessories"
                 className="text-gray-700 hover:underline hover:text-gray-900 font-semibold transition"
               >
                 ACCESSORIES

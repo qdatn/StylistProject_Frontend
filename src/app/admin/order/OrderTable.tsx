@@ -38,20 +38,22 @@ const orderColumns: ColumnsType<Order> = [
     dataIndex: 'status',
     render: (status: string) => {
       let color =
-        status === 'Waiting for payment!' ? 'gray' :
-          status === 'pending' ? 'orange' :
+        status === 'Waiting for payment!' ? 'yellow' :
+          status === 'in progress' ? 'orange' :
             status === 'delivering' ? 'blue' :
               status === 'shipped' ? 'green' :
-                status === 'canceled' ? 'red' : 'gray';
+                status === 'cancelled' ? 'red' : 'gray';
 
       return <Tag color={color}>{status.toUpperCase()}</Tag>;
     },
     filters: [
       { text: 'Waiting for payment!', value: 'Waiting for payment!' },
-      { text: 'Pending', value: 'pending' },
+      { text: 'In progress', value: 'in progress' },
       { text: 'Delivering', value: 'delivering' },
       { text: 'Shipped', value: 'shipped' },
-      { text: 'Canceled', value: 'canceled' },
+      { text: 'Cancelled', value: 'cancelled' },
+      { text: 'Pending', value: 'pending'},
+      { text: 'Refunded', value: 'refunded'}
     ],
     onFilter: (value, record) => record.status === value,
   },

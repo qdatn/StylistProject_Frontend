@@ -18,30 +18,32 @@ const StoragePage: React.FC = () => {
     totalItems: 0,
     totalPages: 0,
   });
+  // Thêm state để theo dõi trạng thái filter
+  const [showActiveProducts, setShowActiveProducts] = useState<boolean>(true);
 
-  const fetchProductItem = async (page: number, pageSize: number) => {
+  const fetchProductItem = async (page: number, pageSize: number, status: boolean) => {
     try {
-      const response = await axiosClient.getOne<ProductList>(
-        `${urlPath}/api/product/`,
-        //pagination params
-        { page: page, limit: pageSize }
+      const response = await axiosClient.getOne<ProductList>(  // Sử dụng axios.get thay vì axios.getOne
+        `${urlPath}/api/product/by-field?field=status&value=${status}`,
+        { page: page, limit: pageSize } // Thêm tham số page và limit
       );
 
       setProducts(response);
-
       setPagination(response.pagination);
-      // setHasMore(page < response.pagination.totalPages!);
     } catch (error) {
       alert(error);
     }
   };
-  const pageSize =8 
+
+
+  const pageSize = 8;
+
   useEffect(() => {
-    fetchProductItem(pagination.currentPage!, pagination.pageSize!);
-  }, []);
+    fetchProductItem(pagination.currentPage!, pageSize, showActiveProducts);
+  }, [showActiveProducts]); // Thêm dependency để fetch lại khi trạng thái thay đổi
+
   const refreshData = () => {
-    // Fetch the updated data and set it to the state that controls `dataSource`
-    fetchProductItem(pagination.currentPage!, pageSize!); // Your existing function to fetch updated data
+    fetchProductItem(pagination.currentPage!, pageSize, showActiveProducts);
   };
   const handlePageChange = (page: number) => {
     if (page <= pagination?.totalPages!) {
@@ -49,19 +51,50 @@ const StoragePage: React.FC = () => {
         ...pagination,
         currentPage: page,
       });
+      fetchProductItem(page, pageSize, showActiveProducts);
     }
-    //setPagination((prev) => ({ ...prev, currentPage: page, pageSize }));
-    fetchProductItem(page, pageSize);
+  };
+
+  // Hàm chuyển đổi giữa các form
+  const toggleProductStatusView = () => {
+    setShowActiveProducts(!showActiveProducts);
+    // Reset về trang đầu tiên khi chuyển đổi
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
   return (
     <div>
-      <div className="font-semibold text-xl p-6"></div>
+      <div className="flex justify-between items-center">
+        <div className="font-semibold text-xl p-6">Product List</div>
+
+        {/* Navigation Tabs */}
+        <div className="flex">
+          <div
+            onClick={() => setShowActiveProducts(true)}
+            className={`${showActiveProducts
+              ? "text-blue-500 border-b-2 border-blue-500 font-semibold"
+              : "text-slate-400 border-b-2 border-slate-300 font-medium"
+              } py-2 px-6 cursor-pointer font-medium transition duration-300 hover:text-blue-500 hover:border-blue-500`}
+          >
+            Active Products
+          </div>
+
+          <div
+            onClick={() => setShowActiveProducts(false)}
+            className={`${!showActiveProducts
+              ? "text-blue-500 border-b-2 border-blue-500 font-semibold"
+              : "text-slate-400 border-b-2 border-slate-300 font-medium"
+              } py-2 px-6 cursor-pointer font-medium transition duration-300 hover:text-blue-500 hover:border-blue-500`}
+          >
+            Inactive Products
+          </div>
+        </div>
+      </div>
       <div>
-        <StorageTable 
-        products={products} 
-        onDeleteSuccess={refreshData}
-        pagination={pagination}
-        onPageChange={handlePageChange} 
+        <StorageTable
+          products={products}
+          onDeleteSuccess={refreshData}
+          pagination={pagination}
+          onPageChange={handlePageChange}
         />
       </div>
     </div>

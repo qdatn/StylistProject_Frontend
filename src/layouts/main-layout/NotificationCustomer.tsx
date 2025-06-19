@@ -113,6 +113,9 @@ const NotificationCustomer = ({ isOpen, onClose, userId }: NotificationCustomerP
                                 )}
                             </div>
                             <p className="text-sm text-gray-600 mt-1">{notification.content}</p>
+                            {notification?.order && (
+                                <p className="text-sm text-gray-600 mt-1">Order ID: ...{notification?.order?.slice(-10)}</p>
+                            )}
                             <p className="text-xs text-gray-400 mt-2">
                                 {new Date(notification.createdAt).toLocaleString()}
                             </p>

@@ -19,6 +19,7 @@ import { Cart } from "@src/types/Cart";
 import { OrderAttribute } from "@src/types/Attribute";
 import { formatCurrency } from "@utils/format";
 import { Product, ProductVariant } from "@src/types/new/Product";
+import LoadingSpinner from "@components/loading";
 
 const DEFAULT_IMAGE = "/assets/images/default-product-image.png";
 
@@ -240,9 +241,10 @@ const ProductDetail: React.FC = () => {
 
   if (!product)
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      // <div className="flex justify-center items-center h-screen">
+      //   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      // </div>
+      <LoadingSpinner />
     );
 
   // Find available options for each attribute
@@ -356,8 +358,8 @@ const ProductDetail: React.FC = () => {
                   <button
                     key={index}
                     className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${currentImageIndex === index
-                        ? "border-blue-500"
-                        : "border-gray-200"
+                      ? "border-blue-500"
+                      : "border-gray-200"
                       }`}
                     onClick={() => setCurrentImageIndex(index)}
                   >
@@ -400,7 +402,7 @@ const ProductDetail: React.FC = () => {
                   </span>
                 ) : (
                   <span className="text-lg text-gray-500">
-                    Select options to see price
+                    Select other options to see price
                   </span>
                 )}
               </div>
@@ -425,10 +427,10 @@ const ProductDetail: React.FC = () => {
                           onClick={() => handleAttributeChange(key, value)}
                           disabled={!isAvailable}
                           className={`px-4 py-2 rounded-full text-sm border ${!isAvailable
-                              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
-                              : isSelected
-                                ? "border-blue-500 bg-blue-50 text-blue-700"
-                                : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+                            : isSelected
+                              ? "border-blue-500 bg-blue-50 text-blue-700"
+                              : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                             }`}
                         >
                           {value}
@@ -489,10 +491,10 @@ const ProductDetail: React.FC = () => {
             </div>
             <button
               className={`w-3/5 gap-2 flex-1 flex items-center justify-center py-3 font-semibold text-white rounded-lg transition-colors ${selectedVariant
-                  ? selectedVariant.stock_quantity > 0
-                    ? "bg-gray-700 hover:bg-blue-500"
-                    : "bg-gray-400 cursor-not-allowed"
-                  : "bg-gray-500 cursor-not-allowed"
+                ? selectedVariant.stock_quantity > 0
+                  ? "bg-gray-700 hover:bg-blue-500"
+                  : "bg-gray-400 cursor-not-allowed"
+                : "bg-gray-500 cursor-not-allowed"
                 }`}
               onClick={handleAddToCart}
               disabled={!selectedVariant || selectedVariant.stock_quantity <= 0}

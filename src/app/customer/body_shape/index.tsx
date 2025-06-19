@@ -16,7 +16,7 @@ export default function BodyShapePage() {
       BODY_SHAPES.forEach(shape => {
         const element = document.getElementById(shape.id);
         if (element) {
-          sectionPositions.current[shape.id] = element.offsetTop - 100;
+          sectionPositions.current[shape.id] = element.offsetTop - 40;
         }
       });
     };
@@ -45,7 +45,7 @@ export default function BodyShapePage() {
     const handleScroll = () => {
       if (isProgrammaticScroll.current) return;
 
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = window.scrollY + 200;
       const sections = BODY_SHAPES.map(shape => ({
         id: shape.id,
         position: sectionPositions.current[shape.id]
@@ -95,7 +95,7 @@ export default function BodyShapePage() {
 
       <ImageUploader
         onUpload={handleAnalyze}
-        // isLoading={isAnalyzing}
+      // isLoading={isAnalyzing}
       />
 
       <div className="space-y-20 pb-20">

@@ -6,6 +6,7 @@ import { UserAccount } from '@src/types/UserAccount';
 import { StylePreference } from '@src/types/StylePreferences';
 import FashionSurveyForm from '@components/FashionSurveyForm';
 import { notification } from 'antd';
+import LoadingData from '@components/LoadingData';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -164,11 +165,7 @@ const FashionSurveyPage = () => {
     };
 
     if (loading) {
-        return (
-            <div className="max-w-4xl mx-auto mt-10 p-6 text-center">
-                <p>Loading your fashion preferences...</p>
-            </div>
-        );
+        return <LoadingData />;
     }
 
     if (error) {
@@ -194,8 +191,8 @@ const FashionSurveyPage = () => {
                     isSubmitting={submitting}
                 />
             ) : (
-                <div className="text-center py-10">
-                    <p>No style preferences found. Creating new profile...</p>
+                <div className="py-10">
+                    <p className='text-center'>No style preferences found. Creating new profile...</p>
                     <FashionSurveyForm
                         onSubmit={handleSubmit}
                         isSubmitting={submitting}
