@@ -68,9 +68,14 @@ const PaymentSuccessPage = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const resultCode = queryParams.get("resultCode");
+    const message = queryParams.get("message");
     const msg = queryParams.get("message") || "Không rõ lý do.";
 
-    if (resultCode === "0") {
+    if (
+      resultCode === "0" ||
+      message === "Successful" ||
+      message === "Thành công"
+    ) {
       setStatus("success");
       setMessage("Payment Successfully! Thanks for your order!");
       updateOrderStatus();
