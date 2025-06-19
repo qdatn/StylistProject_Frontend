@@ -36,9 +36,12 @@ const EditProduct: React.FC = () => {
     if (imagesToDelete.length > 0) {
       await Promise.all(
         imagesToDelete.map(async (imageUrl) => {
-          await axiosClient.post(`${baseUrl}/api/product/delete-img/${id}`, {
-            imageUrl,
-          });
+          const isCloudinaryImage = imageUrl.includes("cloudinary.com");
+          if (isCloudinaryImage) {
+            await axiosClient.post(`${baseUrl}/api/product/delete-img/${id}`, {
+              imageUrl,
+            });
+          }
         })
       );
     }
@@ -78,7 +81,7 @@ const EditProduct: React.FC = () => {
   const handleUpdateProduct = async (
     updatedProduct: Partial<Product>,
     filesToUpload: File[],
-    imagesToDelete: string[] 
+    imagesToDelete: string[]
   ) => {
     if (product) {
       // Đảm bảo rằng _id luôn có giá trị và không bị mất khi cập nhật
@@ -98,7 +101,11 @@ const EditProduct: React.FC = () => {
       setProduct(updatedProductWithId);
 
       // updateProductInDB(updatedProductWithId);
-      await updateProductInDB(updatedProductWithId, filesToUpload, imagesToDelete);
+      await updateProductInDB(
+        updatedProductWithId,
+        filesToUpload,
+        imagesToDelete
+      );
 
       // Thông báo thành công
       console.log("Updated Product:", updatedProductWithId);
