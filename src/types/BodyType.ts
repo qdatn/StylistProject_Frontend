@@ -2,6 +2,7 @@
 export interface BodyShape {
     id: string;
     name: string;
+    imageUrl: string;
     characteristics: string[];
     stylingTips: string[];
     celebrities: string[];
@@ -13,6 +14,7 @@ export const BODY_SHAPES: BodyShape[] = [
     {
         id: 'hourglass',
         name: 'Hourglass',
+        imageUrl: "/assets/images/hourglass.jpg",
         characteristics: [
             'Balanced shoulders and hips',
             'Defined waist (usually at least 25cm smaller than hips)',
@@ -31,6 +33,7 @@ export const BODY_SHAPES: BodyShape[] = [
     {
         id: 'inverted_triangle',
         name: 'Inverted Triangle',
+        imageUrl: "/assets/images/inverted_triangle.jpg",
         characteristics: [
             'Shoulders wider than hips',
             'Sporty or strong build',
@@ -48,6 +51,7 @@ export const BODY_SHAPES: BodyShape[] = [
     {
         id: 'pear',
         name: 'Pear',
+        imageUrl: "/assets/images/pear.jpg",
         characteristics: [
             'Hips wider than shoulders',
             'Narrow shoulders, prominent lower body',
@@ -65,6 +69,7 @@ export const BODY_SHAPES: BodyShape[] = [
     {
         id: 'rectangle',
         name: 'Rectangle',
+        imageUrl: "/assets/images/rectangle.jpg",
         characteristics: [
             'Shoulders, waist, and hips are nearly the same width',
             'Few curves',
@@ -81,7 +86,8 @@ export const BODY_SHAPES: BodyShape[] = [
     },
     {
         id: 'apple',
-        name: 'Apple',
+        name: 'Apple / Oval',
+        imageUrl: "/assets/images/apple.jpg",
         characteristics: [
             'Larger midsection',
             'Full bust',

@@ -4,22 +4,22 @@ import React, { useEffect, useState } from "react";
 const slides = [
   {
     id: 1,
-    image: "./src/public/assets/images/slide1.jpg",
+    image: "/assets/images/slide1.jpg",
     title: "Slide 1",
   },
   {
     id: 2,
-    image: "./src/public/assets/images/slide2.jpg",
+    image: "/assets/images/slide2.jpg",
     title: "Slide 2",
   },
   {
     id: 3,
-    image: "./src/public/assets/images/slide3.jpg",
+    image: "/assets/images/slide3.jpg",
     title: "Slide 3",
   },
   {
     id: 4,
-    image: "./src/public/assets/images/slide4.jpg",
+    image: "/assets/images/slide4.jpg",
     title: "Slide 4",
   },
 ];

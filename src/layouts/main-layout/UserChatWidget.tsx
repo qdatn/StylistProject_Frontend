@@ -78,7 +78,7 @@ const UserChatWidget: React.FC = () => {
       >
         <button onClick={() => setIsOpen(!isOpen)} className=" rounded-full">
           <img
-            src={"../src/public/assets/images/chat-bot.png"}
+            src={"/assets/images/chat-bot.png"}
             alt={"chat bot"}
             className=" w-16 h-16"
           />
