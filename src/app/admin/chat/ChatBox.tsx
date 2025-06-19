@@ -151,7 +151,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               className={`text-sm p-2 rounded-md max-w-[70%] break-words ${
                 msg.sender === currentUser?.user._id
                   ? "bg-blue-100 ml-auto self-end"
-                  : "bg-white self-start"
+                  : msg.sender === userId && msg.receiver === currentUser?.user._id
+                  ? "bg-white self-start"
+                  : null
               }`}
             >
               {msg.content}

@@ -209,7 +209,7 @@ const CustomerAnalytics = () => {
             </div>
 
             {/* Brand Preferences */}
-            <AnalyticsCard title="Top Brand Preferences" className="mt-8 bg-white">
+            {/* <AnalyticsCard title="Top Brand Preferences" className="mt-8 bg-white">
                 <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
@@ -236,7 +236,7 @@ const CustomerAnalytics = () => {
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
-            </AnalyticsCard>
+            </AnalyticsCard> */}
         </div>
     );
 };

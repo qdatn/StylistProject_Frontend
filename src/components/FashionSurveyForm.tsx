@@ -286,7 +286,7 @@ const FashionSurveyForm: React.FC<FashionSurveyFormProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {occasions.map(occasion => (
                 <div key={occasion}>
                   <label className="block mb-2 font-medium">What do you usually wear for {occasion.toLowerCase()}?</label>
@@ -299,7 +299,7 @@ const FashionSurveyForm: React.FC<FashionSurveyFormProps> = ({
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
 
             <div>
               <label className="block mb-2 font-medium">Do you follow fashion trends?</label>
